@@ -1,0 +1,30 @@
+//
+//  AmountField.swift
+//  Finance
+//
+//  Created by Luca Strazzullo on 28/11/2021.
+//
+
+import SwiftUI
+
+struct AmountField: View {
+
+    @Binding var amountValue: String
+
+    let title: String
+    let prompt: Text?
+
+    var body: some View {
+        TextField(title, text: $amountValue, prompt: prompt)
+            .keyboardType(.decimalPad)
+            .textFieldStyle(RoundedBorderTextFieldStyle())
+            .multilineTextAlignment(.center)
+            .padding(.vertical)
+    }
+}
+
+struct AmountField_Previews: PreviewProvider {
+    static var previews: some View {
+        AmountField(amountValue: .constant(""), title: "Amount", prompt: nil).padding()
+    }
+}
