@@ -34,6 +34,10 @@ struct MoneyValue {
     static func -(_ lhs: Self, _ rhs: Self) -> Self {
         return .value(lhs.value - rhs.value)
     }
+
+    static func *(_ lhs: Self, _ rhs: Self) -> Self {
+        return .value(lhs.value * rhs.value)
+    }
 }
 
 extension MoneyValue: Comparable {

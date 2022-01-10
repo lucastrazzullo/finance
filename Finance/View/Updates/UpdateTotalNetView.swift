@@ -20,8 +20,6 @@ struct UpdateTotalNetView: View {
         return newTotalValue - currentTotalValue
     }
 
-    var onSubmit: (MoneyValue) -> ()
-
     var body: some View {
         VStack {
             HStack {
@@ -56,9 +54,9 @@ struct UpdateTotalNetView: View {
             )
 
             ConfirmButton {
-                if let value = MoneyValue.string(newTotalValue) {
-                    onSubmit(value)
-                }
+//                if let value = MoneyValue.string(newTotalValue) {
+//
+//                }
             }
         }
     }
@@ -68,7 +66,7 @@ struct UpdateTotalNetView: View {
 
 struct UpdateBudgetTotalView_Previews: PreviewProvider {
     static var previews: some View {
-        UpdateTotalNetView() { _ in }
+        UpdateTotalNetView()
             .padding()
     }
 }

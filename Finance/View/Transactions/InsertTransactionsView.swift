@@ -9,16 +9,8 @@ import SwiftUI
 
 struct InsertTransactionsView: View {
 
-    private let formatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MMM yy hh:mm"
-        return formatter
-    }()
-
     @State private var transactions: [Transaction] = []
     @State private var newAmount: String = ""
-
-    var onSubmit: ([Transaction]) -> ()
 
     var body: some View {
         VStack {
@@ -31,8 +23,8 @@ struct InsertTransactionsView: View {
 
             List {
                 ForEach(transactions) { transaction in
-                    let date = formatter.string(from: transaction.date)
-                    AmountListItem(label: date, amount: transaction.amount)
+                    let label = transaction.description ?? DateFormatter.transactionDateFormatter.string(from: transaction.date)
+                    AmountListItem(label: label, amount: transaction.amount)
                 }
 
                 HStack {
@@ -41,10 +33,10 @@ struct InsertTransactionsView: View {
                                 prompt: Text("New amount (e.g 10.22)"))
 
                     Button("Add") {
-                        if let moneyValue = MoneyValue.string(newAmount) {
-                            let transaction = Transaction(amount: moneyValue)
-                            transactions.append(transaction)
-                        }
+//                        if let moneyValue = MoneyValue.string(newAmount) {
+//                            let transaction = Transaction(amount: moneyValue, description: Transaction.defaultDescription, subcategory: <#T##Subcategory#>)
+//                            transactions.append(transaction)
+//                        }
                         newAmount = ""
                     }
                 }
@@ -53,7 +45,7 @@ struct InsertTransactionsView: View {
 
             ConfirmButton {
                 if !transactions.isEmpty {
-                    onSubmit(transactions)
+                    
                 }
             }
             .disabled(transactions.isEmpty)
@@ -65,7 +57,7 @@ struct InsertTransactionsView: View {
 
 struct InsertTransactionsView_Previews: PreviewProvider {
     static var previews: some View {
-        InsertTransactionsView() { _ in }
+        InsertTransactionsView()
             .padding(12)
     }
 }

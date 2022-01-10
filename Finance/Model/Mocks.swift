@@ -10,44 +10,66 @@ import Foundation
 #if DEBUG
 enum Mocks {
 
-    static var incomingBudgetList: [Budget] {
-        return [
-            Budget(name: "EMA", baskets: baskets),
-            Budget(name: "ING", baskets: baskets)
-        ]
-    }
+    // MARK: - Categories
 
-    static var expensesBudgetList: [Budget] {
-        return [
-            Budget(name: "Rent", baskets: baskets)
+    static let categories: [Category] = {
+        [
+            Category(name: "EMA"),
+            Category(name: "ING"),
+            Category(name: "House"),
+            Category(name: "Groceries"),
+            Category(name: "Health")
         ]
-    }
+    }()
 
-    static var baskets: [Basket] {
-        return [
-            Basket(description: "January", amount: .value(1000.12)),
-            Basket(description: "February", amount: .value(1000.12)),
-            Basket(description: "March", amount: .value(1000.12))
+    static let subcategories: [Subcategory] = {
+        [
+            Subcategory(name: "Mortgage", category: categories[2].id),
+            Subcategory(name: "Furnitures", category: categories[2].id)
         ]
-    }
+    }()
 
-    static var transactions: [Transaction] {
-        return [
-            Transaction(amount: .value(200.02)),
-            Transaction(amount: .value(200.02)),
-            Transaction(amount: .value(200.02)),
-            Transaction(amount: .value(200.02)),
-            Transaction(amount: .value(200.02)),
-            Transaction(amount: .value(200.02)),
-            Transaction(amount: .value(200.02)),
-            Transaction(amount: .value(200.02)),
-            Transaction(amount: .value(200.02)),
-            Transaction(amount: .value(200.02)),
-            Transaction(amount: .value(200.02)),
-            Transaction(amount: .value(200.02)),
-            Transaction(amount: .value(200.02)),
-            Transaction(amount: .value(200.02))
-        ]
-    }
+    private static let incomingCategories: [Category] = { categories[0...1].compactMap({$0}) }()
+    private static let outgoingCategories: [Category] = { categories[2...4].compactMap({$0}) }()
+
+    // MARK: - Budgets
+
+    static let incomingBudgetList: [Budget] = {
+        incomingCategories.map { category in
+            Budget(amount: .value(200.01), category: category.id)
+        }
+    }()
+
+    static let outgoingBudgetList: [Budget] = {
+        outgoingCategories.map { category in
+            Budget(amount: .value(200.01), category: category.id)
+        }
+    }()
+
+    // MARK: - Transactions
+
+    static let incomingTransactions: [Transaction] = {
+        incomingCategories
+            .map { category in
+                [
+                    Transaction(amount: .value(100.02), category: category.id),
+                    Transaction(amount: .value(200.02), category: category.id),
+                    Transaction(amount: .value(300.02), category: category.id)
+                ]
+            }
+            .flatMap({$0})
+    }()
+
+    static let outgoingTransactions: [Transaction] = {
+        outgoingCategories
+            .map { category in
+                [
+                    Transaction(amount: .value(100.02), category: category.id),
+                    Transaction(amount: .value(200.02), category: category.id),
+                    Transaction(amount: .value(300.02), category: category.id)
+                ]
+            }
+            .flatMap({$0})
+    }()
 }
 #endif
