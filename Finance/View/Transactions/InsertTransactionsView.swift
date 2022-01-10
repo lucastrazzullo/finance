@@ -33,10 +33,13 @@ struct InsertTransactionsView: View {
                                 prompt: Text("New amount (e.g 10.22)"))
 
                     Button("Add") {
-//                        if let moneyValue = MoneyValue.string(newAmount) {
-//                            let transaction = Transaction(amount: moneyValue, description: Transaction.defaultDescription, subcategory: <#T##Subcategory#>)
-//                            transactions.append(transaction)
-//                        }
+                        if let moneyValue = MoneyValue.string(newAmount) {
+                            let transaction = Transaction(amount: moneyValue,
+                                                          category: .init(),
+                                                          subcategory: .init())
+
+                            transactions.append(transaction)
+                        }
                         newAmount = ""
                     }
                 }
