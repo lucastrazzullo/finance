@@ -2,55 +2,23 @@
 //  TransactionsView.swift
 //  Finance
 //
-//  Created by Luca Strazzullo on 10/01/2022.
+//  Created by Luca Strazzullo on 11/01/2022.
 //
 
 import SwiftUI
 
 struct TransactionsView: View {
 
-    @State private var isNewEntrySheetPresented: Bool = false
-
-    let incoming: [Transaction] = Mocks.incomingTransactions
-    let outgoing: [Transaction] = Mocks.outgoingTransactions
-
-    var incomingCategories: [Category] {
-        let categories = incoming.map(\.category)
-        return Mocks.categories.filter { categories.contains($0.id) }
-    }
-
-    var outgoingCategories: [Category] {
-        let categories = outgoing.map(\.category)
-        return Mocks.categories.filter { categories.contains($0.id) }
-    }
+    let transactions: [Transaction]
 
     var body: some View {
-        VStack(spacing: 0) {
-            List {
-                Section(header: Text("Incoming transactions")) {
-                    ForEach(incomingCategories) { category in
-                        let transactions = incoming.filter { $0.category == category.id }
-                        AmountListItem(label: category.name, amount: transactions.totalAmount)
-                    }
-                }
-
-                Section(header: Text("Outgoing transactions")) {
-                    ForEach(outgoingCategories) { category in
-                        let transactions = outgoing.filter { $0.category == category.id }
-                        AmountListItem(label: category.name, amount: transactions.totalAmount)
-                    }
-                }
+        List {
+            ForEach(transactions) { transaction in
+                let label = transaction.description ?? DateFormatter.transactionDateFormatter.string(from: transaction.date)
+                AmountListItem(label: label, amount: transaction.amount)
             }
-
-            Button("Add transactions") { isNewEntrySheetPresented = true }
-                .buttonStyle(BorderedProminentButtonStyle())
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 24)
-                .background(.thinMaterial)
         }
-        .sheet(isPresented: $isNewEntrySheetPresented, content: {
-            UpdateFinanceView()
-        })
+
     }
 }
 
@@ -58,6 +26,6 @@ struct TransactionsView: View {
 
 struct TransactionsView_Previews: PreviewProvider {
     static var previews: some View {
-        TransactionsView()
+        TransactionsView(transactions: Mocks.outgoingTransactions)
     }
 }

@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		811F7BD1278C2A0500F1B8C9 /* Category.swift in Sources */ = {isa = PBXBuildFile; fileRef = 811F7BD0278C2A0500F1B8C9 /* Category.swift */; };
 		811F7BD3278C2A3500F1B8C9 /* Subcategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 811F7BD2278C2A3500F1B8C9 /* Subcategory.swift */; };
-		811F7BD8278C473E00F1B8C9 /* TransactionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 811F7BD7278C473E00F1B8C9 /* TransactionsView.swift */; };
+		811F7BD8278C473E00F1B8C9 /* CategorisedTransactionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 811F7BD7278C473E00F1B8C9 /* CategorisedTransactionsView.swift */; };
 		81947EAB27327FCF001C2AC9 /* FinanceApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81947EAA27327FCF001C2AC9 /* FinanceApp.swift */; };
 		81947EAF27327FD1001C2AC9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 81947EAE27327FD1001C2AC9 /* Assets.xcassets */; };
 		81947EB227327FD1001C2AC9 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 81947EB127327FD1001C2AC9 /* Preview Assets.xcassets */; };
@@ -19,6 +19,7 @@
 		819993DC2757692300FA3E03 /* AmountCollectionItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 819993DB2757692300FA3E03 /* AmountCollectionItem.swift */; };
 		819993DE27576DEF00FA3E03 /* ConfirmButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 819993DD27576DEF00FA3E03 /* ConfirmButton.swift */; };
 		819993E02757708000FA3E03 /* UpdateFinanceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 819993DF2757708000FA3E03 /* UpdateFinanceView.swift */; };
+		81B620F9278D76C600ECDCF0 /* TransactionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81B620F8278D76C600ECDCF0 /* TransactionsView.swift */; };
 		81B80D13278C5516002E002E /* DateFormatter+Defaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81B80D12278C5516002E002E /* DateFormatter+Defaults.swift */; };
 		81BB5376274E1359002B46D6 /* UpdateTotalNetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81BB5375274E1359002B46D6 /* UpdateTotalNetView.swift */; };
 		81BB5378274E1509002B46D6 /* AmountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81BB5377274E1509002B46D6 /* AmountView.swift */; };
@@ -36,7 +37,7 @@
 /* Begin PBXFileReference section */
 		811F7BD0278C2A0500F1B8C9 /* Category.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Category.swift; sourceTree = "<group>"; };
 		811F7BD2278C2A3500F1B8C9 /* Subcategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Subcategory.swift; sourceTree = "<group>"; };
-		811F7BD7278C473E00F1B8C9 /* TransactionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionsView.swift; sourceTree = "<group>"; };
+		811F7BD7278C473E00F1B8C9 /* CategorisedTransactionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategorisedTransactionsView.swift; sourceTree = "<group>"; };
 		81947EA727327FCF001C2AC9 /* Finance.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Finance.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		81947EAA27327FCF001C2AC9 /* FinanceApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceApp.swift; sourceTree = "<group>"; };
 		81947EAE27327FD1001C2AC9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -47,6 +48,7 @@
 		819993DB2757692300FA3E03 /* AmountCollectionItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmountCollectionItem.swift; sourceTree = "<group>"; };
 		819993DD27576DEF00FA3E03 /* ConfirmButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmButton.swift; sourceTree = "<group>"; };
 		819993DF2757708000FA3E03 /* UpdateFinanceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateFinanceView.swift; sourceTree = "<group>"; };
+		81B620F8278D76C600ECDCF0 /* TransactionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionsView.swift; sourceTree = "<group>"; };
 		81B80D12278C5516002E002E /* DateFormatter+Defaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DateFormatter+Defaults.swift"; sourceTree = "<group>"; };
 		81BB5375274E1359002B46D6 /* UpdateTotalNetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateTotalNetView.swift; sourceTree = "<group>"; };
 		81BB5377274E1509002B46D6 /* AmountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmountView.swift; sourceTree = "<group>"; };
@@ -113,7 +115,8 @@
 		811F7BD6278C46DB00F1B8C9 /* Transactions */ = {
 			isa = PBXGroup;
 			children = (
-				811F7BD7278C473E00F1B8C9 /* TransactionsView.swift */,
+				811F7BD7278C473E00F1B8C9 /* CategorisedTransactionsView.swift */,
+				81B620F8278D76C600ECDCF0 /* TransactionsView.swift */,
 				81CB8BFB2746D46700A64785 /* InsertTransactionsView.swift */,
 			);
 			path = Transactions;
@@ -265,6 +268,7 @@
 				81F24A792743D6DC00C37ADE /* DashboardView.swift in Sources */,
 				81CB8BFC2746D46700A64785 /* InsertTransactionsView.swift in Sources */,
 				81CB8BF62746BFDC00A64785 /* BudgetView.swift in Sources */,
+				81B620F9278D76C600ECDCF0 /* TransactionsView.swift in Sources */,
 				819993D72752FAA300FA3E03 /* AmountField.swift in Sources */,
 				811F7BD3278C2A3500F1B8C9 /* Subcategory.swift in Sources */,
 				81947EB927329707001C2AC9 /* BudgetsView.swift in Sources */,
@@ -282,7 +286,7 @@
 				81B80D13278C5516002E002E /* DateFormatter+Defaults.swift in Sources */,
 				81CB8BF82746CA6500A64785 /* AmountListItem.swift in Sources */,
 				819993E02757708000FA3E03 /* UpdateFinanceView.swift in Sources */,
-				811F7BD8278C473E00F1B8C9 /* TransactionsView.swift in Sources */,
+				811F7BD8278C473E00F1B8C9 /* CategorisedTransactionsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

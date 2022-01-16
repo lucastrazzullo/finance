@@ -11,18 +11,16 @@ struct DashboardView: View {
 
     var body: some View {
         NavigationView {
-            VStack(spacing: 0) {
-                List {
-                    NavigationLink(destination: BudgetsView().navigationTitle("Budgets 2022")) {
-                        Text("Budgets")
-                    }
-
-                    NavigationLink(destination: TransactionsView().navigationTitle("Transactions 2022")) {
-                        Text("Transactions")
-                    }
+            List {
+                NavigationLink(destination: BudgetsView().navigationTitle("Budgets 2022")) {
+                    Text("Budgets")
                 }
-                .navigationTitle("Finance 2022")
+
+                NavigationLink(destination: CategorisedTransactionsView().navigationTitle("Transactions 2022")) {
+                    Text("Transactions")
+                }
             }
+            .navigationTitle("Finance 2022")
         }
     }
 }

@@ -41,6 +41,8 @@ struct BudgetsView: View {
 
 struct BudgetsView_Previews: PreviewProvider {
     static var previews: some View {
-        BudgetsView()
+        NavigationView {
+            BudgetsView().navigationTitle("Budgets")
+        }
     }
 }

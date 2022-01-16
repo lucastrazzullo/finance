@@ -11,27 +11,20 @@ struct BudgetView: View {
 
     let budget: Budget
 
+    private var category: Category {
+        Mocks.categories.first(where: { $0.id == budget.category })!
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            VStack(alignment: .leading, spacing: 12) {
-                if let category = Mocks.categories.first(where: { $0.id == budget.category }) {
-                    HStack {
-                        Text("Category:")
-                        Text(category.name).bold()
-                    }
-                }
-
-                HStack {
-                    Text("Monthly cap:")
-                    AmountView(amount: budget.amount)
-                }
-
-                HStack {
-                    Text("Yearly cap:")
-                    AmountView(amount: .value(budget.amount.value * 12))
-                }
-            }
-            .padding()
+            AmountCollectionItem(
+                title: "Monthly",
+                caption: "\(budget.amount.value * 12) per year",
+                amount: budget.amount,
+                color: .gray.opacity(0.7)
+            )
+            .padding(.horizontal, 24)
+            .padding(.vertical, 12)
 
             let subcategories = Mocks.subcategories.filter({ $0.category == budget.category })
             if !subcategories.isEmpty {
@@ -44,6 +37,7 @@ struct BudgetView: View {
                 }
             }
         }
+        .navigationTitle(category.name)
     }
 }
 
@@ -51,6 +45,8 @@ struct BudgetView: View {
 
 struct BudgetView_Previews: PreviewProvider {
     static var previews: some View {
-        BudgetView(budget: Mocks.outgoingBudgetList.first!)
+        NavigationView {
+            BudgetView(budget: Mocks.outgoingBudgetList.first!)
+        }
     }
 }
