@@ -14,7 +14,7 @@ struct AmountListItem: View {
 
     var body: some View {
         HStack {
-            Text(label).bold()
+            Text(label)
             Spacer()
             AmountView(amount: amount)
         }

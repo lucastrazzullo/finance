@@ -7,7 +7,29 @@
 
 import Foundation
 
-struct Transaction: Identifiable, AmountHolder {
+enum Transaction: Identifiable, AmountHolder {
+    case expense(TransactionContent)
+    case income(TransactionContent)
+
+    var id: UUID {
+        return content.id
+    }
+
+    var amount: MoneyValue {
+        return content.amount
+    }
+
+    var content: TransactionContent {
+        switch self {
+        case .expense(let transactionContent):
+            return transactionContent
+        case .income(let transactionContent):
+            return transactionContent
+        }
+    }
+}
+
+struct TransactionContent: Identifiable, AmountHolder {
 
     let id: UUID = UUID()
     let date: Date = Date()

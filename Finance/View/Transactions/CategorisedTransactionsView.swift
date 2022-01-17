@@ -15,12 +15,12 @@ struct CategorisedTransactionsView: View {
     let outgoing: [Transaction] = Mocks.outgoingTransactions
 
     var incomingCategories: [Category] {
-        let categories = incoming.map(\.category)
+        let categories = incoming.map(\.content.category)
         return Mocks.categories.filter { categories.contains($0.id) }
     }
 
     var outgoingCategories: [Category] {
-        let categories = outgoing.map(\.category)
+        let categories = outgoing.map(\.content.category)
         return Mocks.categories.filter { categories.contains($0.id) }
     }
 
@@ -29,7 +29,7 @@ struct CategorisedTransactionsView: View {
             List {
                 Section(header: Text("Incoming transactions")) {
                     ForEach(incomingCategories) { category in
-                        let transactions = incoming.filter { $0.category == category.id }
+                        let transactions = incoming.filter { $0.content.category == category.id }
                         NavigationLink(destination: TransactionsView(transactions: transactions).navigationTitle(Text(category.name))) {
                             AmountListItem(label: category.name, amount: transactions.totalAmount)
                         }
@@ -38,7 +38,7 @@ struct CategorisedTransactionsView: View {
 
                 Section(header: Text("Outgoing transactions")) {
                     ForEach(outgoingCategories) { category in
-                        let transactions = outgoing.filter { $0.category == category.id }
+                        let transactions = outgoing.filter { $0.content.category == category.id }
                         NavigationLink(destination: TransactionsView(transactions: transactions).navigationTitle(Text(category.name))) {
                             AmountListItem(label: category.name, amount: transactions.totalAmount)
                         }

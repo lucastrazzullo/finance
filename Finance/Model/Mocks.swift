@@ -52,9 +52,9 @@ enum Mocks {
         incomingCategories
             .map { category in
                 [
-                    Transaction(amount: .value(100.02), category: category.id),
-                    Transaction(amount: .value(200.02), category: category.id),
-                    Transaction(amount: .value(300.02), category: category.id)
+                    .income(.init(amount: .value(100.02), category: category.id)),
+                    .income(.init(amount: .value(200.02), category: category.id)),
+                    .income(.init(amount: .value(300.02), category: category.id))
                 ]
             }
             .flatMap({$0})
@@ -64,9 +64,9 @@ enum Mocks {
         outgoingCategories
             .map { category in
                 [
-                    Transaction(amount: .value(100.02), category: category.id),
-                    Transaction(amount: .value(200.02), category: category.id),
-                    Transaction(amount: .value(300.02), category: category.id)
+                    .expense(.init(amount: .value(100.02), category: category.id)),
+                    .expense(.init(amount: .value(200.02), category: category.id)),
+                    .expense(.init(amount: .value(300.02), category: category.id))
                 ]
             }
             .flatMap({$0})

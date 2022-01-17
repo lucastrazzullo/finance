@@ -14,11 +14,9 @@ struct TransactionsView: View {
     var body: some View {
         List {
             ForEach(transactions) { transaction in
-                let label = transaction.description ?? DateFormatter.transactionDateFormatter.string(from: transaction.date)
-                AmountListItem(label: label, amount: transaction.amount)
+                TransactionListItem(transaction: transaction)
             }
         }
-
     }
 }
 
@@ -26,6 +24,10 @@ struct TransactionsView: View {
 
 struct TransactionsView_Previews: PreviewProvider {
     static var previews: some View {
-        TransactionsView(transactions: Mocks.outgoingTransactions)
+        var transactions = [Transaction]()
+        transactions.append(contentsOf: Mocks.outgoingTransactions)
+        transactions.append(contentsOf: Mocks.incomingTransactions)
+
+        return TransactionsView(transactions: transactions)
     }
 }

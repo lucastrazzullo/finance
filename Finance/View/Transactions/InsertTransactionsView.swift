@@ -9,8 +9,14 @@ import SwiftUI
 
 struct InsertTransactionsView: View {
 
+    private enum TransactionType: String {
+        case expense = "EXPENSE"
+        case income = "INCOME"
+    }
+
     @State private var transactions: [Transaction] = []
     @State private var newAmount: String = ""
+    @State private var newTransactionType: String = TransactionType.expense.rawValue
 
     var body: some View {
         VStack {
@@ -23,7 +29,7 @@ struct InsertTransactionsView: View {
 
             List {
                 ForEach(transactions) { transaction in
-                    let label = transaction.description ?? DateFormatter.transactionDateFormatter.string(from: transaction.date)
+                    let label = transaction.content.description ?? DateFormatter.transactionDateFormatter.string(from: transaction.content.date)
                     AmountListItem(label: label, amount: transaction.amount)
                 }
 
@@ -33,14 +39,14 @@ struct InsertTransactionsView: View {
                                 prompt: Text("New amount (e.g 10.22)"))
 
                     Button("Add") {
-                        if let moneyValue = MoneyValue.string(newAmount) {
-                            let transaction = Transaction(amount: moneyValue,
-                                                          category: .init(),
-                                                          subcategory: .init())
-
-                            transactions.append(transaction)
-                        }
-                        newAmount = ""
+//                        if let moneyValue = MoneyValue.string(newAmount) {
+//                            let transaction = Transaction(amount: moneyValue,
+//                                                          category: .init(),
+//                                                          subcategory: .init())
+//
+//                            transactions.append(transaction)
+//                        }
+//                        newAmount = ""
                     }
                 }
             }

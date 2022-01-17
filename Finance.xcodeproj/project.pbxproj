@@ -10,6 +10,7 @@
 		811F7BD1278C2A0500F1B8C9 /* Category.swift in Sources */ = {isa = PBXBuildFile; fileRef = 811F7BD0278C2A0500F1B8C9 /* Category.swift */; };
 		811F7BD3278C2A3500F1B8C9 /* Subcategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 811F7BD2278C2A3500F1B8C9 /* Subcategory.swift */; };
 		811F7BD8278C473E00F1B8C9 /* CategorisedTransactionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 811F7BD7278C473E00F1B8C9 /* CategorisedTransactionsView.swift */; };
+		81542BD82795812100A05B77 /* TransactionListItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81542BD72795812100A05B77 /* TransactionListItem.swift */; };
 		81947EAB27327FCF001C2AC9 /* FinanceApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81947EAA27327FCF001C2AC9 /* FinanceApp.swift */; };
 		81947EAF27327FD1001C2AC9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 81947EAE27327FD1001C2AC9 /* Assets.xcassets */; };
 		81947EB227327FD1001C2AC9 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 81947EB127327FD1001C2AC9 /* Preview Assets.xcassets */; };
@@ -38,6 +39,7 @@
 		811F7BD0278C2A0500F1B8C9 /* Category.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Category.swift; sourceTree = "<group>"; };
 		811F7BD2278C2A3500F1B8C9 /* Subcategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Subcategory.swift; sourceTree = "<group>"; };
 		811F7BD7278C473E00F1B8C9 /* CategorisedTransactionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategorisedTransactionsView.swift; sourceTree = "<group>"; };
+		81542BD72795812100A05B77 /* TransactionListItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionListItem.swift; sourceTree = "<group>"; };
 		81947EA727327FCF001C2AC9 /* Finance.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Finance.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		81947EAA27327FCF001C2AC9 /* FinanceApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceApp.swift; sourceTree = "<group>"; };
 		81947EAE27327FD1001C2AC9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -117,9 +119,21 @@
 			children = (
 				811F7BD7278C473E00F1B8C9 /* CategorisedTransactionsView.swift */,
 				81B620F8278D76C600ECDCF0 /* TransactionsView.swift */,
+				81542BD72795812100A05B77 /* TransactionListItem.swift */,
 				81CB8BFB2746D46700A64785 /* InsertTransactionsView.swift */,
 			);
 			path = Transactions;
+			sourceTree = "<group>";
+		};
+		81542BD6279580F300A05B77 /* Amount */ = {
+			isa = PBXGroup;
+			children = (
+				81BB5377274E1509002B46D6 /* AmountView.swift */,
+				819993D62752FAA300FA3E03 /* AmountField.swift */,
+				81CB8BF72746CA6500A64785 /* AmountListItem.swift */,
+				819993DB2757692300FA3E03 /* AmountCollectionItem.swift */,
+			);
+			path = Amount;
 			sourceTree = "<group>";
 		};
 		81947E9E27327FCE001C2AC9 = {
@@ -161,10 +175,6 @@
 		819993D82756CFA300FA3E03 /* Common */ = {
 			isa = PBXGroup;
 			children = (
-				81BB5377274E1509002B46D6 /* AmountView.swift */,
-				819993D62752FAA300FA3E03 /* AmountField.swift */,
-				81CB8BF72746CA6500A64785 /* AmountListItem.swift */,
-				819993DB2757692300FA3E03 /* AmountCollectionItem.swift */,
 				819993DD27576DEF00FA3E03 /* ConfirmButton.swift */,
 			);
 			path = Common;
@@ -174,6 +184,7 @@
 			isa = PBXGroup;
 			children = (
 				81F24A782743D6DC00C37ADE /* DashboardView.swift */,
+				81542BD6279580F300A05B77 /* Amount */,
 				811F7BD4278C46C100F1B8C9 /* Budget */,
 				811F7BD6278C46DB00F1B8C9 /* Transactions */,
 				811F7BD5278C46CE00F1B8C9 /* Updates */,
@@ -285,6 +296,7 @@
 				81F24A7B2743D7CE00C37ADE /* Mocks.swift in Sources */,
 				81B80D13278C5516002E002E /* DateFormatter+Defaults.swift in Sources */,
 				81CB8BF82746CA6500A64785 /* AmountListItem.swift in Sources */,
+				81542BD82795812100A05B77 /* TransactionListItem.swift in Sources */,
 				819993E02757708000FA3E03 /* UpdateFinanceView.swift in Sources */,
 				811F7BD8278C473E00F1B8C9 /* CategorisedTransactionsView.swift in Sources */,
 			);
