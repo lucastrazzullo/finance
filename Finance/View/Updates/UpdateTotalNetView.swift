@@ -47,7 +47,7 @@ struct UpdateTotalNetView: View {
 
             Spacer()
 
-            AmountField(
+            InsertAmountField(
                 amountValue: $newTotalValue,
                 title: "Total Net",
                 prompt: nil

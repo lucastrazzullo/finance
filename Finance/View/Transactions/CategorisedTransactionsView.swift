@@ -9,7 +9,7 @@ import SwiftUI
 
 struct CategorisedTransactionsView: View {
 
-    @State private var isNewEntrySheetPresented: Bool = false
+    @State private var isInsertTransactionsPresented: Bool = false
 
     let incoming: [Transaction] = Mocks.incomingTransactions
     let outgoing: [Transaction] = Mocks.outgoingTransactions
@@ -30,7 +30,7 @@ struct CategorisedTransactionsView: View {
                 Section(header: Text("Incoming transactions")) {
                     ForEach(incomingCategories) { category in
                         let transactions = incoming.filter { $0.content.category == category.id }
-                        NavigationLink(destination: TransactionsView(transactions: transactions).navigationTitle(Text(category.name))) {
+                        NavigationLink(destination: makeTransactionsView(with: transactions, for: category)) {
                             AmountListItem(label: category.name, amount: transactions.totalAmount)
                         }
                     }
@@ -39,22 +39,30 @@ struct CategorisedTransactionsView: View {
                 Section(header: Text("Outgoing transactions")) {
                     ForEach(outgoingCategories) { category in
                         let transactions = outgoing.filter { $0.content.category == category.id }
-                        NavigationLink(destination: TransactionsView(transactions: transactions).navigationTitle(Text(category.name))) {
+                        NavigationLink(destination: makeTransactionsView(with: transactions, for: category)) {
                             AmountListItem(label: category.name, amount: transactions.totalAmount)
                         }
                     }
                 }
             }
-
-            Button("Add transactions") { isNewEntrySheetPresented = true }
-                .buttonStyle(BorderedProminentButtonStyle())
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 24)
-                .background(.thinMaterial)
         }
-        .sheet(isPresented: $isNewEntrySheetPresented, content: {
-            UpdateFinanceView()
-        })
+    }
+
+    // MARK: Private factory methods
+
+    private func makeTransactionsView(with transactions: [Transaction], for category: Category) -> some View {
+        TransactionsView(transactions: transactions)
+            .navigationTitle(Text(category.name))
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Add transaction") {
+                        isInsertTransactionsPresented = true
+                    }
+                }
+            }
+            .sheet(isPresented: $isInsertTransactionsPresented, onDismiss: nil) {
+                InsertTransactionsView(category: category)
+            }
     }
 }
 

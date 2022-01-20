@@ -1,5 +1,5 @@
 //
-//  AmountField.swift
+//  InsertAmountField.swift
 //  Finance
 //
 //  Created by Luca Strazzullo on 28/11/2021.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct AmountField: View {
+struct InsertAmountField: View {
 
     @Binding var amountValue: String
 
@@ -17,7 +17,6 @@ struct AmountField: View {
     var body: some View {
         TextField(title, text: $amountValue, prompt: prompt)
             .keyboardType(.decimalPad)
-            .textFieldStyle(RoundedBorderTextFieldStyle())
             .multilineTextAlignment(.center)
             .padding(.vertical)
     }
@@ -25,6 +24,6 @@ struct AmountField: View {
 
 struct AmountField_Previews: PreviewProvider {
     static var previews: some View {
-        AmountField(amountValue: .constant(""), title: "Amount", prompt: nil).padding()
+        InsertAmountField(amountValue: .constant(""), title: "Amount", prompt: nil).padding()
     }
 }

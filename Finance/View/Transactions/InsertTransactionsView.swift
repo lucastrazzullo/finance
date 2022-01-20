@@ -9,23 +9,32 @@ import SwiftUI
 
 struct InsertTransactionsView: View {
 
-    private enum TransactionType: String {
-        case expense = "EXPENSE"
-        case income = "INCOME"
+    private enum TransactionType: String, CaseIterable {
+        case expense = "Expense"
+        case income = "Income"
     }
 
+    @State private var isInsertNewTransactionPresented: Bool = false
+
     @State private var transactions: [Transaction] = []
-    @State private var newAmount: String = ""
-    @State private var newTransactionType: String = TransactionType.expense.rawValue
+    @State private var newTransactionAmount: String = ""
+    @State private var newTransactionTypeIndex: Int = 0
+    @State private var newTransactionSubcategoryIndex: Int = 0
+
+    private var subcategories: [Subcategory] {
+        Mocks.subcategories.filter { $0.category == category.id }
+    }
+
+    private var types: [TransactionType] {
+        TransactionType.allCases
+    }
+
+    let category: Category
 
     var body: some View {
         VStack {
-            AmountCollectionItem(
-                title: "Total",
-                caption: nil,
-                amount: transactions.totalAmount,
-                color: .yellow
-            )
+            Text(category.name)
+                .font(.largeTitle)
 
             List {
                 ForEach(transactions) { transaction in
@@ -33,21 +42,8 @@ struct InsertTransactionsView: View {
                     AmountListItem(label: label, amount: transaction.amount)
                 }
 
-                HStack {
-                    AmountField(amountValue: $newAmount,
-                                title: "Amount",
-                                prompt: Text("New amount (e.g 10.22)"))
-
-                    Button("Add") {
-//                        if let moneyValue = MoneyValue.string(newAmount) {
-//                            let transaction = Transaction(amount: moneyValue,
-//                                                          category: .init(),
-//                                                          subcategory: .init())
-//
-//                            transactions.append(transaction)
-//                        }
-//                        newAmount = ""
-                    }
+                Button("Add transactions") {
+                    isInsertNewTransactionPresented = true
                 }
             }
             .listStyle(PlainListStyle())
@@ -58,6 +54,57 @@ struct InsertTransactionsView: View {
                 }
             }
             .disabled(transactions.isEmpty)
+            .padding()
+        }
+        .sheet(isPresented: $isInsertNewTransactionPresented, onDismiss: {}) {
+            Form {
+                Section(header: Text("Type")) {
+                    Picker("Type", selection: $newTransactionTypeIndex) {
+                        ForEach(types.enumerated().map(\.offset), id: \.self) { index in
+                            Text(types[index].rawValue)
+                        }
+                    }
+                    .pickerStyle(MenuPickerStyle())
+                }
+
+                Section(header: Text("Subcategory")) {
+                    Picker("Subcategory", selection: $newTransactionSubcategoryIndex) {
+                        ForEach(subcategories.enumerated().map(\.offset), id: \.self) { index in
+                            Text(subcategories[index].name)
+                        }
+                    }
+                    .pickerStyle(MenuPickerStyle())
+                }
+
+                Section {
+                    InsertAmountField(amountValue: $newTransactionAmount, title: "Amount", prompt: Text("New amount (e.g 10.22)"))
+                }
+
+                Section {
+                    Button("Add") {
+                        guard let amount = MoneyValue.string(newTransactionAmount) else {
+                            return
+                        }
+
+                        let type = types[newTransactionTypeIndex]
+                        let subcategory = subcategories[newTransactionSubcategoryIndex].id
+                        let transactionContent = TransactionContent(amount: amount, category: category.id, subcategory: subcategory)
+
+                        switch type {
+                        case .expense:
+                            transactions.append(.expense(transactionContent))
+                        case .income:
+                            transactions.append(.income(transactionContent))
+                        }
+
+                        newTransactionAmount = ""
+                        newTransactionTypeIndex = 0
+                        newTransactionSubcategoryIndex = 0
+
+                        isInsertNewTransactionPresented = false
+                    }
+                }
+            }
         }
     }
 }
@@ -66,7 +113,8 @@ struct InsertTransactionsView: View {
 
 struct InsertTransactionsView_Previews: PreviewProvider {
     static var previews: some View {
-        InsertTransactionsView()
-            .padding(12)
+        let subcategory = Mocks.subcategories.first!
+        let category = Mocks.categories.first(where: { $0.id == subcategory.category })!
+        return InsertTransactionsView(category: category)
     }
 }

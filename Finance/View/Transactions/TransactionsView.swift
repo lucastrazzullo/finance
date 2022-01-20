@@ -28,6 +28,9 @@ struct TransactionsView_Previews: PreviewProvider {
         transactions.append(contentsOf: Mocks.outgoingTransactions)
         transactions.append(contentsOf: Mocks.incomingTransactions)
 
-        return TransactionsView(transactions: transactions)
+        return NavigationView {
+            TransactionsView(transactions: transactions)
+                .navigationTitle("Transactions")
+        }
     }
 }
