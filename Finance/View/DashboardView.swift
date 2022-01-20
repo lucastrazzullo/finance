@@ -18,15 +18,8 @@ struct DashboardView: View {
 
                 HStack {
                     AmountCollectionItem(
-                        title: "Total statements",
+                        title: "Total",
                         caption: "as of Friday 12 Oct",
-                        amount: totalTransactions,
-                        color: Color(UIColor.systemGroupedBackground)
-                    )
-
-                    AmountCollectionItem(
-                        title: "Transactions",
-                        caption: "Sat 22 Oct 2022",
                         amount: totalTransactions,
                         color: Color(UIColor.systemGroupedBackground)
                     )

@@ -9,9 +9,21 @@ import SwiftUI
 
 struct InsertTransactionsView: View {
 
-    private enum TransactionType: String, CaseIterable {
-        case expense = "Expense"
-        case income = "Income"
+    final class Controller: ObservableObject {
+
+        let budget: Budget
+
+        init(budget: Budget) {
+            self.budget = budget
+        }
+
+        lazy var transactionTypes: [Transaction.TransactionType] = {
+            Transaction.TransactionType.allCases
+        }()
+
+        lazy var budgetSlicesId: [BudgetSlice.ID] = {
+            budget.slices.map(\.id)
+        }()
     }
 
     @State private var isInsertNewTransactionPresented: Bool = false
@@ -19,26 +31,18 @@ struct InsertTransactionsView: View {
     @State private var transactions: [Transaction] = []
     @State private var newTransactionAmount: String = ""
     @State private var newTransactionTypeIndex: Int = 0
-    @State private var newTransactionSubcategoryIndex: Int = 0
+    @State private var newTransactionBudgetSliceIndex: Int = 0
 
-    private var subcategories: [Subcategory] {
-        Mocks.subcategories.filter { $0.category == category.id }
-    }
-
-    private var types: [TransactionType] {
-        TransactionType.allCases
-    }
-
-    let category: Category
+    @ObservedObject private var controller: Controller
 
     var body: some View {
         VStack {
-            Text(category.name)
+            Text(controller.budget.name)
                 .font(.largeTitle)
 
             List {
                 ForEach(transactions) { transaction in
-                    let label = transaction.content.description ?? DateFormatter.transactionDateFormatter.string(from: transaction.content.date)
+                    let label = transaction.description ?? DateFormatter.transactionDateFormatter.string(from: transaction.date)
                     AmountListItem(label: label, amount: transaction.amount)
                 }
 
@@ -58,19 +62,22 @@ struct InsertTransactionsView: View {
         }
         .sheet(isPresented: $isInsertNewTransactionPresented, onDismiss: {}) {
             Form {
-                Section(header: Text("Type")) {
-                    Picker("Type", selection: $newTransactionTypeIndex) {
-                        ForEach(types.enumerated().map(\.offset), id: \.self) { index in
-                            Text(types[index].rawValue)
+                Section(header: Text("Transaction Type")) {
+                    Picker("Transaction Type", selection: $newTransactionTypeIndex) {
+                        ForEach(controller.transactionTypes.enumerated().map(\.offset), id: \.self) { index in
+                            Text(controller.transactionTypes[index].rawValue)
                         }
                     }
                     .pickerStyle(MenuPickerStyle())
                 }
 
                 Section(header: Text("Subcategory")) {
-                    Picker("Subcategory", selection: $newTransactionSubcategoryIndex) {
-                        ForEach(subcategories.enumerated().map(\.offset), id: \.self) { index in
-                            Text(subcategories[index].name)
+                    Picker("Subcategory", selection: $newTransactionBudgetSliceIndex) {
+                        ForEach(controller.budgetSlicesId.enumerated().map(\.offset), id: \.self) { index in
+                            let sliceIdentifier = controller.budgetSlicesId[index]
+                            if let slice = controller.budget.slices.first(where: { $0.id == sliceIdentifier }) {
+                                AmountListItem(label: slice.name, amount: slice.amount)
+                            }
                         }
                     }
                     .pickerStyle(MenuPickerStyle())
@@ -86,20 +93,14 @@ struct InsertTransactionsView: View {
                             return
                         }
 
-                        let type = types[newTransactionTypeIndex]
-                        let subcategory = subcategories[newTransactionSubcategoryIndex].id
-                        let transactionContent = TransactionContent(amount: amount, category: category.id, subcategory: subcategory)
-
-                        switch type {
-                        case .expense:
-                            transactions.append(.expense(transactionContent))
-                        case .income:
-                            transactions.append(.income(transactionContent))
-                        }
+                        let transactionType = controller.transactionTypes[newTransactionTypeIndex]
+                        let budgetSliceId = controller.budgetSlicesId[newTransactionBudgetSliceIndex]
+                        let transaction = Transaction(amount: amount, type: transactionType, budgetId: controller.budget.id, budgetSliceId: budgetSliceId)
+                        transactions.append(transaction)
 
                         newTransactionAmount = ""
                         newTransactionTypeIndex = 0
-                        newTransactionSubcategoryIndex = 0
+                        newTransactionBudgetSliceIndex = 0
 
                         isInsertNewTransactionPresented = false
                     }
@@ -107,14 +108,21 @@ struct InsertTransactionsView: View {
             }
         }
     }
+
+    init(budget: Budget) {
+        self.controller = Controller(budget: budget)
+    }
 }
 
 // MARK: - Previews
 
 struct InsertTransactionsView_Previews: PreviewProvider {
     static var previews: some View {
-        let subcategory = Mocks.subcategories.first!
-        let category = Mocks.categories.first(where: { $0.id == subcategory.category })!
-        return InsertTransactionsView(category: category)
+        let budget = Budget(name: "Test", slices: [
+            .default(amount: .value(200)),
+            .default(amount: .value(100)),
+            .default(amount: .value(500))
+        ])
+        return InsertTransactionsView(budget: budget)
     }
 }

@@ -7,42 +7,26 @@
 
 import Foundation
 
-enum Transaction: Identifiable, AmountHolder {
-    case expense(TransactionContent)
-    case income(TransactionContent)
+struct Transaction: Identifiable, AmountHolder {
 
-    var id: UUID {
-        return content.id
+    enum TransactionType: String, CaseIterable {
+        case expense
+        case income
     }
-
-    var amount: MoneyValue {
-        return content.amount
-    }
-
-    var content: TransactionContent {
-        switch self {
-        case .expense(let transactionContent):
-            return transactionContent
-        case .income(let transactionContent):
-            return transactionContent
-        }
-    }
-}
-
-struct TransactionContent: Identifiable, AmountHolder {
 
     let id: UUID = UUID()
     let date: Date = Date()
     let amount: MoneyValue
+    let type: TransactionType
     let description: String?
+    let budgetId: Budget.ID
+    let budgetSliceId: BudgetSlice.ID
 
-    let category: Category.ID
-    let subcategory: Subcategory.ID?
-
-    init(amount: MoneyValue, description: String? = nil, category: Category.ID, subcategory: Subcategory.ID? = nil) {
+    init(amount: MoneyValue, type: TransactionType, description: String? = nil, budgetId: Budget.ID, budgetSliceId: BudgetSlice.ID) {
         self.amount = amount
+        self.type = type
         self.description = description
-        self.category = category
-        self.subcategory = subcategory
+        self.budgetId = budgetId
+        self.budgetSliceId = budgetSliceId
     }
 }

@@ -9,17 +9,15 @@ import SwiftUI
 
 struct BudgetsView: View {
 
-    let incoming: [Budget] = Mocks.incomingBudgetList
-    let expenses: [Budget] = Mocks.outgoingBudgetList
+    let incoming: [Budget] = BudgetProvider.incomingBudgetList
+    let expenses: [Budget] = BudgetProvider.expensesBudgetList
 
     var body: some View {
         List {
             Section(header: Text("Incoming (monthly)")) {
                 ForEach(incoming) { budget in
                     NavigationLink(destination: BudgetView(budget: budget)) {
-                        if let categoryName = Mocks.categories.first(where: { $0.id == budget.category })?.name {
-                            AmountListItem(label: categoryName, amount: budget.amount)
-                        }
+                        AmountListItem(label: budget.name, amount: budget.amount)
                     }
                 }
             }
@@ -27,9 +25,7 @@ struct BudgetsView: View {
             Section(header: Text("Expenses (monthly)")) {
                 ForEach(expenses) { budget in
                     NavigationLink(destination: BudgetView(budget: budget)) {
-                        if let categoryName = Mocks.categories.first(where: { $0.id == budget.category })?.name {
-                            AmountListItem(label: categoryName, amount: budget.amount)
-                        }
+                        AmountListItem(label: budget.name, amount: budget.amount)
                     }
                 }
             }

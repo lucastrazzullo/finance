@@ -12,9 +12,9 @@ struct TransactionListItem: View {
     let transaction: Transaction
 
     var body: some View {
-        let label = transaction.content.description ?? DateFormatter.transactionDateFormatter.string(from: transaction.content.date)
+        let label = transaction.description ?? DateFormatter.transactionDateFormatter.string(from: transaction.date)
         HStack {
-            Text(label)
+            Text(label).font(.caption)
             Spacer()
 
             HStack {
@@ -31,7 +31,7 @@ struct TransactionListItem: View {
     // MARK: Private factory methods
 
     private func makeIconName(for transaction: Transaction) -> String {
-        switch transaction {
+        switch transaction.type {
         case .expense:
             return "minus"
         case .income:
@@ -40,7 +40,7 @@ struct TransactionListItem: View {
     }
 
     private func makeBackgroundColor(for transaction: Transaction) -> Color {
-        switch transaction {
+        switch transaction.type {
         case .expense:
             return .yellow
         case .income:

@@ -9,38 +9,58 @@ import SwiftUI
 
 struct CategorisedTransactionsView: View {
 
+    final class Controller: ObservableObject {
+        private let incoming: [Transaction] = Mocks.incomingTransactions
+        private let outgoing: [Transaction] = Mocks.outgoingTransactions
+
+        lazy var incomingBudgets: [Budget] = {
+            incoming
+                .map(\.budgetId)
+                .removeDuplicates()
+                .compactMap({ budgetId in
+                    BudgetProvider.incomingBudgetList.first(where: { $0.id == budgetId })
+                })
+        }()
+
+        lazy var expensesBudgets: [Budget] = {
+            outgoing
+                .map(\.budgetId)
+                .removeDuplicates()
+                .compactMap({ budgetId in
+                    BudgetProvider.expensesBudgetList.first(where: { $0.id == budgetId })
+                })
+        }()
+
+        func incomingTransactions(for budgetId: Budget.ID) -> [Transaction] {
+            incoming.filter { $0.budgetId == budgetId }
+        }
+
+        func outgoingTransactions(for budgetId: Budget.ID) -> [Transaction] {
+            outgoing.filter { $0.budgetId == budgetId }
+        }
+    }
+
     @State private var isInsertTransactionsPresented: Bool = false
 
-    let incoming: [Transaction] = Mocks.incomingTransactions
-    let outgoing: [Transaction] = Mocks.outgoingTransactions
-
-    var incomingCategories: [Category] {
-        let categories = incoming.map(\.content.category)
-        return Mocks.categories.filter { categories.contains($0.id) }
-    }
-
-    var outgoingCategories: [Category] {
-        let categories = outgoing.map(\.content.category)
-        return Mocks.categories.filter { categories.contains($0.id) }
-    }
+    @ObservedObject private var controller: Controller = Controller()
 
     var body: some View {
         VStack(spacing: 0) {
             List {
                 Section(header: Text("Incoming transactions")) {
-                    ForEach(incomingCategories) { category in
-                        let transactions = incoming.filter { $0.content.category == category.id }
-                        NavigationLink(destination: makeTransactionsView(with: transactions, for: category)) {
-                            AmountListItem(label: category.name, amount: transactions.totalAmount)
+                    ForEach(controller.incomingBudgets) { budget in
+                        let transactions = controller.incomingTransactions(for: budget.id)
+                        NavigationLink(destination: makeTransactionsView(with: transactions, for: budget)) {
+                            AmountListItem(label: budget.name, amount: transactions.totalAmount)
                         }
                     }
                 }
 
                 Section(header: Text("Outgoing transactions")) {
-                    ForEach(outgoingCategories) { category in
-                        let transactions = outgoing.filter { $0.content.category == category.id }
-                        NavigationLink(destination: makeTransactionsView(with: transactions, for: category)) {
-                            AmountListItem(label: category.name, amount: transactions.totalAmount)
+                    ForEach(controller.expensesBudgets) { budget in
+                        let transactions = controller.outgoingTransactions(for: budget.id)
+                        NavigationLink(destination: makeTransactionsView(with: transactions, for: budget)) {
+                            AmountListItem(label: budget.name, amount: transactions.totalAmount)
                         }
                     }
                 }
@@ -50,9 +70,9 @@ struct CategorisedTransactionsView: View {
 
     // MARK: Private factory methods
 
-    private func makeTransactionsView(with transactions: [Transaction], for category: Category) -> some View {
+    private func makeTransactionsView(with transactions: [Transaction], for budget: Budget) -> some View {
         TransactionsView(transactions: transactions)
-            .navigationTitle(Text(category.name))
+            .navigationTitle(Text(budget.name))
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Add transaction") {
@@ -61,7 +81,7 @@ struct CategorisedTransactionsView: View {
                 }
             }
             .sheet(isPresented: $isInsertTransactionsPresented, onDismiss: nil) {
-                InsertTransactionsView(category: category)
+                InsertTransactionsView(budget: budget)
             }
     }
 }
