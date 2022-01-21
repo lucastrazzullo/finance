@@ -12,7 +12,7 @@ struct InsertTransactionsView: View {
     final class Controller: ObservableObject {
 
         enum TransactionType: String, CaseIterable {
-            case income, expense
+            case expense, income
         }
 
         let budget: Budget
