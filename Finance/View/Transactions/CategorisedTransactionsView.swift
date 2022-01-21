@@ -10,46 +10,87 @@ import SwiftUI
 struct CategorisedTransactionsView: View {
 
     final class Controller: ObservableObject {
-        private let incoming: [Transaction] = Mocks.incomingTransactions
-        private let outgoing: [Transaction] = Mocks.outgoingTransactions
 
-        lazy var incomingBudgets: [Budget] = {
-            incoming
-                .map(\.budgetId)
-                .removeDuplicates()
-                .compactMap({ budgetId in
-                    BudgetProvider.incomingBudgetList.first(where: { $0.id == budgetId })
-                })
-        }()
+        private let incomingTransactions: [Transaction] = Mocks.incomingTransactions
+        private let outgoingTransactions: [Transaction] = Mocks.outgoingTransactions
 
-        lazy var expensesBudgets: [Budget] = {
-            outgoing
-                .map(\.budgetId)
-                .removeDuplicates()
-                .compactMap({ budgetId in
-                    BudgetProvider.expensesBudgetList.first(where: { $0.id == budgetId })
-                })
-        }()
+        let allIncomingBudgets: [Budget] = BudgetProvider.incomingBudgetList
+        let allExpensesBudgets: [Budget] = BudgetProvider.expensesBudgetList
 
-        func incomingTransactions(for budgetId: Budget.ID) -> [Transaction] {
-            incoming.filter { $0.budgetId == budgetId }
+        func incomingTransactions(for budgetId: Budget.ID, filteredBy monthIdentifier: Int) -> [Transaction] {
+            incomingTransactions
+                .filter { $0.budgetId == budgetId }
+                .filter { transaction in
+                    let monthComponent = Calendar.current.component(.month, from: transaction.date)
+                    return monthComponent == monthIdentifier
+                }
         }
 
-        func outgoingTransactions(for budgetId: Budget.ID) -> [Transaction] {
-            outgoing.filter { $0.budgetId == budgetId }
+        func outgoingTransactions(for budgetId: Budget.ID, filteredBy monthIdentifier: Int) -> [Transaction] {
+            outgoingTransactions
+                .filter { $0.budgetId == budgetId }
+                .filter { transaction in
+                    let monthComponent = Calendar.current.component(.month, from: transaction.date)
+                    return monthComponent == monthIdentifier
+                }
+        }
+
+        // MARK: Private methods
+
+        private func incomingBudgets(for transactions: [Transaction]) -> [Budget] {
+            transactions
+                .map(\.budgetId)
+                .removeDuplicates()
+                .compactMap(incomingBudget(with:))
+        }
+
+        private func expensesBudgets(for transactions: [Transaction]) -> [Budget] {
+            transactions
+                .map(\.budgetId)
+                .removeDuplicates()
+                .compactMap(expensesBudget(with:))
+        }
+
+        private func incomingBudget(with id: Budget.ID) -> Budget? {
+            allIncomingBudgets.first(where: { $0.id == id })
+        }
+
+        private func expensesBudget(with id: Budget.ID) -> Budget? {
+            allExpensesBudgets.first(where: { $0.id == id })
+        }
+    }
+
+    private struct Months {
+        static let allMonths: [String] = {
+            return Calendar.current.standaloneMonthSymbols
+        }()
+
+        static var currentMonthIdentifier: Int {
+            return Calendar.current.component(.month, from: Date())
+        }
+
+        static func monthIdentifier(by index: Int) -> Int {
+            return index + 1
+        }
+
+        static func monthIndex(for identifier: Int) -> Int {
+            return identifier - 1
         }
     }
 
     @State private var isInsertTransactionsPresented: Bool = false
+    @State private var selectedMonthInbdex: Int = Months.monthIndex(for: Months.currentMonthIdentifier)
 
     @ObservedObject private var controller: Controller = Controller()
 
     var body: some View {
-        VStack(spacing: 0) {
+        VStack(spacing: 10) {
+
             List {
                 Section(header: Text("Incoming transactions")) {
-                    ForEach(controller.incomingBudgets) { budget in
-                        let transactions = controller.incomingTransactions(for: budget.id)
+                    let selectedMonthIdentifier = Months.monthIdentifier(by: selectedMonthInbdex)
+                    ForEach(controller.allIncomingBudgets) { budget in
+                        let transactions = controller.incomingTransactions(for: budget.id, filteredBy: selectedMonthIdentifier)
                         NavigationLink(destination: makeTransactionsView(with: transactions, for: budget)) {
                             AmountListItem(label: budget.name, amount: transactions.totalAmount)
                         }
@@ -57,12 +98,26 @@ struct CategorisedTransactionsView: View {
                 }
 
                 Section(header: Text("Outgoing transactions")) {
-                    ForEach(controller.expensesBudgets) { budget in
-                        let transactions = controller.outgoingTransactions(for: budget.id)
+                    let selectedMonthIdentifier = Months.monthIdentifier(by: selectedMonthInbdex)
+                    ForEach(controller.allExpensesBudgets) { budget in
+                        let transactions = controller.outgoingTransactions(for: budget.id, filteredBy: selectedMonthIdentifier)
                         NavigationLink(destination: makeTransactionsView(with: transactions, for: budget)) {
                             AmountListItem(label: budget.name, amount: transactions.totalAmount)
                         }
                     }
+                }
+            }
+        }
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                HStack {
+                    Picker("Month", selection: $selectedMonthInbdex) {
+                        ForEach(Months.allMonths.enumerated().map(\.offset), id: \.self) { index in
+                            Text(Months.allMonths[index])
+                        }
+                    }
+
+                    Image(systemName: "calendar")
                 }
             }
         }
@@ -92,6 +147,7 @@ struct CategorisedTransactionsView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
             CategorisedTransactionsView()
+                .navigationTitle("Transactions 2022")
         }
     }
 }
