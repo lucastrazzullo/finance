@@ -7,24 +7,17 @@
 
 import Foundation
 
-struct Transaction: Identifiable, AmountHolder {
-
-    enum TransactionType: String, CaseIterable {
-        case expense
-        case income
-    }
+struct Transaction: Identifiable, TransferHolder {
 
     let id: UUID = UUID()
     let date: Date = Date()
-    let amount: MoneyValue
-    let type: TransactionType
+    let transfer: Transfer
     let description: String?
     let budgetId: Budget.ID
     let budgetSliceId: BudgetSlice.ID
 
-    init(amount: MoneyValue, type: TransactionType, description: String? = nil, budgetId: Budget.ID, budgetSliceId: BudgetSlice.ID) {
-        self.amount = amount
-        self.type = type
+    init(transfer: Transfer, description: String? = nil, budgetId: Budget.ID, budgetSliceId: BudgetSlice.ID) {
+        self.transfer = transfer
         self.description = description
         self.budgetId = budgetId
         self.budgetSliceId = budgetSliceId

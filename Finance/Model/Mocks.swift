@@ -17,9 +17,9 @@ enum Mocks {
             .map { budget in
                 budget.slices.map { slice in
                     [
-                        Transaction(amount: .value(100.02), type: .income, budgetId: budget.id, budgetSliceId: slice.id),
-                        Transaction(amount: .value(200.02), type: .income, budgetId: budget.id, budgetSliceId: slice.id),
-                        Transaction(amount: .value(300.02), type: .income, budgetId: budget.id, budgetSliceId: slice.id)
+                        Transaction(transfer: .income(amount: .value(100.02)), budgetId: budget.id, budgetSliceId: slice.id),
+                        Transaction(transfer: .income(amount: .value(200.02)), budgetId: budget.id, budgetSliceId: slice.id),
+                        Transaction(transfer: .income(amount: .value(300.02)), budgetId: budget.id, budgetSliceId: slice.id)
                     ]
                 }
                 .flatMap({$0})
@@ -32,9 +32,9 @@ enum Mocks {
             .map { budget in
                 budget.slices.map { slice in
                     [
-                        Transaction(amount: .value(100.02), type: .expense, budgetId: budget.id, budgetSliceId: slice.id),
-                        Transaction(amount: .value(200.02), type: .expense, budgetId: budget.id, budgetSliceId: slice.id),
-                        Transaction(amount: .value(300.02), type: .expense, budgetId: budget.id, budgetSliceId: slice.id)
+                        Transaction(transfer: .expense(amount: .value(100.02)), budgetId: budget.id, budgetSliceId: slice.id),
+                        Transaction(transfer: .expense(amount: .value(200.02)), budgetId: budget.id, budgetSliceId: slice.id),
+                        Transaction(transfer: .expense(amount: .value(300.02)), budgetId: budget.id, budgetSliceId: slice.id)
                     ]
                 }
                 .flatMap({$0})

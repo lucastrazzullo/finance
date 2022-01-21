@@ -18,7 +18,7 @@ final class BudgetProvider {
 
     static let expensesBudgetList: [Budget] = {
         [
-            Budget(name: "House", slices: [
+            Budget(name: "House").sliced(in: [
                 .init(name: "Mortgage", amount: .value(120.23)),
                 .init(name: "Furnitures", amount: .value(120.23))
             ]),

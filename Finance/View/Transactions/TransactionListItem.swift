@@ -19,7 +19,7 @@ struct TransactionListItem: View {
 
             HStack {
                 Image(systemName: makeIconName(for: transaction))
-                AmountView(amount: transaction.amount)
+                AmountView(amount: transaction.transfer.amount)
             }
             .font(.subheadline)
             .padding(4)
@@ -31,7 +31,7 @@ struct TransactionListItem: View {
     // MARK: Private factory methods
 
     private func makeIconName(for transaction: Transaction) -> String {
-        switch transaction.type {
+        switch transaction.transfer {
         case .expense:
             return "minus"
         case .income:
@@ -40,7 +40,7 @@ struct TransactionListItem: View {
     }
 
     private func makeBackgroundColor(for transaction: Transaction) -> Color {
-        switch transaction.type {
+        switch transaction.transfer {
         case .expense:
             return .yellow
         case .income:

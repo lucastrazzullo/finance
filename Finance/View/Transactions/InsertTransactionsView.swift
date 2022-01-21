@@ -11,14 +11,18 @@ struct InsertTransactionsView: View {
 
     final class Controller: ObservableObject {
 
+        enum TransactionType: String, CaseIterable {
+            case income, expense
+        }
+
         let budget: Budget
 
         init(budget: Budget) {
             self.budget = budget
         }
 
-        lazy var transactionTypes: [Transaction.TransactionType] = {
-            Transaction.TransactionType.allCases
+        lazy var transactionTypes: [TransactionType] = {
+            return TransactionType.allCases
         }()
 
         lazy var budgetSlicesId: [BudgetSlice.ID] = {
@@ -31,7 +35,7 @@ struct InsertTransactionsView: View {
     @State private var transactions: [Transaction] = []
     @State private var newTransactionAmount: String = ""
     @State private var newTransactionTypeIndex: Int = 0
-    @State private var newTransactionBudgetSliceIndex: Int = 0
+    @State private var newTransactionBudgetSliceIndex: Int
 
     @ObservedObject private var controller: Controller
 
@@ -39,11 +43,19 @@ struct InsertTransactionsView: View {
         VStack {
             Text(controller.budget.name)
                 .font(.largeTitle)
+                .padding(.top)
 
             List {
                 ForEach(transactions) { transaction in
                     let label = transaction.description ?? DateFormatter.transactionDateFormatter.string(from: transaction.date)
-                    AmountListItem(label: label, amount: transaction.amount)
+                    AmountListItem(label: label, amount: transaction.transfer.amount)
+                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                            Button(role: .destructive) {
+                                transactions.removeAll(where: { $0.id == transaction.id })
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
+                        }
                 }
 
                 Button("Add transactions") {
@@ -93,9 +105,18 @@ struct InsertTransactionsView: View {
                             return
                         }
 
-                        let transactionType = controller.transactionTypes[newTransactionTypeIndex]
                         let budgetSliceId = controller.budgetSlicesId[newTransactionBudgetSliceIndex]
-                        let transaction = Transaction(amount: amount, type: transactionType, budgetId: controller.budget.id, budgetSliceId: budgetSliceId)
+                        let transactionType = controller.transactionTypes[newTransactionTypeIndex]
+                        let transfer: Transfer = {
+                            switch transactionType {
+                            case .expense:
+                                return .expense(amount: amount)
+                            case .income:
+                                return .income(amount: amount)
+                            }
+                        }()
+
+                        let transaction = Transaction(transfer: transfer, budgetId: controller.budget.id, budgetSliceId: budgetSliceId)
                         transactions.append(transaction)
 
                         newTransactionAmount = ""
@@ -109,8 +130,16 @@ struct InsertTransactionsView: View {
         }
     }
 
-    init(budget: Budget) {
-        self.controller = Controller(budget: budget)
+    init(budget: Budget, initialSliceId: BudgetSlice.ID? = nil) {
+        let controller = Controller(budget: budget)
+        self.controller = controller
+
+        if let initialSliceId = initialSliceId,
+           let initialIndex = controller.budgetSlicesId.firstIndex(of: initialSliceId) {
+            self.newTransactionBudgetSliceIndex = initialIndex
+        } else {
+            self.newTransactionBudgetSliceIndex = 0
+        }
     }
 }
 
@@ -118,10 +147,10 @@ struct InsertTransactionsView: View {
 
 struct InsertTransactionsView_Previews: PreviewProvider {
     static var previews: some View {
-        let budget = Budget(name: "Test", slices: [
-            .default(amount: .value(200)),
-            .default(amount: .value(100)),
-            .default(amount: .value(500))
+        let budget = Budget(name: "Test").sliced(in: [
+            .init(name: "", amount: .value(200)),
+            .init(name: "", amount: .value(100)),
+            .init(name: "", amount: .value(500))
         ])
         return InsertTransactionsView(budget: budget)
     }

@@ -60,24 +60,6 @@ struct CategorisedTransactionsView: View {
         }
     }
 
-    private struct Months {
-        static let allMonths: [String] = {
-            return Calendar.current.standaloneMonthSymbols
-        }()
-
-        static var currentMonthIdentifier: Int {
-            return Calendar.current.component(.month, from: Date())
-        }
-
-        static func monthIdentifier(by index: Int) -> Int {
-            return index + 1
-        }
-
-        static func monthIndex(for identifier: Int) -> Int {
-            return identifier - 1
-        }
-    }
-
     @State private var isInsertTransactionsPresented: Bool = false
     @State private var selectedMonthInbdex: Int = Months.monthIndex(for: Months.currentMonthIdentifier)
 
