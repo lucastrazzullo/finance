@@ -14,8 +14,8 @@ struct CategorisedTransactionsView: View {
         private let incomingTransactions: [Transaction] = Mocks.incomingTransactions
         private let outgoingTransactions: [Transaction] = Mocks.outgoingTransactions
 
-        let allIncomingBudgets: [Budget] = BudgetProvider.incomingBudgetList
-        let allExpensesBudgets: [Budget] = BudgetProvider.expensesBudgetList
+        let allIncomingBudgets: [Budget] = Mocks.budgets
+        let allExpensesBudgets: [Budget] = Mocks.budgets
 
         func incomingTransactions(for budgetId: Budget.ID, filteredBy monthIdentifier: Int) -> [Transaction] {
             incomingTransactions

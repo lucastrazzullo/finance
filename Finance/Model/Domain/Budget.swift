@@ -9,11 +9,6 @@ import Foundation
 
 struct Budget: Identifiable, AmountHolder {
 
-    struct Slice {
-        let name: String
-        let amount: MoneyValue
-    }
-
     let id: UUID
     let name: String
     let slices: [BudgetSlice]
@@ -22,23 +17,30 @@ struct Budget: Identifiable, AmountHolder {
         return slices.totalAmount
     }
 
-    init(name: String, amount: MoneyValue = .zero) {
-        self.id = UUID()
-        self.name = name
-        self.slices = [.default(amount: amount, budgetId: id)]
+    init(id: ID, name: String, amount: MoneyValue = .zero) {
+        self.init(id: id, name: name, slices: [.default(amount: amount)])
     }
 
-    private init(id: ID, name: String, slices: [BudgetSlice]) {
+    init(id: ID, name: String, slices: [BudgetSlice]) {
         self.id = id
         self.name = name
         self.slices = slices
     }
+}
 
-    func sliced(in slices: [Slice]) -> Self {
-        let slices = slices.map { slice in
-            BudgetSlice(name: slice.name, amount: slice.amount, budgetId: id)
+extension Budget {
+
+    static func with(budgetEntity: BudgetEntity) -> Self? {
+        guard let identifier = budgetEntity.identifier,
+              let name = budgetEntity.name,
+              let slices = budgetEntity.slices else {
+            return nil
         }
 
-        return Self.init(id: id, name: name, slices: slices)
+        let budgetSlices = slices
+            .compactMap { $0 as? BudgetSliceEntity }
+            .compactMap { BudgetSlice.with(budgetSliceEntity: $0) }
+
+        return Budget(id: identifier, name: name, slices: budgetSlices)
     }
 }

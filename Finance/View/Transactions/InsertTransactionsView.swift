@@ -30,7 +30,7 @@ struct InsertTransactionsView: View {
         }()
     }
 
-    @State private var isInsertNewTransactionPresented: Bool = false
+    @State private var isInsertNewTransactionPresented: Bool
 
     @State private var transactions: [Transaction] = []
     @State private var newTransactionAmount: String = ""
@@ -130,9 +130,10 @@ struct InsertTransactionsView: View {
         }
     }
 
-    init(budget: Budget, initialSliceId: BudgetSlice.ID? = nil) {
+    init(budget: Budget, initialSliceId: BudgetSlice.ID? = nil, initialInsertionPresented: Bool = false) {
         let controller = Controller(budget: budget)
         self.controller = controller
+        self.isInsertNewTransactionPresented = initialInsertionPresented
 
         if let initialSliceId = initialSliceId,
            let initialIndex = controller.budgetSlicesId.firstIndex(of: initialSliceId) {
@@ -147,7 +148,7 @@ struct InsertTransactionsView: View {
 
 struct InsertTransactionsView_Previews: PreviewProvider {
     static var previews: some View {
-        let budget = Budget(name: "Test").sliced(in: [
+        let budget = Budget(id: UUID(), name: "Test", slices: [
             .init(name: "", amount: .value(200)),
             .init(name: "", amount: .value(100)),
             .init(name: "", amount: .value(500))

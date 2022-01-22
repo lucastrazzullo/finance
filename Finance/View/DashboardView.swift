@@ -9,6 +9,8 @@ import SwiftUI
 
 struct DashboardView: View {
 
+    @StateObject private var storageProvider: StorageProvider = StorageProvider()
+
     private let totalStatements: MoneyValue = .value(10000)
     private let totalTransactions: MoneyValue = .value(10000)
 
@@ -27,7 +29,7 @@ struct DashboardView: View {
                 .padding()
 
                 List {
-                    NavigationLink(destination: BudgetsView().navigationTitle("Budgets 2022")) {
+                    NavigationLink(destination: BudgetsView(storageProvider: storageProvider.budgetProvider).navigationTitle("Budgets 2022")) {
                         Text("Budgets")
                     }
 

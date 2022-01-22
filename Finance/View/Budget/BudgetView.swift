@@ -80,7 +80,7 @@ struct BudgetView: View {
 struct BudgetView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
-            BudgetView(budget: BudgetProvider.expensesBudgetList.first!)
+            BudgetView(budget: Mocks.budgets.first!)
         }
         .preferredColorScheme(.dark)
     }

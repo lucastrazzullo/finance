@@ -9,7 +9,17 @@ import SwiftUI
 
 struct TransactionsView: View {
 
-    final class Controller: ObservableObject {
+    private struct InsertTransactionItem: Identifiable {
+
+        var id: UUID {
+            return budgetSliceId
+        }
+
+        let budget: Budget
+        let budgetSliceId: BudgetSlice.ID
+    }
+
+    private final class Controller: ObservableObject {
 
         private let transactions: [Transaction]
 
@@ -51,14 +61,11 @@ struct TransactionsView: View {
         }
 
         private func allBudgets() -> [Budget] {
-            return [
-                BudgetProvider.incomingBudgetList,
-                BudgetProvider.expensesBudgetList
-            ].flatMap({$0})
+            Mocks.budgets
         }
     }
 
-    @State private var insertTransactionsForBudgetSlice: BudgetSlice?
+    @State private var insertTransactions: InsertTransactionItem?
 
     @ObservedObject private var controller: Controller
 
@@ -76,7 +83,7 @@ struct TransactionsView: View {
                             HStack {
                                 Spacer()
                                 Button(action: {
-                                    insertTransactionsForBudgetSlice = slice
+                                    insertTransactions = InsertTransactionItem(budget: budget, budgetSliceId: slice.id)
                                 }) {
                                     Label("Add Transaction", systemImage: "plus").font(.footnote)
                                 }
@@ -86,12 +93,10 @@ struct TransactionsView: View {
                 }
             }
         }
-        .sheet(item: $insertTransactionsForBudgetSlice, onDismiss: {
-            insertTransactionsForBudgetSlice = nil
-        }) { budgetSlice in
-            if let budget = controller.budget(with: budgetSlice.budgetId) {
-                InsertTransactionsView(budget: budget, initialSliceId: budgetSlice.id)
-            }
+        .sheet(item: $insertTransactions, onDismiss: {
+            insertTransactions = nil
+        }) { object in
+            InsertTransactionsView(budget: object.budget, initialSliceId: object.budgetSliceId, initialInsertionPresented: true)
         }
     }
 

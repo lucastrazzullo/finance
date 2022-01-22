@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="19574" systemVersion="21C52" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="BudgetEntity" representedClassName="BudgetEntity" syncable="YES" codeGenerationType="class">
+        <attribute name="name" attributeType="String"/>
+        <relationship name="slices" toMany="YES" deletionRule="Cascade" destinationEntity="BudgetSliceEntity" inverseName="budget" inverseEntity="BudgetSliceEntity"/>
+    </entity>
+    <entity name="BudgetSliceEntity" representedClassName="BudgetSliceEntity" syncable="YES" codeGenerationType="class">
+        <attribute name="amount" attributeType="Decimal" defaultValueString="0.0"/>
+        <attribute name="name" attributeType="String"/>
+        <relationship name="budget" maxCount="1" deletionRule="Nullify" destinationEntity="BudgetEntity" inverseName="slices" inverseEntity="BudgetEntity"/>
+    </entity>
+    <elements>
+        <element name="BudgetEntity" positionX="-209.69921875" positionY="-150.32421875" width="128" height="59"/>
+        <element name="BudgetSliceEntity" positionX="-63" positionY="-18" width="128" height="88"/>
+    </elements>
+</model>
