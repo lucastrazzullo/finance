@@ -8,7 +8,13 @@
 import Foundation
 import CoreData
 
-final class BudgetStorageProvider {
+protocol BudgetProvider {
+    func save(budget: Budget, completion: ((Result<Void, Error>) -> Void)?)
+    func delete(budget: Budget, completion: ((Result<Void, Error>) -> Void)?)
+    func fetchBudgets(completion: (Result<[Budget], Error>) -> Void)
+}
+
+final class BudgetStorageProvider: BudgetProvider {
 
     enum StorageError: Error {
         case entityNotFound
@@ -16,8 +22,13 @@ final class BudgetStorageProvider {
 
     private let persistentContainer: NSPersistentContainer
 
+    private var budgetEntities: Set<BudgetEntity>
+
+    // MARK: Object life cycle
+
     init(persistentContainer: NSPersistentContainer) {
         self.persistentContainer = persistentContainer
+        self.budgetEntities = []
     }
 
     // MARK: Internal methods
@@ -25,20 +36,35 @@ final class BudgetStorageProvider {
     func save(budget: Budget, completion: ((Result<Void, Error>) -> Void)? = nil) {
         let budgetEntity = BudgetEntity(context: persistentContainer.viewContext)
         updateBudgetEntity(budgetEntity, with: budget)
+        budgetEntities.insert(budgetEntity)
         save(completion: completion)
     }
 
-    func delete(budgetEntity: BudgetEntity, completion: ((Result<Void, Error>) -> Void)? = nil) {
-        persistentContainer.viewContext.delete(budgetEntity)
-        save(completion: completion)
+    func delete(budget: Budget, completion: ((Result<Void, Error>) -> Void)? = nil) {
+        guard let entity = budgetEntities.first(where: { $0.identifier == budget.id }) else {
+            completion?(.failure(StorageError.entityNotFound))
+            return
+        }
+
+        persistentContainer.viewContext.delete(entity)
+        save { [weak self] result in
+            if case .success = result {
+                self?.budgetEntities.remove(entity)
+            }
+
+            completion?(result)
+        }
     }
 
-    func fetchBudgetEntities(completion: (Result<[BudgetEntity], Error>) -> Void) {
+    func fetchBudgets(completion: (Result<[Budget], Error>) -> Void) {
         let fetchBudgetsRequest: NSFetchRequest<BudgetEntity> = BudgetEntity.fetchRequest()
 
         do {
             let entities = try persistentContainer.viewContext.fetch(fetchBudgetsRequest)
-            completion(.success(entities))
+            budgetEntities = Set(entities)
+
+            let budgets = entities.compactMap(Budget.with(budgetEntity:))
+            completion(.success(budgets))
         } catch {
             completion(.failure(error))
         }

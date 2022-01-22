@@ -11,30 +11,20 @@ struct BudgetsView: View {
 
     final class Controller: ObservableObject {
 
-        enum ControllerError: Error {
-            case entityNotFound
-        }
-
         @Published var budgets: [Budget] = []
 
-        let storageProvider: BudgetStorageProvider
+        let storageProvider: BudgetProvider
 
-        private var budgetEntities: [BudgetEntity] {
-            didSet {
-                budgets = budgetEntities.compactMap(Budget.with(budgetEntity:))
-            }
-        }
-
-        init(storageProvider: BudgetStorageProvider) {
+        init(storageProvider: BudgetProvider) {
             self.storageProvider = storageProvider
-            self.budgetEntities = []
+            self.budgets = []
         }
 
         func fetch() {
-            storageProvider.fetchBudgetEntities { [weak self] result in
+            storageProvider.fetchBudgets { [weak self] result in
                 switch result {
                 case .success(let budgets):
-                    self?.budgetEntities = budgets
+                    self?.budgets = budgets
                 case .failure:
                     break
                 }
@@ -49,12 +39,7 @@ struct BudgetsView: View {
         }
 
         func delete(budget: Budget, completion: @escaping (Result<Void, Error>) -> Void) {
-            guard let entity = budgetEntities.first(where: { $0.identifier == budget.id }) else {
-                completion(.failure(ControllerError.entityNotFound))
-                return
-            }
-
-            storageProvider.delete(budgetEntity: entity) { [weak self] result in
+            storageProvider.delete(budget: budget) { [weak self] result in
                 self?.fetch()
                 completion(result)
             }
@@ -115,7 +100,7 @@ struct BudgetsView: View {
         .onAppear(perform: controller.fetch)
     }
 
-    init(storageProvider: BudgetStorageProvider) {
+    init(storageProvider: BudgetProvider) {
         self.controller = Controller(storageProvider: storageProvider)
     }
 }
@@ -124,9 +109,28 @@ struct BudgetsView: View {
 
 struct BudgetsView_Previews: PreviewProvider {
     static var previews: some View {
-        let storageProvider = StorageProvider()
+        let storageProvider = MockBudgetProvider()
         NavigationView {
-            BudgetsView(storageProvider: storageProvider.budgetProvider).navigationTitle("Budgets")
+            BudgetsView(storageProvider: storageProvider).navigationTitle("Budgets")
         }
+    }
+}
+
+final class MockBudgetProvider: BudgetProvider {
+
+    private var budgets: [Budget] = Mocks.budgets
+
+    func save(budget: Budget, completion: ((Result<Void, Error>) -> Void)?) {
+        budgets.append(budget)
+        completion?(.success(Void()))
+    }
+
+    func delete(budget: Budget, completion: ((Result<Void, Error>) -> Void)?) {
+        budgets.removeAll(where: { $0.id == budget.id })
+        completion?(.success(Void()))
+    }
+
+    func fetchBudgets(completion: (Result<[Budget], Error>) -> Void) {
+        completion(.success(budgets))
     }
 }
