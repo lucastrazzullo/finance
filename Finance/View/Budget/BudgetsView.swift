@@ -31,6 +31,8 @@ struct BudgetsView: View {
             }
         }
 
+        // MARK: Budget
+
         func save(budget: Budget, completion: @escaping (Result<Void, Error>) -> Void) {
             storageProvider.save(budget: budget) { [weak self] result in
                 self?.fetch()
@@ -46,9 +48,14 @@ struct BudgetsView: View {
         }
     }
 
-    @State private var isInsertBudgetPresented: Bool = false
+    @State private var isInsertNewBudgetPresented: Bool = false
     @State private var newBudgetName: String = ""
     @State private var newBudgetAmount: String = ""
+    @State private var newBudgetSlices: [BudgetSlice] = []
+
+    @State private var isInsertNewBudgetSlicePresented: Bool = false
+    @State private var newBudgetSliceName: String = ""
+    @State private var newBudgetSliceAmount: String = ""
 
     @ObservedObject private var controller: Controller
 
@@ -69,26 +76,65 @@ struct BudgetsView: View {
         }
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                Button(action: { isInsertBudgetPresented = true }) {
+                Button(action: { isInsertNewBudgetPresented = true }) {
                     Label("Add", systemImage: "plus")
                 }
             }
         }
-        .sheet(isPresented: $isInsertBudgetPresented, onDismiss: {}) {
+        .sheet(isPresented: $isInsertNewBudgetPresented, onDismiss: {
+            newBudgetName = ""
+            newBudgetAmount = ""
+            newBudgetSlices = []
+        }, content: {
             Form {
                 Section(header: Text("New Budget")) {
                     TextField("Name", text: $newBudgetName)
-                    InsertAmountField(amountValue: $newBudgetAmount, title: "Monthly Amount", prompt: nil)
+
+                    if newBudgetSlices.isEmpty {
+                        InsertAmountField(amountValue: $newBudgetAmount, title: "Monthly Amount", prompt: nil)
+                    } else {
+                        AmountCollectionItem(title: "Monthly total",
+                                             caption: nil,
+                                             amount: newBudgetSlices.totalAmount,
+                                             color: .green)
+                    }
+                }
+
+                Section(header: Text("Slices")) {
+                    if !newBudgetSlices.isEmpty {
+                        List {
+                            ForEach(newBudgetSlices) { slice in
+                                AmountListItem(label: slice.name, amount: slice.amount)
+                                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                        Button(role: .destructive) {
+                                            newBudgetSlices.removeAll(where: { $0.id == slice.id })
+                                        } label: {
+                                            Label("Delete", systemImage: "trash")
+                                        }
+                                    }
+                            }
+                        }
+                    }
+                    Button(action: { isInsertNewBudgetSlicePresented = true }) {
+                        Label("Add", systemImage: "plus")
+                    }
                 }
 
                 Section {
                     Button("Save") {
-                        let amount = MoneyValue.string(newBudgetAmount) ?? .zero
-                        let budget = Budget(id: UUID(), name: newBudgetName, amount: amount)
+                        let budget: Budget
+                        if newBudgetSlices.isEmpty, let amount = MoneyValue.string(newBudgetAmount) {
+                            budget = Budget(id: .init(), name: newBudgetName, amount: amount)
+                        } else if !newBudgetSlices.isEmpty {
+                            budget = Budget(id: .init(), name: newBudgetName, slices: newBudgetSlices)
+                        } else {
+                            return
+                        }
+
                         controller.save(budget: budget) { result in
                             switch result {
                             case .success:
-                                isInsertBudgetPresented = false
+                                isInsertNewBudgetPresented = false
                             case .failure:
                                 break
                             }
@@ -96,7 +142,29 @@ struct BudgetsView: View {
                     }
                 }
             }
-        }
+            .sheet(isPresented: $isInsertNewBudgetSlicePresented, onDismiss: {
+                newBudgetSliceName = ""
+                newBudgetSliceAmount = ""
+            }, content: {
+                Form {
+                    Section(header: Text("New Budget Slice")) {
+                        TextField("Name", text: $newBudgetSliceName)
+                        InsertAmountField(amountValue: $newBudgetSliceAmount, title: "Monthly Amount", prompt: nil)
+                    }
+
+                    Section {
+                        Button("Save") {
+                            guard let amount = MoneyValue.string(newBudgetSliceAmount) else {
+                                return
+                            }
+
+                            newBudgetSlices.append(BudgetSlice(id: .init(), name: newBudgetSliceName, amount: amount))
+                            isInsertNewBudgetSlicePresented = false
+                        }
+                    }
+                }
+            })
+        })
         .onAppear(perform: controller.fetch)
     }
 

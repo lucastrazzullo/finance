@@ -77,6 +77,7 @@ final class BudgetStorageProvider: BudgetProvider {
         entity.name = budget.name
         entity.slices = NSSet(array: budget.slices.map { slice in
             let sliceEntity = BudgetSliceEntity(context: persistentContainer.viewContext)
+            sliceEntity.identifier = slice.id
             sliceEntity.budget = entity
             sliceEntity.name = slice.name
             sliceEntity.amount = NSDecimalNumber(decimal: slice.amount.value)

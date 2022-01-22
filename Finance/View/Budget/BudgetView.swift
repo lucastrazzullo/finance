@@ -46,7 +46,7 @@ struct BudgetView: View {
             List {
                 Section(header: Text("Slices")) {
                     ForEach(controller.budget.slices) { slice in
-                        if controller.budget.slices.count > 1 {
+                        if controller.budget.slices.count > 0 {
                             HStack {
                                 AmountListItem(label: slice.name, amount: slice.amount)
                                 Text(makePercentageStringFor(amount: slice.amount)).font(.caption)

@@ -8,12 +8,12 @@
 import Foundation
 
 struct BudgetSlice: Identifiable, Hashable, AmountHolder {
-    let id: UUID = .init()
+    let id: UUID
     let name: String
     let amount: MoneyValue
 
     static func `default`(amount: MoneyValue) -> Self {
-        BudgetSlice(name: "Default", amount: amount)
+        BudgetSlice(id: .init(), name: "Default", amount: amount)
     }
 
     func hash(into hasher: inout Hasher) {
@@ -26,11 +26,12 @@ struct BudgetSlice: Identifiable, Hashable, AmountHolder {
 extension BudgetSlice {
 
     static func with(budgetSliceEntity: BudgetSliceEntity) -> Self? {
-        guard let name = budgetSliceEntity.name,
+        guard let identifier = budgetSliceEntity.identifier,
+              let name = budgetSliceEntity.name,
               let amountDecimal = budgetSliceEntity.amount else {
             return nil
         }
 
-        return BudgetSlice(name: name, amount: .value(amountDecimal.decimalValue))
+        return BudgetSlice(id: identifier, name: name, amount: .value(amountDecimal.decimalValue))
     }
 }

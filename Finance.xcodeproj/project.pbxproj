@@ -63,6 +63,8 @@
 		81B80D12278C5516002E002E /* DateFormatter+Defaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DateFormatter+Defaults.swift"; sourceTree = "<group>"; };
 		81BB5375274E1359002B46D6 /* UpdateTotalNetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateTotalNetView.swift; sourceTree = "<group>"; };
 		81BB5377274E1509002B46D6 /* AmountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmountView.swift; sourceTree = "<group>"; };
+		81C222D7279CB5C700759CCB /* Finance 0. 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Finance 0. 2.xcdatamodel"; sourceTree = "<group>"; };
+		81C222D8279CC4F600759CCB /* Finance 0. 3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Finance 0. 3.xcdatamodel"; sourceTree = "<group>"; };
 		81CB8BEF2746B92400A64785 /* Budget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Budget.swift; sourceTree = "<group>"; };
 		81CB8BF32746BC4A00A64785 /* MoneyValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoneyValue.swift; sourceTree = "<group>"; };
 		81CB8BF52746BFDC00A64785 /* BudgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetView.swift; sourceTree = "<group>"; };
@@ -547,10 +549,12 @@
 		81FC874E279B65460031D3AC /* Finance.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				81C222D8279CC4F600759CCB /* Finance 0. 3.xcdatamodel */,
+				81C222D7279CB5C700759CCB /* Finance 0. 2.xcdatamodel */,
 				81FCE397279C59F200A407A7 /* Finance 0.1.xcdatamodel */,
 				81FC874F279B65460031D3AC /* Finance.xcdatamodel */,
 			);
-			currentVersion = 81FCE397279C59F200A407A7 /* Finance 0.1.xcdatamodel */;
+			currentVersion = 81C222D8279CC4F600759CCB /* Finance 0. 3.xcdatamodel */;
 			path = Finance.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
