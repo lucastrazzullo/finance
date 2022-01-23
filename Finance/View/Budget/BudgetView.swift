@@ -40,9 +40,18 @@ struct BudgetView: View {
                         try? self?.budget.remove(slice: slice)
                     }
                 }
-            } catch {
-                assertionFailure(error.localizedDescription)
-            }
+            } catch {}
+        }
+
+        func delete(slice: BudgetSlice) {
+            do {
+                try budget.remove(slice: slice)
+                budgetProvider?.delete(budgetSlice: slice) { [weak self] result in
+                    if case .failure = result {
+                        try? self?.budget.add(slice: slice)
+                    }
+                }
+            } catch {}
         }
     }
 
@@ -70,6 +79,13 @@ struct BudgetView: View {
                             HStack {
                                 AmountListItem(label: slice.name, amount: slice.amount)
                                 Text(makePercentageStringFor(amount: slice.amount)).font(.caption)
+                            }
+                            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                Button(role: .destructive) {
+                                    controller.delete(slice: slice)
+                                } label: {
+                                    Label("Delete", systemImage: "trash")
+                                }
                             }
                         }
                     } else {

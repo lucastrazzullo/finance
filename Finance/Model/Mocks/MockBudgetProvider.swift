@@ -43,6 +43,24 @@ final class MockBudgetProvider: BudgetProvider {
         completion(.success(Void()))
     }
 
+    func delete(budgetSlice: BudgetSlice, completion: @escaping MutateCompletion) {
+        guard let budgetIndex = budgets.firstIndex(where: { $0.slices.contains(where: { $0.id == budgetSlice.id}) }) else {
+            completion(.failure(Error.mock))
+            return
+        }
+
+        var budget = budgets.remove(at: budgetIndex)
+
+        do {
+            try budget.remove(slice: budgetSlice)
+        } catch {
+            completion(.failure(Error.mock))
+            return
+        }
+
+        budgets.insert(budget, at: budgetIndex)
+    }
+
     func fetchBudgets(completion: @escaping FetchCompletion) {
         completion(.success(budgets))
     }
