@@ -27,13 +27,10 @@ final class BudgetStorageProvider: BudgetProvider {
 
     private let persistentContainer: NSPersistentContainer
 
-    private var budgetEntities: Set<BudgetEntity>
-
     // MARK: Object life cycle
 
     init(persistentContainer: NSPersistentContainer) {
         self.persistentContainer = persistentContainer
-        self.budgetEntities = []
     }
 
     // MARK: Internal methods
@@ -51,61 +48,90 @@ final class BudgetStorageProvider: BudgetProvider {
             return sliceEntity
         })
 
-        saveOrRollback { [weak self] result in
-            if case .success = result {
-                self?.budgetEntities.insert(budgetEntity)
-            }
-
-            completion(result)
-        }
-    }
-
-    func add(budgetSlice: BudgetSlice, toBudgetWith budgetId: Budget.ID, completion: @escaping BudgetProvider.MutateCompletion) {
-        guard let budgetEntity = budgetEntities.first(where: { $0.identifier == budgetId }) else {
-            completion(.failure(Error.budgetEntityNotFound))
-            return
-        }
-
-        let sliceEntity = BudgetSliceEntity(context: persistentContainer.viewContext)
-        sliceEntity.identifier = budgetSlice.id
-        sliceEntity.name = budgetSlice.name
-        sliceEntity.amount = NSDecimalNumber(decimal: budgetSlice.amount.value)
-        sliceEntity.budget = budgetEntity
-
         saveOrRollback(completion: completion)
     }
 
-    func delete(budget: Budget, completion: @escaping BudgetProvider.MutateCompletion) {
-        guard let entity = budgetEntities.first(where: { $0.identifier == budget.id }) else {
-            completion(.failure(Error.budgetEntityNotFound))
-            return
-        }
-
-        persistentContainer.viewContext.delete(entity)
-        saveOrRollback { [weak self] result in
-            if case .success = result {
-                self?.budgetEntities.remove(entity)
+    func add(budgetSlice: BudgetSlice, toBudgetWith budgetId: Budget.ID, completion: @escaping BudgetProvider.MutateCompletion) {
+        fetchBudgetEntity(with: budgetId) { [weak self] result in
+            guard let self = self else {
+                completion(.failure(Error.budgetEntityNotFound))
+                return
             }
 
-            completion(result)
+            switch result {
+            case .success(let budgetEntity):
+                let sliceEntity = BudgetSliceEntity(context: self.persistentContainer.viewContext)
+                sliceEntity.identifier = budgetSlice.id
+                sliceEntity.name = budgetSlice.name
+                sliceEntity.amount = NSDecimalNumber(decimal: budgetSlice.amount.value)
+                sliceEntity.budget = budgetEntity
+
+                self.saveOrRollback(completion: completion)
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
+
+
+    }
+
+    func delete(budget: Budget, completion: @escaping BudgetProvider.MutateCompletion) {
+        fetchBudgetEntity(with: budget.id) { [weak self] result in
+            guard let self = self else {
+                completion(.failure(Error.budgetEntityNotFound))
+                return
+            }
+
+            switch result {
+            case .success(let budgetEntity):
+                self.persistentContainer.viewContext.delete(budgetEntity)
+                self.saveOrRollback(completion: completion)
+            case .failure(let error):
+                completion(.failure(error))
+            }
         }
     }
 
     func fetchBudgets(completion: @escaping BudgetProvider.FetchCompletion) {
+        fetchBudgetEntities { result in
+            switch result {
+            case .success(let budgetEntities):
+                let budgets = budgetEntities.compactMap(Budget.with(budgetEntity:))
+                completion(.success(budgets))
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
+    }
+
+    // MARK: Private helper methods
+
+    private func fetchBudgetEntities(completion: @escaping (Result<[BudgetEntity], Swift.Error>) -> Void) {
         let fetchBudgetsRequest: NSFetchRequest<BudgetEntity> = BudgetEntity.fetchRequest()
 
         do {
             let entities = try persistentContainer.viewContext.fetch(fetchBudgetsRequest)
-            budgetEntities = Set(entities)
-
-            let budgets = entities.compactMap(Budget.with(budgetEntity:))
-            completion(.success(budgets))
+            completion(.success(entities))
         } catch {
             completion(.failure(error))
         }
     }
 
-    // MARK: Private helper methods
+    private func fetchBudgetEntity(with identifier: Budget.ID, completion: @escaping (Result<BudgetEntity, Swift.Error>) -> Void) {
+        let predicate = NSPredicate(format: "%K == %@", #keyPath(BudgetEntity.identifier), identifier as CVarArg)
+        let fetchBudgetsRequest: NSFetchRequest<BudgetEntity> = BudgetEntity.fetchRequest()
+        fetchBudgetsRequest.predicate = predicate
+
+        do {
+            guard let budgetEntity = try persistentContainer.viewContext.fetch(fetchBudgetsRequest).first else {
+                completion(.failure(Error.budgetEntityNotFound))
+                return
+            }
+            completion(.success(budgetEntity))
+        } catch {
+            completion(.failure(error))
+        }
+    }
 
     private func saveOrRollback(completion: ((Result<Void, Swift.Error>) -> Void)) {
         do {
