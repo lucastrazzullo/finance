@@ -28,6 +28,7 @@
 		81BB5376274E1359002B46D6 /* UpdateTotalNetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81BB5375274E1359002B46D6 /* UpdateTotalNetView.swift */; };
 		81BB5378274E1509002B46D6 /* AmountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81BB5377274E1509002B46D6 /* AmountView.swift */; };
 		81C222DC279CD11F00759CCB /* MockBudgetProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81C222DB279CD11F00759CCB /* MockBudgetProvider.swift */; };
+		81C222E0279DC72100759CCB /* TransactionProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81C222DF279DC72000759CCB /* TransactionProvider.swift */; };
 		81CB8BF02746B92400A64785 /* Budget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81CB8BEF2746B92400A64785 /* Budget.swift */; };
 		81CB8BF42746BC4A00A64785 /* MoneyValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81CB8BF32746BC4A00A64785 /* MoneyValue.swift */; };
 		81CB8BF62746BFDC00A64785 /* BudgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81CB8BF52746BFDC00A64785 /* BudgetView.swift */; };
@@ -67,6 +68,7 @@
 		81C222D7279CB5C700759CCB /* Finance 0. 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Finance 0. 2.xcdatamodel"; sourceTree = "<group>"; };
 		81C222D8279CC4F600759CCB /* Finance 0. 3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Finance 0. 3.xcdatamodel"; sourceTree = "<group>"; };
 		81C222DB279CD11F00759CCB /* MockBudgetProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockBudgetProvider.swift; sourceTree = "<group>"; };
+		81C222DF279DC72000759CCB /* TransactionProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionProvider.swift; sourceTree = "<group>"; };
 		81CB8BEF2746B92400A64785 /* Budget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Budget.swift; sourceTree = "<group>"; };
 		81CB8BF32746BC4A00A64785 /* MoneyValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoneyValue.swift; sourceTree = "<group>"; };
 		81CB8BF52746BFDC00A64785 /* BudgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetView.swift; sourceTree = "<group>"; };
@@ -160,6 +162,7 @@
 			children = (
 				81FC8751279B77240031D3AC /* StorageProvider.swift */,
 				81EC7CAC279A17AD006194C9 /* BudgetProvider.swift */,
+				81C222DF279DC72000759CCB /* TransactionProvider.swift */,
 			);
 			path = Storage;
 			sourceTree = "<group>";
@@ -328,6 +331,7 @@
 				81FC8750279B65460031D3AC /* Finance.xcdatamodeld in Sources */,
 				81CB8BFC2746D46700A64785 /* InsertTransactionsView.swift in Sources */,
 				81FC8752279B77240031D3AC /* StorageProvider.swift in Sources */,
+				81C222E0279DC72100759CCB /* TransactionProvider.swift in Sources */,
 				81CB8BF62746BFDC00A64785 /* BudgetView.swift in Sources */,
 				81B620F9278D76C600ECDCF0 /* TransactionsView.swift in Sources */,
 				81C222DC279CD11F00759CCB /* MockBudgetProvider.swift in Sources */,

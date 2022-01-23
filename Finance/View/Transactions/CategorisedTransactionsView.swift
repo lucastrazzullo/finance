@@ -11,14 +11,32 @@ struct CategorisedTransactionsView: View {
 
     final class Controller: ObservableObject {
 
-        private let incomingTransactions: [Transaction] = Mocks.incomingTransactions
-        private let outgoingTransactions: [Transaction] = Mocks.outgoingTransactions
+        private let transactions: [Transaction] = Mocks.incomingTransactions
 
-        let allIncomingBudgets: [Budget] = Mocks.budgets
-        let allExpensesBudgets: [Budget] = Mocks.budgets
+        @Published var budgets: [Budget] = []
 
-        func incomingTransactions(for budgetId: Budget.ID, filteredBy monthIdentifier: Int) -> [Transaction] {
-            incomingTransactions
+        private(set) weak var budgetProvider: BudgetProvider?
+
+        init(budgetProvider: BudgetProvider) {
+            self.budgetProvider = budgetProvider
+            self.budgets = []
+        }
+
+        // MARK: Public methods
+
+        func fetch() {
+            budgetProvider?.fetchBudgets { [weak self] result in
+                switch result {
+                case .success(let budgets):
+                    self?.budgets = budgets
+                case .failure:
+                    break
+                }
+            }
+        }
+
+        func transactions(for budgetId: Budget.ID, filteredBy monthIdentifier: Int) -> [Transaction] {
+            transactions
                 .filter { $0.budgetId == budgetId }
                 .filter { transaction in
                     let monthComponent = Calendar.current.component(.month, from: transaction.date)
@@ -26,14 +44,6 @@ struct CategorisedTransactionsView: View {
                 }
         }
 
-        func outgoingTransactions(for budgetId: Budget.ID, filteredBy monthIdentifier: Int) -> [Transaction] {
-            outgoingTransactions
-                .filter { $0.budgetId == budgetId }
-                .filter { transaction in
-                    let monthComponent = Calendar.current.component(.month, from: transaction.date)
-                    return monthComponent == monthIdentifier
-                }
-        }
 
         // MARK: Private methods
 
@@ -44,48 +54,25 @@ struct CategorisedTransactionsView: View {
                 .compactMap(incomingBudget(with:))
         }
 
-        private func expensesBudgets(for transactions: [Transaction]) -> [Budget] {
-            transactions
-                .map(\.budgetId)
-                .removeDuplicates()
-                .compactMap(expensesBudget(with:))
-        }
-
         private func incomingBudget(with id: Budget.ID) -> Budget? {
-            allIncomingBudgets.first(where: { $0.id == id })
-        }
-
-        private func expensesBudget(with id: Budget.ID) -> Budget? {
-            allExpensesBudgets.first(where: { $0.id == id })
+            budgets.first(where: { $0.id == id })
         }
     }
 
     @State private var isInsertTransactionsPresented: Bool = false
     @State private var selectedMonthInbdex: Int = Months.monthIndex(for: Months.currentMonthIdentifier)
 
-    @ObservedObject private var controller: Controller = Controller()
+    @ObservedObject private var controller: Controller
 
     var body: some View {
         VStack(spacing: 10) {
 
             List {
-                Section(header: Text("Incoming transactions")) {
-                    let selectedMonthIdentifier = Months.monthIdentifier(by: selectedMonthInbdex)
-                    ForEach(controller.allIncomingBudgets) { budget in
-                        let transactions = controller.incomingTransactions(for: budget.id, filteredBy: selectedMonthIdentifier)
-                        NavigationLink(destination: makeTransactionsView(with: transactions, for: budget)) {
-                            AmountListItem(label: budget.name, amount: transactions.totalAmount)
-                        }
-                    }
-                }
-
-                Section(header: Text("Outgoing transactions")) {
-                    let selectedMonthIdentifier = Months.monthIdentifier(by: selectedMonthInbdex)
-                    ForEach(controller.allExpensesBudgets) { budget in
-                        let transactions = controller.outgoingTransactions(for: budget.id, filteredBy: selectedMonthIdentifier)
-                        NavigationLink(destination: makeTransactionsView(with: transactions, for: budget)) {
-                            AmountListItem(label: budget.name, amount: transactions.totalAmount)
-                        }
+                let selectedMonthIdentifier = Months.monthIdentifier(by: selectedMonthInbdex)
+                ForEach(controller.budgets) { budget in
+                    let transactions = controller.transactions(for: budget.id, filteredBy: selectedMonthIdentifier)
+                    NavigationLink(destination: makeTransactionsView(with: transactions, for: budget)) {
+                        AmountListItem(label: budget.name, amount: transactions.totalAmount)
                     }
                 }
             }
@@ -103,6 +90,7 @@ struct CategorisedTransactionsView: View {
                 }
             }
         }
+        .onAppear(perform: controller.fetch)
     }
 
     // MARK: Private factory methods
@@ -121,14 +109,19 @@ struct CategorisedTransactionsView: View {
                 InsertTransactionsView(budget: budget)
             }
     }
+
+    init(budgetProvider: BudgetProvider) {
+        self.controller = Controller(budgetProvider: budgetProvider)
+    }
 }
 
 // MARK: - Previews
 
 struct CategorisedTransactionsView_Previews: PreviewProvider {
+    static let budgetStorageProvider = MockBudgetProvider()
     static var previews: some View {
         NavigationView {
-            CategorisedTransactionsView()
+            CategorisedTransactionsView(budgetProvider: budgetStorageProvider)
                 .navigationTitle("Transactions 2022")
         }
     }

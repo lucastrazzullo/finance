@@ -33,7 +33,7 @@ struct DashboardView: View {
                         Text("Budgets")
                     }
 
-                    NavigationLink(destination: CategorisedTransactionsView().navigationTitle("Transactions 2022")) {
+                    NavigationLink(destination: CategorisedTransactionsView(budgetProvider: storageProvider.budgetProvider).navigationTitle("Transactions 2022")) {
                         Text("Transactions")
                     }
                 }
