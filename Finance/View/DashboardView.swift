@@ -29,7 +29,7 @@ struct DashboardView: View {
                 .padding()
 
                 List {
-                    NavigationLink(destination: BudgetsView(storageProvider: storageProvider.budgetProvider).navigationTitle("Budgets 2022")) {
+                    NavigationLink(destination: BudgetsView(budgetProvider: storageProvider.budgetProvider).navigationTitle("Budgets 2022")) {
                         Text("Budgets")
                     }
 

@@ -13,15 +13,15 @@ struct BudgetsView: View {
 
         @Published var budgets: [Budget] = []
 
-        let storageProvider: BudgetProvider
+        private(set) weak var budgetProvider: BudgetProvider?
 
-        init(storageProvider: BudgetProvider) {
-            self.storageProvider = storageProvider
+        init(budgetProvider: BudgetProvider) {
+            self.budgetProvider = budgetProvider
             self.budgets = []
         }
 
         func fetch() {
-            storageProvider.fetchBudgets { [weak self] result in
+            budgetProvider?.fetchBudgets { [weak self] result in
                 switch result {
                 case .success(let budgets):
                     self?.budgets = budgets
@@ -31,17 +31,17 @@ struct BudgetsView: View {
             }
         }
 
-        // MARK: Budget
+        // MARK: Internal methods
 
         func save(budget: Budget, completion: @escaping (Result<Void, Error>) -> Void) {
-            storageProvider.save(budget: budget) { [weak self] result in
+            budgetProvider?.add(budget: budget) { [weak self] result in
                 self?.fetch()
                 completion(result)
             }
         }
 
         func delete(budget: Budget, completion: @escaping (Result<Void, Error>) -> Void) {
-            storageProvider.delete(budget: budget) { [weak self] result in
+            budgetProvider?.delete(budget: budget) { [weak self] result in
                 self?.fetch()
                 completion(result)
             }
@@ -62,14 +62,16 @@ struct BudgetsView: View {
     var body: some View {
         List {
             ForEach(controller.budgets) { budget in
-                NavigationLink(destination: BudgetView(budget: budget)) {
-                    AmountListItem(label: budget.name, amount: budget.amount)
-                }
-                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                    Button(role: .destructive) {
-                        controller.delete(budget: budget, completion: { _ in })
-                    } label: {
-                        Label("Delete", systemImage: "trash")
+                if let budgetProvider = controller.budgetProvider {
+                    NavigationLink(destination: BudgetView(budget: budget, budgetProvider: budgetProvider)) {
+                        AmountListItem(label: budget.name, amount: budget.amount)
+                    }
+                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                        Button(role: .destructive) {
+                            controller.delete(budget: budget, completion: { _ in })
+                        } label: {
+                            Label("Delete", systemImage: "trash")
+                        }
                     }
                 }
             }
@@ -168,37 +170,18 @@ struct BudgetsView: View {
         .onAppear(perform: controller.fetch)
     }
 
-    init(storageProvider: BudgetProvider) {
-        self.controller = Controller(storageProvider: storageProvider)
+    init(budgetProvider: BudgetProvider) {
+        self.controller = Controller(budgetProvider: budgetProvider)
     }
 }
 
 // MARK: - Previews
 
 struct BudgetsView_Previews: PreviewProvider {
+    static let budgetStorageProvider = MockBudgetProvider()
     static var previews: some View {
-        let storageProvider = MockBudgetProvider()
         NavigationView {
-            BudgetsView(storageProvider: storageProvider).navigationTitle("Budgets")
+            BudgetsView(budgetProvider: budgetStorageProvider).navigationTitle("Budgets")
         }
-    }
-}
-
-final class MockBudgetProvider: BudgetProvider {
-
-    private var budgets: [Budget] = Mocks.budgets
-
-    func save(budget: Budget, completion: ((Result<Void, Error>) -> Void)?) {
-        budgets.append(budget)
-        completion?(.success(Void()))
-    }
-
-    func delete(budget: Budget, completion: ((Result<Void, Error>) -> Void)?) {
-        budgets.removeAll(where: { $0.id == budget.id })
-        completion?(.success(Void()))
-    }
-
-    func fetchBudgets(completion: (Result<[Budget], Error>) -> Void) {
-        completion(.success(budgets))
     }
 }

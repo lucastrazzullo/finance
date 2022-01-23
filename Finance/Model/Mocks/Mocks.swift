@@ -14,12 +14,16 @@ enum Mocks {
 
     static let budgets: [Budget] = {
         [
-            Budget(id: UUID(), name: "House", slices: [
-                .init(id: .init(), name: "Mortgage", amount: .value(120.23)),
-                .init(id: .init(), name: "Furnitures", amount: .value(120.23))
-            ]),
+            Budget(id: UUID(), name: "House", slices: Mocks.slices),
             Budget(id: UUID(), name: "Groceries", amount: .value(200.01)),
             Budget(id: UUID(), name: "Health", amount: .value(200.01))
+        ]
+    }()
+
+    static let slices: [BudgetSlice] = {
+        [
+            BudgetSlice(id: .init(), name: "Mortgage", amount: .value(120.23)),
+            BudgetSlice(id: .init(), name: "Furnitures", amount: .value(120.23))
         ]
     }()
 

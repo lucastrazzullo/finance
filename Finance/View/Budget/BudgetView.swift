@@ -11,7 +11,9 @@ struct BudgetView: View {
 
     final class Controller: ObservableObject {
 
-        let budget: Budget
+        @Published var budget: Budget
+
+        private weak var budgetProvider: BudgetProvider?
 
         var monthlyAmount: MoneyValue {
             budget.amount
@@ -21,14 +23,32 @@ struct BudgetView: View {
             budget.amount * .value(12)
         }
 
-        init(budget: Budget) {
+        init(budget: Budget, budgetProvider: BudgetProvider) {
             self.budget = budget
+            self.budgetProvider = budgetProvider
         }
 
         func slicePercentage(amount: MoneyValue) -> Float {
             NSDecimalNumber(decimal: amount.value * 100 / budget.amount.value).floatValue
         }
+
+        func add(slice: BudgetSlice) {
+            do {
+                try budget.add(slice: slice)
+                budgetProvider?.add(budgetSlice: slice, toBudgetWith: budget.id) { [weak self] result in
+                    if case .failure = result {
+                        try? self?.budget.remove(slice: slice)
+                    }
+                }
+            } catch {
+                assertionFailure(error.localizedDescription)
+            }
+        }
     }
+
+    @State private var isAddSlicePresented: Bool = false
+    @State private var newBudgetSliceName: String = ""
+    @State private var newBudgetSliceAmount: String = ""
 
     @ObservedObject private var controller: Controller
 
@@ -45,20 +65,46 @@ struct BudgetView: View {
 
             List {
                 Section(header: Text("Slices")) {
-                    ForEach(controller.budget.slices) { slice in
-                        if controller.budget.slices.count > 0 {
+                    if controller.budget.slices.count > 0 {
+                        ForEach(controller.budget.slices) { slice in
                             HStack {
                                 AmountListItem(label: slice.name, amount: slice.amount)
                                 Text(makePercentageStringFor(amount: slice.amount)).font(.caption)
                             }
-                        } else {
-                            Text("No slices defined for this budget")
                         }
+                    } else {
+                        Text("No slices defined for this budget")
+                    }
+
+                    Button(action: { isAddSlicePresented = true }) {
+                        Label("Add", systemImage: "plus")
                     }
                 }
             }
             .listStyle(InsetGroupedListStyle())
         }
+        .sheet(isPresented: $isAddSlicePresented, onDismiss: {
+            newBudgetSliceName = ""
+            newBudgetSliceAmount = ""
+        }, content: {
+            Form {
+                Section(header: Text("New Budget Slice")) {
+                    TextField("Name", text: $newBudgetSliceName)
+                    InsertAmountField(amountValue: $newBudgetSliceAmount, title: "Monthly Amount", prompt: nil)
+                }
+
+                Section {
+                    Button("Save") {
+                        guard let amount = MoneyValue.string(newBudgetSliceAmount) else {
+                            return
+                        }
+
+                        controller.add(slice: BudgetSlice(id: .init(), name: newBudgetSliceName, amount: amount))
+                        isAddSlicePresented = false
+                    }
+                }
+            }
+        })
         .navigationTitle(controller.budget.name)
     }
 
@@ -70,8 +116,8 @@ struct BudgetView: View {
 
     // MARK: - Object life cycle
 
-    init(budget: Budget) {
-        self.controller = Controller(budget: budget)
+    init(budget: Budget, budgetProvider: BudgetProvider) {
+        self.controller = Controller(budget: budget, budgetProvider: budgetProvider)
     }
 }
 
@@ -79,8 +125,9 @@ struct BudgetView: View {
 
 struct BudgetView_Previews: PreviewProvider {
     static var previews: some View {
+        let budgetProvider = MockBudgetProvider()
         NavigationView {
-            BudgetView(budget: Mocks.budgets.first!)
+            BudgetView(budget: Mocks.budgets.last!, budgetProvider: budgetProvider)
         }
         .preferredColorScheme(.dark)
     }

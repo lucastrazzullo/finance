@@ -12,8 +12,10 @@ struct BudgetSlice: Identifiable, Hashable, AmountHolder {
     let name: String
     let amount: MoneyValue
 
+    static let defaultName: String = "Default"
+
     static func `default`(amount: MoneyValue) -> Self {
-        BudgetSlice(id: .init(), name: "Default", amount: amount)
+        BudgetSlice(id: .init(), name: defaultName, amount: amount)
     }
 
     func hash(into hasher: inout Hasher) {

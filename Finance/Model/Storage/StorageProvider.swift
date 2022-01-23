@@ -13,7 +13,7 @@ final class StorageProvider: ObservableObject {
 
     private let persistentContainer: NSPersistentContainer
 
-    lazy var budgetProvider: BudgetStorageProvider = {
+    lazy var budgetProvider: BudgetProvider = {
         BudgetStorageProvider(persistentContainer: persistentContainer)
     }()
 

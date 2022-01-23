@@ -9,9 +9,14 @@ import Foundation
 
 struct Budget: Identifiable, AmountHolder {
 
+    enum Error: Swift.Error {
+        case sliceAlreadyExistsWith(name: String)
+        case thereMustBeAtLeastOneSlice
+    }
+
     let id: UUID
     let name: String
-    let slices: [BudgetSlice]
+    private(set) var slices: [BudgetSlice]
 
     var amount: MoneyValue {
         return slices.totalAmount
@@ -25,6 +30,22 @@ struct Budget: Identifiable, AmountHolder {
         self.id = id
         self.name = name
         self.slices = slices
+    }
+
+    mutating func add(slice: BudgetSlice) throws {
+        guard !slices.contains(where: { $0.name == slice.name }) else {
+            throw Error.sliceAlreadyExistsWith(name: slice.name)
+        }
+
+        slices.append(slice)
+    }
+
+    mutating func remove(slice: BudgetSlice) throws {
+        guard slices.count > 1 else {
+            throw Error.thereMustBeAtLeastOneSlice
+        }
+
+        slices.removeAll(where: { $0.id == slice.id })
     }
 }
 
