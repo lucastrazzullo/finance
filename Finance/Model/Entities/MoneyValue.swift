@@ -9,7 +9,19 @@ import Foundation
 
 struct MoneyValue {
 
+    private static let formatter: NumberFormatter = {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        return formatter
+    }()
+
     let value: Decimal
+
+    var localizedDescription: String {
+        return Self.formatter.string(from: value as NSDecimalNumber) ?? Self.unknownSymbol
+    }
+
+    static var unknownSymbol: String = "--"
 
     static var zero: Self {
         return MoneyValue(value: 0)

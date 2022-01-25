@@ -18,7 +18,7 @@ struct BudgetView: View {
         VStack(alignment: .leading, spacing: 12) {
             AmountCollectionItem(
                 title: "Monthly",
-                caption: "\(controller.yearlyAmount.value) per year",
+                caption: "\(controller.yearlyAmount.localizedDescription) per year",
                 amount: controller.monthlyAmount,
                 color: .gray.opacity(0.3)
             )

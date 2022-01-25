@@ -9,24 +9,10 @@ import SwiftUI
 
 struct AmountView: View {
 
-    private let formatter: NumberFormatter = {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        return formatter
-    }()
-
     let amount: MoneyValue?
 
-    var text: String {
-        if let amount = amount, let text = formatter.string(from: amount.value as NSDecimalNumber) {
-            return text
-        } else {
-            return "--"
-        }
-    }
-
     var body: some View {
-        Text(text)
+        Text(amount?.localizedDescription ?? MoneyValue.unknownSymbol)
     }
 }
 
