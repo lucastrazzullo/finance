@@ -17,7 +17,6 @@ struct InsertAmountField: View {
     var body: some View {
         TextField(title, text: $amountValue, prompt: prompt)
             .keyboardType(.decimalPad)
-            .multilineTextAlignment(.center)
             .padding(.vertical)
     }
 }

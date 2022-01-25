@@ -9,7 +9,7 @@ import Foundation
 
 final class MockBudgetProvider: BudgetProvider {
 
-    enum Error: Swift.Error {
+    private enum Error: Swift.Error {
         case mock
     }
 
@@ -22,7 +22,7 @@ final class MockBudgetProvider: BudgetProvider {
 
     func add(budgetSlice: BudgetSlice, toBudgetWith budgetId: Budget.ID, completion: @escaping MutateCompletion) {
         guard let budgetIndex = budgets.firstIndex(where: { $0.id == budgetId }) else {
-            completion(.failure(Error.mock))
+            completion(.failure(.budgetProvider(error: .underlying(error: Error.mock))))
             return
         }
 
@@ -31,7 +31,7 @@ final class MockBudgetProvider: BudgetProvider {
         do {
             try budget.add(slice: budgetSlice)
         } catch {
-            completion(.failure(Error.mock))
+            completion(.failure(.budgetProvider(error: .underlying(error: Error.mock))))
             return
         }
 
@@ -45,7 +45,7 @@ final class MockBudgetProvider: BudgetProvider {
 
     func delete(budgetSlice: BudgetSlice, completion: @escaping MutateCompletion) {
         guard let budgetIndex = budgets.firstIndex(where: { $0.slices.contains(where: { $0.id == budgetSlice.id}) }) else {
-            completion(.failure(Error.mock))
+            completion(.failure(.budgetProvider(error: .underlying(error: Error.mock))))
             return
         }
 
@@ -54,7 +54,7 @@ final class MockBudgetProvider: BudgetProvider {
         do {
             try budget.remove(slice: budgetSlice)
         } catch {
-            completion(.failure(Error.mock))
+            completion(.failure(.budgetProvider(error: .underlying(error: Error.mock))))
             return
         }
 

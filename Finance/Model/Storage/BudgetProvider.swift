@@ -9,8 +9,8 @@ import Foundation
 import CoreData
 
 protocol BudgetProvider: AnyObject {
-    typealias MutateCompletion = ((Result<Void, Swift.Error>) -> Void)
-    typealias FetchCompletion = (Result<[Budget], Swift.Error>) -> Void
+    typealias MutateCompletion = ((Result<Void, DomainError>) -> Void)
+    typealias FetchCompletion = (Result<[Budget], DomainError>) -> Void
     func add(budget: Budget, completion: @escaping MutateCompletion)
     func add(budgetSlice: BudgetSlice, toBudgetWith budgetId: Budget.ID, completion: @escaping MutateCompletion)
     func delete(budget: Budget, completion: @escaping MutateCompletion)
@@ -21,10 +21,6 @@ protocol BudgetProvider: AnyObject {
 final class BudgetStorageProvider: BudgetProvider {
 
     // MARK: Types
-
-    enum Error: Swift.Error {
-        case budgetEntityNotFound
-    }
 
     private let persistentContainer: NSPersistentContainer
 
@@ -55,7 +51,7 @@ final class BudgetStorageProvider: BudgetProvider {
     func add(budgetSlice: BudgetSlice, toBudgetWith budgetId: Budget.ID, completion: @escaping BudgetProvider.MutateCompletion) {
         fetchBudgetEntity(with: budgetId) { [weak self] result in
             guard let self = self else {
-                completion(.failure(Error.budgetEntityNotFound))
+                completion(.failure(.budgetProvider(error: .budgetEntityNotFound)))
                 return
             }
 
@@ -79,7 +75,7 @@ final class BudgetStorageProvider: BudgetProvider {
     func delete(budget: Budget, completion: @escaping BudgetProvider.MutateCompletion) {
         fetchBudgetEntity(with: budget.id) { [weak self] result in
             guard let self = self else {
-                completion(.failure(Error.budgetEntityNotFound))
+                completion(.failure(.budgetProvider(error: .budgetEntityNotFound)))
                 return
             }
 
@@ -96,7 +92,7 @@ final class BudgetStorageProvider: BudgetProvider {
     func delete(budgetSlice: BudgetSlice, completion: @escaping MutateCompletion) {
         fetchBudgetSliceEntity(with: budgetSlice.id) { [weak self] result in
             guard let self = self else {
-                completion(.failure(Error.budgetEntityNotFound))
+                completion(.failure(.budgetProvider(error: .budgetEntityNotFound)))
                 return
             }
 
@@ -124,56 +120,56 @@ final class BudgetStorageProvider: BudgetProvider {
 
     // MARK: Private helper methods
 
-    private func fetchBudgetEntities(completion: @escaping (Result<[BudgetEntity], Swift.Error>) -> Void) {
+    private func fetchBudgetEntities(completion: @escaping (Result<[BudgetEntity], DomainError>) -> Void) {
         let fetchBudgetsRequest: NSFetchRequest<BudgetEntity> = BudgetEntity.fetchRequest()
 
         do {
             let entities = try persistentContainer.viewContext.fetch(fetchBudgetsRequest)
             completion(.success(entities))
         } catch {
-            completion(.failure(error))
+            completion(.failure(.budgetProvider(error: .underlying(error: error))))
         }
     }
 
-    private func fetchBudgetEntity(with identifier: Budget.ID, completion: @escaping (Result<BudgetEntity, Swift.Error>) -> Void) {
+    private func fetchBudgetEntity(with identifier: Budget.ID, completion: @escaping (Result<BudgetEntity, DomainError>) -> Void) {
         let predicate = NSPredicate(format: "%K == %@", #keyPath(BudgetEntity.identifier), identifier as CVarArg)
         let fetchBudgetsRequest: NSFetchRequest<BudgetEntity> = BudgetEntity.fetchRequest()
         fetchBudgetsRequest.predicate = predicate
 
         do {
             guard let budgetEntity = try persistentContainer.viewContext.fetch(fetchBudgetsRequest).first else {
-                completion(.failure(Error.budgetEntityNotFound))
+                completion(.failure(.budgetProvider(error: .budgetEntityNotFound)))
                 return
             }
             completion(.success(budgetEntity))
         } catch {
-            completion(.failure(error))
+            completion(.failure(.budgetProvider(error: .underlying(error: error))))
         }
     }
 
-    private func fetchBudgetSliceEntity(with identifier: BudgetSlice.ID, completion: @escaping (Result<BudgetSliceEntity, Swift.Error>) -> Void) {
+    private func fetchBudgetSliceEntity(with identifier: BudgetSlice.ID, completion: @escaping (Result<BudgetSliceEntity, DomainError>) -> Void) {
         let predicate = NSPredicate(format: "%K == %@", #keyPath(BudgetSliceEntity.identifier), identifier as CVarArg)
         let fetchBudgetSlicesRequest: NSFetchRequest<BudgetSliceEntity> = BudgetSliceEntity.fetchRequest()
         fetchBudgetSlicesRequest.predicate = predicate
 
         do {
             guard let budgetSliceEntity = try persistentContainer.viewContext.fetch(fetchBudgetSlicesRequest).first else {
-                completion(.failure(Error.budgetEntityNotFound))
+                completion(.failure(.budgetProvider(error: .budgetEntityNotFound)))
                 return
             }
             completion(.success(budgetSliceEntity))
         } catch {
-            completion(.failure(error))
+            completion(.failure(.budgetProvider(error: .underlying(error: error))))
         }
     }
 
-    private func saveOrRollback(completion: ((Result<Void, Swift.Error>) -> Void)) {
+    private func saveOrRollback(completion: ((Result<Void, DomainError>) -> Void)) {
         do {
             try persistentContainer.viewContext.save()
             completion(.success(Void()))
         } catch {
             persistentContainer.viewContext.rollback()
-            completion(.failure(error))
+            completion(.failure(.budgetProvider(error: .underlying(error: error))))
         }
     }
 }

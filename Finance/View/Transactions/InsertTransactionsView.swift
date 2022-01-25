@@ -148,7 +148,7 @@ struct InsertTransactionsView: View {
 
 struct InsertTransactionsView_Previews: PreviewProvider {
     static var previews: some View {
-        let budget = Budget(id: UUID(), name: "Test", slices: [
+        let budget = try! Budget(id: UUID(), name: "Test", slices: [
             .init(id: .init(), name: "", amount: .value(200)),
             .init(id: .init(), name: "", amount: .value(100)),
             .init(id: .init(), name: "", amount: .value(500))

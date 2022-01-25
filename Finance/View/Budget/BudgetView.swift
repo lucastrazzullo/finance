@@ -9,57 +9,23 @@ import SwiftUI
 
 struct BudgetView: View {
 
-    final class Controller: ObservableObject {
+    enum Sheet: Identifiable {
+        case error(DomainError)
+        case addNewBudgetSlice
 
-        @Published var budget: Budget
-
-        private weak var budgetProvider: BudgetProvider?
-
-        var monthlyAmount: MoneyValue {
-            budget.amount
-        }
-
-        var yearlyAmount: MoneyValue {
-            budget.amount * .value(12)
-        }
-
-        init(budget: Budget, budgetProvider: BudgetProvider) {
-            self.budget = budget
-            self.budgetProvider = budgetProvider
-        }
-
-        func slicePercentage(amount: MoneyValue) -> Float {
-            NSDecimalNumber(decimal: amount.value * 100 / budget.amount.value).floatValue
-        }
-
-        func add(slice: BudgetSlice) {
-            do {
-                try budget.add(slice: slice)
-                budgetProvider?.add(budgetSlice: slice, toBudgetWith: budget.id) { [weak self] result in
-                    if case .failure = result {
-                        try? self?.budget.remove(slice: slice)
-                    }
-                }
-            } catch {}
-        }
-
-        func delete(slice: BudgetSlice) {
-            do {
-                try budget.remove(slice: slice)
-                budgetProvider?.delete(budgetSlice: slice) { [weak self] result in
-                    if case .failure = result {
-                        try? self?.budget.add(slice: slice)
-                    }
-                }
-            } catch {}
+        var id: String {
+            switch self {
+            case .error(let error):
+                return error.localizedDescription
+            case .addNewBudgetSlice:
+                return "newBudgetSlice"
+            }
         }
     }
 
-    @State private var isAddSlicePresented: Bool = false
-    @State private var newBudgetSliceName: String = ""
-    @State private var newBudgetSliceAmount: String = ""
+    @State private var sheet: Sheet?
 
-    @ObservedObject private var controller: Controller
+    @ObservedObject private var controller: BudgetController
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -82,7 +48,11 @@ struct BudgetView: View {
                             }
                             .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                                 Button(role: .destructive) {
-                                    controller.delete(slice: slice)
+                                    controller.delete(slice: slice) { result in
+                                        if case let .failure(error) = result {
+                                            sheet = .error(error)
+                                        }
+                                    }
                                 } label: {
                                     Label("Delete", systemImage: "trash")
                                 }
@@ -92,48 +62,59 @@ struct BudgetView: View {
                         Text("No slices defined for this budget")
                     }
 
-                    Button(action: { isAddSlicePresented = true }) {
+                    Button(action: { sheet = .addNewBudgetSlice }) {
                         Label("Add", systemImage: "plus")
                     }
                 }
             }
             .listStyle(InsetGroupedListStyle())
         }
-        .sheet(isPresented: $isAddSlicePresented, onDismiss: {
-            newBudgetSliceName = ""
-            newBudgetSliceAmount = ""
-        }, content: {
-            Form {
-                Section(header: Text("New Budget Slice")) {
-                    TextField("Name", text: $newBudgetSliceName)
-                    InsertAmountField(amountValue: $newBudgetSliceAmount, title: "Monthly Amount", prompt: nil)
-                }
-
-                Section {
-                    Button("Save") {
-                        guard let amount = MoneyValue.string(newBudgetSliceAmount) else {
-                            return
-                        }
-
-                        controller.add(slice: BudgetSlice(id: .init(), name: newBudgetSliceName, amount: amount))
-                        isAddSlicePresented = false
-                    }
-                }
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Label("Rename", systemImage: "square.and.pencil")
             }
-        })
+        }
+        .sheet(item: $sheet) { presentingSheet in
+            switch presentingSheet {
+            case .error(let error):
+                makeErrorView(error: error)
+            case .addNewBudgetSlice:
+                makeAddNewBudgetSliceView()
+            }
+        }
         .navigationTitle(controller.budget.name)
     }
 
-    // MARK: - Private helper methods
+    // MARK: - Private factory methods
+
+    @ViewBuilder private func makeErrorView(error: DomainError) -> some View {
+        ErrorView(error: error, options: [.retry], onSubmit: { option in
+            sheet = .addNewBudgetSlice
+        })
+    }
+
+    @ViewBuilder private func makeAddNewBudgetSliceView() -> some View {
+        NewBudgetSliceView { slice in
+            controller.add(slice: slice) { result in
+                switch result {
+                case .success:
+                    sheet = nil
+                case .failure(let error):
+                    sheet = .error(error)
+                }
+            }
+        }
+    }
 
     private func makePercentageStringFor(amount: MoneyValue) -> String {
-        return "\(controller.slicePercentage(amount: amount))%"
+        let percentage = NSDecimalNumber(decimal: amount.value * 100 / controller.budget.amount.value).floatValue
+        return "\(percentage)%"
     }
 
     // MARK: - Object life cycle
 
     init(budget: Budget, budgetProvider: BudgetProvider) {
-        self.controller = Controller(budget: budget, budgetProvider: budgetProvider)
+        self.controller = BudgetController(budget: budget, budgetProvider: budgetProvider)
     }
 }
 
