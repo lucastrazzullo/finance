@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum DomainError: Error {
+enum DomainError: Error, Identifiable {
 
     case budgets(error: BudgetsError)
     case budget(error: BudgetError)
@@ -18,6 +18,21 @@ enum DomainError: Error {
 
     static func with(error: Error) -> Self {
         return error as? DomainError ?? .underlying(error: error)
+    }
+
+    var id: String {
+        switch self {
+        case .budgets:
+            return "budgets"
+        case .budget:
+            return "budget"
+        case .budgetSlice:
+            return "budgetSlice"
+        case .budgetProvider:
+            return "budgetProvider"
+        case .underlying:
+            return "underlying"
+        }
     }
 }
 

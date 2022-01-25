@@ -9,21 +9,8 @@ import SwiftUI
 
 struct BudgetsView: View {
 
-    enum Sheet: Identifiable {
-        case error(DomainError)
-        case addNewBudget
-
-        var id: String {
-            switch self {
-            case .error(let error):
-                return error.localizedDescription
-            case .addNewBudget:
-                return "newBudget"
-            }
-        }
-    }
-
-    @State private var sheet: Sheet?
+    @State private var isAddNewBudgetPresented: Bool = false
+    @State private var addNewBudgetError: DomainError?
 
     @ObservedObject private var controller: BudgetsController
 
@@ -38,7 +25,7 @@ struct BudgetsView: View {
                         Button(role: .destructive) {
                             controller.delete(budget: budget) { result in
                                 if case let .failure(error) = result {
-                                    sheet = .error(error)
+                                    addNewBudgetError = error
                                 }
                             }
                         } label: {
@@ -50,39 +37,29 @@ struct BudgetsView: View {
         }
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                Button(action: { sheet = .addNewBudget }) {
+                Button(action: { isAddNewBudgetPresented = true }) {
                     Label("Add", systemImage: "plus")
                 }
             }
         }
-        .sheet(item: $sheet, onDismiss: nil) { presentingSheet in
-            switch presentingSheet {
-            case .error(let error):
-                makeErrorView(error: error)
-            case .addNewBudget:
-                makeAddNewBudgetView()
+        .sheet(isPresented: $isAddNewBudgetPresented) {
+            NewBudgetView() { budget in
+                controller.save(budget: budget) { result in
+                    switch result {
+                    case .success:
+                        isAddNewBudgetPresented = false
+                    case .failure(let error):
+                        addNewBudgetError = error
+                    }
+                }
+            }
+            .sheet(item: $addNewBudgetError) { presentedError in
+                ErrorView(error: presentedError, options: [.retry], onSubmit: { option in
+                    addNewBudgetError = nil
+                })
             }
         }
         .onAppear(perform: controller.fetch)
-    }
-
-    @ViewBuilder private func makeErrorView(error: DomainError) -> some View {
-        ErrorView(error: error, options: [.retry], onSubmit: { option in
-            sheet = .addNewBudget
-        })
-    }
-
-    @ViewBuilder private func makeAddNewBudgetView() -> some View {
-        NewBudgetView() { budget in
-            controller.save(budget: budget) { result in
-                switch result {
-                case .success:
-                    sheet = nil
-                case .failure(let error):
-                    sheet = .error(error)
-                }
-            }
-        }
     }
 
     init(budgetProvider: BudgetProvider) {

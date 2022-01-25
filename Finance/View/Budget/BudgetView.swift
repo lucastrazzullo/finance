@@ -9,21 +9,8 @@ import SwiftUI
 
 struct BudgetView: View {
 
-    enum Sheet: Identifiable {
-        case error(DomainError)
-        case addNewBudgetSlice
-
-        var id: String {
-            switch self {
-            case .error(let error):
-                return error.localizedDescription
-            case .addNewBudgetSlice:
-                return "newBudgetSlice"
-            }
-        }
-    }
-
-    @State private var sheet: Sheet?
+    @State private var isAddNewBudgetSlicePresented: Bool = false
+    @State private var addNewBudgetSliceError: DomainError?
 
     @ObservedObject private var controller: BudgetController
 
@@ -50,7 +37,7 @@ struct BudgetView: View {
                                 Button(role: .destructive) {
                                     controller.delete(slice: slice) { result in
                                         if case let .failure(error) = result {
-                                            sheet = .error(error)
+                                            addNewBudgetSliceError = error
                                         }
                                     }
                                 } label: {
@@ -62,7 +49,7 @@ struct BudgetView: View {
                         Text("No slices defined for this budget")
                     }
 
-                    Button(action: { sheet = .addNewBudgetSlice }) {
+                    Button(action: { isAddNewBudgetSlicePresented = true }) {
                         Label("Add", systemImage: "plus")
                     }
                 }
@@ -74,37 +61,27 @@ struct BudgetView: View {
                 Label("Rename", systemImage: "square.and.pencil")
             }
         }
-        .sheet(item: $sheet) { presentingSheet in
-            switch presentingSheet {
-            case .error(let error):
-                makeErrorView(error: error)
-            case .addNewBudgetSlice:
-                makeAddNewBudgetSliceView()
+        .sheet(isPresented: $isAddNewBudgetSlicePresented) {
+            NewBudgetSliceView { slice in
+                controller.add(slice: slice) { result in
+                    switch result {
+                    case .success:
+                        isAddNewBudgetSlicePresented = false
+                    case .failure(let error):
+                        addNewBudgetSliceError = error
+                    }
+                }
+            }
+            .sheet(item: $addNewBudgetSliceError) { error in
+                ErrorView(error: error, options: [.retry], onSubmit: { option in
+                    addNewBudgetSliceError = nil
+                })
             }
         }
         .navigationTitle(controller.budget.name)
     }
 
     // MARK: - Private factory methods
-
-    @ViewBuilder private func makeErrorView(error: DomainError) -> some View {
-        ErrorView(error: error, options: [.retry], onSubmit: { option in
-            sheet = .addNewBudgetSlice
-        })
-    }
-
-    @ViewBuilder private func makeAddNewBudgetSliceView() -> some View {
-        NewBudgetSliceView { slice in
-            controller.add(slice: slice) { result in
-                switch result {
-                case .success:
-                    sheet = nil
-                case .failure(let error):
-                    sheet = .error(error)
-                }
-            }
-        }
-    }
 
     private func makePercentageStringFor(amount: MoneyValue) -> String {
         let percentage = NSDecimalNumber(decimal: amount.value * 100 / controller.budget.amount.value).floatValue
