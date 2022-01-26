@@ -32,32 +32,32 @@ struct NewBudgetView: View {
 
     let onSubmit: (Budget) -> ()
 
-    @State private var newBudgetName: String = ""
-    @State private var newBudgetAmount: String = ""
-    @State private var newBudgetSlices: [BudgetSlice] = []
-    @State private var newBudgetInlineError: InlineError?
+    @State private var budgetName: String = ""
+    @State private var budgetAmount: String = ""
+    @State private var budgetSlices: [BudgetSlice] = []
+    @State private var budgetInlineError: InlineError?
 
     @State private var isInsertNewBudgetSlicePresented: Bool = false
 
     var body: some View {
         Form {
-            Section(header: Text("New Budget")) {
+            Section(header: Text("New budget")) {
 
                 VStack(alignment: .leading) {
-                    TextField("Name", text: $newBudgetName)
+                    TextField("Name", text: $budgetName)
 
-                    if let inlineError = newBudgetInlineError?.budgetError, case .nameNotValid = inlineError {
+                    if let inlineError = budgetInlineError?.budgetError, case .nameNotValid = inlineError {
                         Text("Please insert a valid name")
                             .font(.caption2)
                             .foregroundColor(.teal)
                     }
                 }
 
-                if newBudgetSlices.isEmpty {
+                if budgetSlices.isEmpty {
                     VStack(alignment: .leading) {
-                        InsertAmountField(amountValue: $newBudgetAmount, title: "Monthly Amount", prompt: nil)
+                        InsertAmountField(amountValue: $budgetAmount, title: "Monthly Amount", prompt: nil)
 
-                        if let inlineError = newBudgetInlineError?.budgetError, case .amountNotValid = inlineError  {
+                        if let inlineError = budgetInlineError?.budgetError, case .amountNotValid = inlineError  {
                             Text("Please insert a valid amount or add at least one slice")
                                 .font(.caption2)
                                 .foregroundColor(.teal)
@@ -66,19 +66,19 @@ struct NewBudgetView: View {
                 } else {
                     AmountCollectionItem(title: "Monthly total",
                                          caption: nil,
-                                         amount: newBudgetSlices.totalAmount,
+                                         amount: budgetSlices.totalAmount,
                                          color: .green)
                 }
             }
 
             Section(header: Text("Slices")) {
-                if !newBudgetSlices.isEmpty {
+                if !budgetSlices.isEmpty {
                     List {
-                        ForEach(newBudgetSlices) { slice in
+                        ForEach(budgetSlices) { slice in
                             AmountListItem(label: slice.name, amount: slice.amount)
                                 .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                                     Button(role: .destructive) {
-                                        newBudgetSlices.removeAll(where: { $0.id == slice.id })
+                                        budgetSlices.removeAll(where: { $0.id == slice.id })
                                     } label: {
                                         Label("Delete", systemImage: "trash")
                                     }
@@ -86,7 +86,7 @@ struct NewBudgetView: View {
                         }
                     }
 
-                    if let inlineError = newBudgetInlineError?.budgetError, case .sliceAlreadyExistsWith = inlineError {
+                    if let inlineError = budgetInlineError?.budgetError, case .sliceAlreadyExistsWith = inlineError {
                         Text("There's more than one slice with the same name.")
                             .font(.caption2)
                             .foregroundColor(.teal)
@@ -98,7 +98,7 @@ struct NewBudgetView: View {
             }
 
             Section {
-                if let inlineError = newBudgetInlineError, case .unknown = inlineError {
+                if let inlineError = budgetInlineError, case .unknown = inlineError {
                     Text("Something is wrong in the data you added")
                         .font(.caption2)
                         .foregroundColor(.teal)
@@ -106,22 +106,22 @@ struct NewBudgetView: View {
 
                 Button("Save") {
                     do {
-                        newBudgetInlineError = nil
+                        budgetInlineError = nil
 
-                        if !newBudgetSlices.isEmpty {
-                            onSubmit(try Budget(id: .init(), name: newBudgetName, slices: newBudgetSlices))
+                        if !budgetSlices.isEmpty {
+                            onSubmit(try Budget(id: .init(), name: budgetName, slices: budgetSlices))
                         } else {
-                            onSubmit(try Budget(id: .init(), name: newBudgetName, amount: newBudgetAmount))
+                            onSubmit(try Budget(id: .init(), name: budgetName, amount: budgetAmount))
                         }
                     } catch {
-                        newBudgetInlineError = .init(error: error)
+                        budgetInlineError = .init(error: error)
                     }
                 }
             }
         }
         .sheet(isPresented: $isInsertNewBudgetSlicePresented, onDismiss: {}, content: {
             NewBudgetSliceView { slice in
-                newBudgetSlices.append(slice)
+                budgetSlices.append(slice)
                 isInsertNewBudgetSlicePresented = false
             }
         })
@@ -133,6 +133,6 @@ struct NewBudgetView: View {
 struct NewBudgetView_Previews: PreviewProvider {
 
     static var previews: some View {
-        NewBudgetView() { _ in }
+        NewBudgetView { _ in }
     }
 }

@@ -25,15 +25,15 @@ final class BudgetsController: ObservableObject {
             switch result {
             case .success(let budgets):
                 self?.budgets = Budgets(list: budgets)
-            case .failure:
-                break
+            case .failure(let error):
+                print(error.localizedDescription)
             }
         }
     }
 
     func save(budget: Budget, completion: @escaping (Result<Void, DomainError>) -> Void) {
         do {
-            try budgets.add(budget: budget)
+            try budgets.canAdd(budget: budget)
             budgetProvider?.add(budget: budget) { [weak self] result in
                 self?.fetch()
                 completion(result)
@@ -45,7 +45,7 @@ final class BudgetsController: ObservableObject {
 
     func delete(budget: Budget, completion: @escaping (Result<Void, DomainError>) -> Void) {
         do {
-            try budgets.remove(budget: budget)
+            try budgets.canRemove(budget: budget)
             budgetProvider?.delete(budget: budget) { [weak self] result in
                 self?.fetch()
                 completion(result)

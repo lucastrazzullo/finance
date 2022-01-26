@@ -11,7 +11,6 @@ struct ErrorView: View {
 
     enum Option {
         case dismiss
-        case retry
     }
 
     let error: DomainError
@@ -48,12 +47,16 @@ struct ErrorView: View {
             switch error {
             case .sliceAlreadyExistsWith(let name):
                 return "A slice named: \(name) already exists."
+            case .sliceDoesntExist:
+                return "The slice you're trying to modify or delete doesn't exist"
             case .thereMustBeAtLeastOneSlice:
                 return "There must be at least one slice."
             case .nameNotValid:
                 return "Please use a valid name"
             case .amountNotValid:
                 return "Please use a valid amount"
+            case .cannotUpdateTheBudget:
+                return "This budget cannot be updated!"
             }
         case .budgetSlice(let error):
             switch error {
@@ -66,6 +69,8 @@ struct ErrorView: View {
             switch error {
             case .budgetEntityNotFound:
                 return "The budget you're looking for is missing"
+            case .cannotCreateBudgetWithEntity:
+                return "Cannot generate budget with entity"
             case .underlying(_):
                 return "Something went wrong!"
             }
@@ -77,9 +82,7 @@ struct ErrorView: View {
     private func makeOptionDescription(option: Option) -> String {
         switch option {
         case .dismiss:
-            return "Dismiss"
-        case .retry:
-            return "Retry"
+            return "Ok"
         }
     }
 }
@@ -88,6 +91,6 @@ struct ErrorView: View {
 
 struct ErrorView_Previews: PreviewProvider {
     static var previews: some View {
-        ErrorView(error: .budgets(error: .budgetAlreadyExistsWith(name: "BudgetName")), options: [.retry, .dismiss]) { _ in }
+        ErrorView(error: .budgets(error: .budgetAlreadyExistsWith(name: "BudgetName")), options: [.dismiss]) { _ in }
     }
 }

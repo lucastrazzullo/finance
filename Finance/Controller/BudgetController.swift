@@ -26,15 +26,40 @@ final class BudgetController: ObservableObject {
         self.budgetProvider = budgetProvider
     }
 
-    // MARK: Internal methods
+    // MARK: Budget
+
+    func fetch() {
+        budgetProvider?.fetchBudget(with: budget.id) { [weak self] result in
+            switch result {
+            case .success(let budget):
+                self?.budget = budget
+            case .failure(let error):
+                print(error.localizedDescription)
+            }
+        }
+    }
+
+    // MARK: Properties
+
+    func update(name: String, completion: @escaping (Result<Void, DomainError>) -> Void) {
+        do {
+            try Budget.canUse(name: name)
+            budgetProvider?.update(name: name, inBudgetWith: budget.id) { [weak self] result in
+                self?.fetch()
+                completion(result)
+            }
+        } catch {
+            completion(.failure(.with(error: error)))
+        }
+    }
+
+    // MARK: Slices
 
     func add(slice: BudgetSlice, completion: @escaping (Result<Void, DomainError>) -> Void) {
         do {
-            try budget.add(slice: slice)
+            try budget.canAdd(newSlice: slice)
             budgetProvider?.add(budgetSlice: slice, toBudgetWith: budget.id) { [weak self] result in
-                if case .failure = result {
-                    try? self?.budget.remove(slice: slice)
-                }
+                self?.fetch()
                 completion(result)
             }
         } catch {
@@ -44,11 +69,9 @@ final class BudgetController: ObservableObject {
 
     func delete(slice: BudgetSlice, completion: @escaping (Result<Void, DomainError>) -> Void) {
         do {
-            try budget.remove(slice: slice)
+            try budget.canRemove(slice: slice)
             budgetProvider?.delete(budgetSlice: slice) { [weak self] result in
-                if case .failure = result {
-                    try? self?.budget.add(slice: slice)
-                }
+                self?.fetch()
                 completion(result)
             }
         } catch {

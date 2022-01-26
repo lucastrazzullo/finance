@@ -27,9 +27,9 @@ final class MockBudgetProvider: BudgetProvider {
         }
 
         var budget = budgets.remove(at: budgetIndex)
-
         do {
-            try budget.add(slice: budgetSlice)
+            try budget.add(newSlice: budgetSlice)
+            completion(.success(Void()))
         } catch {
             completion(.failure(.budgetProvider(error: .underlying(error: Error.mock))))
             return
@@ -50,9 +50,9 @@ final class MockBudgetProvider: BudgetProvider {
         }
 
         var budget = budgets.remove(at: budgetIndex)
-
         do {
             try budget.remove(slice: budgetSlice)
+            completion(.success(Void()))
         } catch {
             completion(.failure(.budgetProvider(error: .underlying(error: Error.mock))))
             return
@@ -61,7 +61,32 @@ final class MockBudgetProvider: BudgetProvider {
         budgets.insert(budget, at: budgetIndex)
     }
 
-    func fetchBudgets(completion: @escaping FetchCompletion) {
+    func update(name: String, inBudgetWith identifier: Budget.ID, completion: @escaping MutateCompletion) {
+        guard let budgetIndex = budgets.firstIndex(where: { $0.id == identifier }) else {
+            completion(.failure(.budgetProvider(error: .underlying(error: Error.mock))))
+            return
+        }
+
+        var budget = budgets.remove(at: budgetIndex)
+        do {
+            try budget.update(name: name)
+            budgets.insert(budget, at: budgetIndex)
+            completion(.success(Void()))
+        } catch {
+            completion(.failure(.budgetProvider(error: .underlying(error: Error.mock))))
+            return
+        }
+    }
+
+    func fetchBudget(with identifier: Budget.ID, completion: @escaping FetchBudgetCompletion) {
+        if let budget = budgets.first(where: { $0.id == identifier }) {
+            completion(.success(budget))
+        } else {
+            completion(.failure(.budgetProvider(error: .budgetEntityNotFound)))
+        }
+    }
+
+    func fetchBudgets(completion: @escaping FetchBudgetsCompletion) {
         completion(.success(budgets))
     }
 }

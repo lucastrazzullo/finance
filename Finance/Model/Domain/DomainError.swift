@@ -43,9 +43,11 @@ enum BudgetsError {
 
 enum BudgetError {
     case sliceAlreadyExistsWith(name: String)
+    case sliceDoesntExist
     case thereMustBeAtLeastOneSlice
     case nameNotValid
     case amountNotValid
+    case cannotUpdateTheBudget
 }
 
 enum BudgetSliceError {
@@ -55,5 +57,6 @@ enum BudgetSliceError {
 
 enum BudgetStorageProviderError {
     case budgetEntityNotFound
+    case cannotCreateBudgetWithEntity
     case underlying(error: Error)
 }

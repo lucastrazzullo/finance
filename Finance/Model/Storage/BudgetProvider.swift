@@ -10,12 +10,19 @@ import CoreData
 
 protocol BudgetProvider: AnyObject {
     typealias MutateCompletion = ((Result<Void, DomainError>) -> Void)
-    typealias FetchCompletion = (Result<[Budget], DomainError>) -> Void
+    typealias FetchBudgetCompletion = (Result<Budget, DomainError>) -> Void
+    typealias FetchBudgetsCompletion = (Result<[Budget], DomainError>) -> Void
+
     func add(budget: Budget, completion: @escaping MutateCompletion)
     func add(budgetSlice: BudgetSlice, toBudgetWith budgetId: Budget.ID, completion: @escaping MutateCompletion)
+
     func delete(budget: Budget, completion: @escaping MutateCompletion)
     func delete(budgetSlice: BudgetSlice, completion: @escaping MutateCompletion)
-    func fetchBudgets(completion: @escaping FetchCompletion)
+
+    func update(name: String, inBudgetWith identifier: Budget.ID, completion: @escaping MutateCompletion)
+
+    func fetchBudget(with identifier: Budget.ID, completion: @escaping FetchBudgetCompletion)
+    func fetchBudgets(completion: @escaping FetchBudgetsCompletion)
 }
 
 final class BudgetStorageProvider: BudgetProvider {
@@ -34,16 +41,7 @@ final class BudgetStorageProvider: BudgetProvider {
 
     func add(budget: Budget, completion: BudgetProvider.MutateCompletion) {
         let budgetEntity = BudgetEntity(context: persistentContainer.viewContext)
-        budgetEntity.identifier = budget.id
-        budgetEntity.name = budget.name
-        budgetEntity.slices = NSSet(array: budget.slices.map { slice in
-            let sliceEntity = BudgetSliceEntity(context: persistentContainer.viewContext)
-            sliceEntity.identifier = slice.id
-            sliceEntity.name = slice.name
-            sliceEntity.amount = NSDecimalNumber(decimal: slice.amount.value)
-            sliceEntity.budget = budgetEntity
-            return sliceEntity
-        })
+        updateBudgetEntity(budgetEntity, with: budget)
 
         saveOrRollback(completion: completion)
     }
@@ -58,11 +56,7 @@ final class BudgetStorageProvider: BudgetProvider {
             switch result {
             case .success(let budgetEntity):
                 let sliceEntity = BudgetSliceEntity(context: self.persistentContainer.viewContext)
-                sliceEntity.identifier = budgetSlice.id
-                sliceEntity.name = budgetSlice.name
-                sliceEntity.amount = NSDecimalNumber(decimal: budgetSlice.amount.value)
-                sliceEntity.budget = budgetEntity
-
+                self.updateBudgetSliceEntity(sliceEntity, with: budgetSlice, in: budgetEntity)
                 self.saveOrRollback(completion: completion)
             case .failure(let error):
                 completion(.failure(error))
@@ -106,19 +100,60 @@ final class BudgetStorageProvider: BudgetProvider {
         }
     }
 
-    func fetchBudgets(completion: @escaping BudgetProvider.FetchCompletion) {
-        fetchBudgetEntities { result in
+    func update(name: String, inBudgetWith identifier: Budget.ID, completion: @escaping MutateCompletion) {
+        fetchBudgetEntity(with: identifier) { [weak self] result in
+            guard let self = self else {
+                completion(.failure(.budgetProvider(error: .budgetEntityNotFound)))
+                return
+            }
+
             switch result {
-            case .success(let budgetEntities):
-                let budgets = budgetEntities.compactMap(Budget.with(budgetEntity:))
-                completion(.success(budgets))
+            case .success(let budgetEntity):
+                budgetEntity.name = name
+                self.saveOrRollback(completion: completion)
             case .failure(let error):
                 completion(.failure(error))
             }
         }
     }
 
-    // MARK: Private helper methods
+    func fetchBudget(with identifier: Budget.ID, completion: @escaping FetchBudgetCompletion) {
+        fetchBudgetEntity(with: identifier) { result in
+            switch result {
+            case .success(let budgetEntity):
+                do {
+                    let budget = try Budget.with(budgetEntity: budgetEntity)
+                    completion(.success(budget))
+                } catch let error as DomainError {
+                    completion(.failure(error))
+                } catch {
+                    completion(.failure(.budgetProvider(error: .underlying(error: error))))
+                }
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
+    }
+
+    func fetchBudgets(completion: @escaping BudgetProvider.FetchBudgetsCompletion) {
+        fetchBudgetEntities { result in
+            switch result {
+            case .success(let budgetEntities):
+                do {
+                    let budgets = try budgetEntities.compactMap(Budget.with(budgetEntity:))
+                    completion(.success(budgets))
+                } catch let error as DomainError {
+                    completion(.failure(error))
+                } catch {
+                    completion(.failure(.budgetProvider(error: .underlying(error: error))))
+                }
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
+    }
+
+    // MARK: Private fetching methods
 
     private func fetchBudgetEntities(completion: @escaping (Result<[BudgetEntity], DomainError>) -> Void) {
         let fetchBudgetsRequest: NSFetchRequest<BudgetEntity> = BudgetEntity.fetchRequest()
@@ -163,6 +198,27 @@ final class BudgetStorageProvider: BudgetProvider {
         }
     }
 
+    // MARK: Private updating methods
+
+    private func updateBudgetEntity(_ budgetEntity: BudgetEntity, with budget: Budget) {
+        budgetEntity.identifier = budget.id
+        budgetEntity.name = budget.name
+        budgetEntity.slices = NSSet(array: budget.slices.map { [weak self] slice in
+            let sliceEntity = BudgetSliceEntity(context: persistentContainer.viewContext)
+            self?.updateBudgetSliceEntity(sliceEntity, with: slice, in: budgetEntity)
+            return sliceEntity
+        })
+    }
+
+    private func updateBudgetSliceEntity(_ sliceEntity: BudgetSliceEntity, with slice: BudgetSlice, in budgetEntity: BudgetEntity) {
+        sliceEntity.identifier = slice.id
+        sliceEntity.name = slice.name
+        sliceEntity.amount = NSDecimalNumber(decimal: slice.amount.value)
+        sliceEntity.budget = budgetEntity
+    }
+
+    // MARK: Private saving methods
+
     private func saveOrRollback(completion: ((Result<Void, DomainError>) -> Void)) {
         do {
             try persistentContainer.viewContext.save()
@@ -171,5 +227,24 @@ final class BudgetStorageProvider: BudgetProvider {
             persistentContainer.viewContext.rollback()
             completion(.failure(.budgetProvider(error: .underlying(error: error))))
         }
+    }
+}
+
+// MARK: Private Extensions
+
+private extension Budget {
+
+    static func with(budgetEntity: BudgetEntity) throws -> Budget {
+        guard let identifier = budgetEntity.identifier,
+              let name = budgetEntity.name,
+              let slices = budgetEntity.slices else {
+                  throw DomainError.budgetProvider(error: .cannotCreateBudgetWithEntity)
+        }
+
+        let budgetSlices = slices
+            .compactMap { $0 as? BudgetSliceEntity }
+            .compactMap { BudgetSlice.with(budgetSliceEntity: $0) }
+
+        return try Budget(id: identifier, name: name, slices: budgetSlices)
     }
 }

@@ -54,7 +54,7 @@ struct BudgetsView: View {
                 }
             }
             .sheet(item: $addNewBudgetError) { presentedError in
-                ErrorView(error: presentedError, options: [.retry], onSubmit: { option in
+                ErrorView(error: presentedError, options: [.dismiss], onSubmit: { option in
                     addNewBudgetError = nil
                 })
             }
