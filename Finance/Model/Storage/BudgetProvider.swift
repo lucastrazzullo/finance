@@ -11,7 +11,7 @@ import CoreData
 protocol BudgetProvider: AnyObject {
     typealias MutateCompletion = ((Result<Void, DomainError>) -> Void)
     typealias FetchBudgetCompletion = (Result<Budget, DomainError>) -> Void
-    typealias FetchBudgetsCompletion = (Result<[Budget], DomainError>) -> Void
+    typealias FetchBudgetListCompletion = (Result<[Budget], DomainError>) -> Void
 
     func add(budget: Budget, completion: @escaping MutateCompletion)
     func add(budgetSlice: BudgetSlice, toBudgetWith budgetId: Budget.ID, completion: @escaping MutateCompletion)
@@ -22,7 +22,7 @@ protocol BudgetProvider: AnyObject {
     func update(name: String, inBudgetWith identifier: Budget.ID, completion: @escaping MutateCompletion)
 
     func fetchBudget(with identifier: Budget.ID, completion: @escaping FetchBudgetCompletion)
-    func fetchBudgets(completion: @escaping FetchBudgetsCompletion)
+    func fetchBudgets(completion: @escaping FetchBudgetListCompletion)
 }
 
 final class BudgetStorageProvider: BudgetProvider {
@@ -135,7 +135,7 @@ final class BudgetStorageProvider: BudgetProvider {
         }
     }
 
-    func fetchBudgets(completion: @escaping BudgetProvider.FetchBudgetsCompletion) {
+    func fetchBudgets(completion: @escaping BudgetProvider.FetchBudgetListCompletion) {
         fetchBudgetEntities { result in
             switch result {
             case .success(let budgetEntities):

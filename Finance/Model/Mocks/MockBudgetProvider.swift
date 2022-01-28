@@ -86,7 +86,7 @@ final class MockBudgetProvider: BudgetProvider {
         }
     }
 
-    func fetchBudgets(completion: @escaping FetchBudgetsCompletion) {
+    func fetchBudgets(completion: @escaping FetchBudgetListCompletion) {
         completion(.success(budgets))
     }
 }
