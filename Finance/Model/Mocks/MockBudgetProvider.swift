@@ -15,6 +15,8 @@ final class MockBudgetProvider: BudgetProvider {
 
     private var budgets: [Budget] = Mocks.budgets
 
+    // MARK: Add
+
     func add(budget: Budget, completion: @escaping MutateCompletion) {
         budgets.append(budget)
         completion(.success(Void()))
@@ -38,8 +40,17 @@ final class MockBudgetProvider: BudgetProvider {
         budgets.insert(budget, at: budgetIndex)
     }
 
+    // MARK: Delete
+
     func delete(budget: Budget, completion: @escaping MutateCompletion) {
         budgets.removeAll(where: { $0.id == budget.id })
+        completion(.success(Void()))
+    }
+
+    func delete(budgets: [Budget], completion: @escaping MutateCompletion) {
+        budgets.forEach { budget in
+            self.budgets.removeAll(where: { $0.id == budget.id })
+        }
         completion(.success(Void()))
     }
 
@@ -61,22 +72,20 @@ final class MockBudgetProvider: BudgetProvider {
         budgets.insert(budget, at: budgetIndex)
     }
 
-    func update(name: String, inBudgetWith identifier: Budget.ID, completion: @escaping MutateCompletion) {
-        guard let budgetIndex = budgets.firstIndex(where: { $0.id == identifier }) else {
+    // MARK: Update
+
+    func update(budget: Budget, completion: @escaping MutateCompletion) {
+        guard let budgetIndex = budgets.firstIndex(where: { $0.id == budget.id }) else {
             completion(.failure(.budgetProvider(error: .underlying(error: Error.mock))))
             return
         }
 
-        var budget = budgets.remove(at: budgetIndex)
-        do {
-            try budget.update(name: name)
-            budgets.insert(budget, at: budgetIndex)
-            completion(.success(Void()))
-        } catch {
-            completion(.failure(.budgetProvider(error: .underlying(error: Error.mock))))
-            return
-        }
+        budgets.remove(at: budgetIndex)
+        budgets.insert(budget, at: budgetIndex)
+        completion(.success(Void()))
     }
+
+    // MARK: Fetch
 
     func fetchBudget(with identifier: Budget.ID, completion: @escaping FetchBudgetCompletion) {
         if let budget = budgets.first(where: { $0.id == identifier }) {

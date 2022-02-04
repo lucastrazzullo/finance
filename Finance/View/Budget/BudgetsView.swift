@@ -9,10 +9,10 @@ import SwiftUI
 
 struct BudgetsView: View {
 
-    @State private var isAddNewBudgetPresented: Bool = false
-    @State private var addNewBudgetError: DomainError?
-
     @ObservedObject private var controller: BudgetsController
+
+    @State private var isAddNewBudgetPresented: Bool = false
+    @State private var updateBudgetsError: DomainError?
 
     var body: some View {
         List {
@@ -21,43 +21,40 @@ struct BudgetsView: View {
                     NavigationLink(destination: BudgetView(budget: budget, budgetProvider: budgetProvider)) {
                         AmountListItem(label: budget.name, amount: budget.amount)
                     }
-                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                        Button(role: .destructive) {
-                            controller.delete(budget: budget) { result in
-                                if case let .failure(error) = result {
-                                    addNewBudgetError = error
-                                }
-                            }
-                        } label: {
-                            Label("Delete", systemImage: "trash")
-                        }
+                }
+            }
+            .onDelete { offsets in
+                controller.delete(budgetsAt: offsets) { result in
+                    if case let .failure(error) = result {
+                        updateBudgetsError = error
+                    } else {
+                        updateBudgetsError = nil
+                    }
+                }
+            }
+
+            if let error = updateBudgetsError {
+                InlineErrorView(error: error)
+            }
+
+            Button(action: { isAddNewBudgetPresented = true }) {
+                Label("Add", systemImage: "plus")
+            }
+        }
+        .sheet(isPresented: $isAddNewBudgetPresented) {
+            NewBudgetView() { createdBudget, errorHandler in
+                controller.add(budget: createdBudget) { result in
+                    switch result {
+                    case .success:
+                        isAddNewBudgetPresented = false
+                    case .failure(let error):
+                        errorHandler(error)
                     }
                 }
             }
         }
         .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button(action: { isAddNewBudgetPresented = true }) {
-                    Label("Add", systemImage: "plus")
-                }
-            }
-        }
-        .sheet(isPresented: $isAddNewBudgetPresented) {
-            NewBudgetView() { budget in
-                controller.save(budget: budget) { result in
-                    switch result {
-                    case .success:
-                        isAddNewBudgetPresented = false
-                    case .failure(let error):
-                        addNewBudgetError = error
-                    }
-                }
-            }
-            .sheet(item: $addNewBudgetError) { presentedError in
-                ErrorView(error: presentedError, options: [.dismiss], onSubmit: { option in
-                    addNewBudgetError = nil
-                })
-            }
+            EditButton()
         }
         .onAppear(perform: controller.fetch)
     }

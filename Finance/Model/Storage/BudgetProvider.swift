@@ -17,9 +17,10 @@ protocol BudgetProvider: AnyObject {
     func add(budgetSlice: BudgetSlice, toBudgetWith budgetId: Budget.ID, completion: @escaping MutateCompletion)
 
     func delete(budget: Budget, completion: @escaping MutateCompletion)
+    func delete(budgets: [Budget], completion: @escaping MutateCompletion)
     func delete(budgetSlice: BudgetSlice, completion: @escaping MutateCompletion)
 
-    func update(name: String, inBudgetWith identifier: Budget.ID, completion: @escaping MutateCompletion)
+    func update(budget: Budget, completion: @escaping MutateCompletion)
 
     func fetchBudget(with identifier: Budget.ID, completion: @escaping FetchBudgetCompletion)
     func fetchBudgets(completion: @escaping FetchBudgetListCompletion)
@@ -37,11 +38,20 @@ final class BudgetStorageProvider: BudgetProvider {
         self.persistentContainer = persistentContainer
     }
 
-    // MARK: Internal methods
+    // MARK: Add
 
     func add(budget: Budget, completion: BudgetProvider.MutateCompletion) {
         let budgetEntity = BudgetEntity(context: persistentContainer.viewContext)
-        updateBudgetEntity(budgetEntity, with: budget)
+        budgetEntity.identifier = budget.id
+        budgetEntity.name = budget.name
+        budgetEntity.slices = NSSet(array: budget.slices.map { slice in
+            let sliceEntity = BudgetSliceEntity(context: persistentContainer.viewContext)
+            sliceEntity.identifier = slice.id
+            sliceEntity.name = slice.name
+            sliceEntity.amount = NSDecimalNumber(decimal: slice.amount.value)
+            sliceEntity.budget = budgetEntity
+            return sliceEntity
+        })
 
         saveOrRollback(completion: completion)
     }
@@ -56,15 +66,18 @@ final class BudgetStorageProvider: BudgetProvider {
             switch result {
             case .success(let budgetEntity):
                 let sliceEntity = BudgetSliceEntity(context: self.persistentContainer.viewContext)
-                self.updateBudgetSliceEntity(sliceEntity, with: budgetSlice, in: budgetEntity)
+                sliceEntity.identifier = budgetSlice.id
+                sliceEntity.name = budgetSlice.name
+                sliceEntity.amount = NSDecimalNumber(decimal: budgetSlice.amount.value)
+                sliceEntity.budget = budgetEntity
                 self.saveOrRollback(completion: completion)
             case .failure(let error):
                 completion(.failure(error))
             }
         }
-
-
     }
+
+    // MARK: Delete
 
     func delete(budget: Budget, completion: @escaping BudgetProvider.MutateCompletion) {
         fetchBudgetEntity(with: budget.id) { [weak self] result in
@@ -76,6 +89,29 @@ final class BudgetStorageProvider: BudgetProvider {
             switch result {
             case .success(let budgetEntity):
                 self.persistentContainer.viewContext.delete(budgetEntity)
+                self.saveOrRollback(completion: completion)
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
+    }
+
+    func delete(budgets: [Budget], completion: @escaping MutateCompletion) {
+        fetchBudgetEntities { [weak self] result in
+            guard let self = self else {
+                completion(.failure(.budgetProvider(error: .budgetEntityNotFound)))
+                return
+            }
+
+            let idsToRemove = Set(budgets.map(\.id))
+
+            switch result {
+            case .success(let budgetsEntities):
+                budgetsEntities.forEach { budgetEntity in
+                    if let identifier = budgetEntity.identifier, idsToRemove.contains(identifier) {
+                        self.persistentContainer.viewContext.delete(budgetEntity)
+                    }
+                }
                 self.saveOrRollback(completion: completion)
             case .failure(let error):
                 completion(.failure(error))
@@ -100,22 +136,13 @@ final class BudgetStorageProvider: BudgetProvider {
         }
     }
 
-    func update(name: String, inBudgetWith identifier: Budget.ID, completion: @escaping MutateCompletion) {
-        fetchBudgetEntity(with: identifier) { [weak self] result in
-            guard let self = self else {
-                completion(.failure(.budgetProvider(error: .budgetEntityNotFound)))
-                return
-            }
+    // MARK: Update
 
-            switch result {
-            case .success(let budgetEntity):
-                budgetEntity.name = name
-                self.saveOrRollback(completion: completion)
-            case .failure(let error):
-                completion(.failure(error))
-            }
-        }
+    func update(budget: Budget, completion: @escaping MutateCompletion) {
+        fatalError("To implement")
     }
+
+    // MARK: Fetch
 
     func fetchBudget(with identifier: Budget.ID, completion: @escaping FetchBudgetCompletion) {
         fetchBudgetEntity(with: identifier) { result in
@@ -196,25 +223,6 @@ final class BudgetStorageProvider: BudgetProvider {
         } catch {
             completion(.failure(.budgetProvider(error: .underlying(error: error))))
         }
-    }
-
-    // MARK: Private updating methods
-
-    private func updateBudgetEntity(_ budgetEntity: BudgetEntity, with budget: Budget) {
-        budgetEntity.identifier = budget.id
-        budgetEntity.name = budget.name
-        budgetEntity.slices = NSSet(array: budget.slices.map { [weak self] slice in
-            let sliceEntity = BudgetSliceEntity(context: persistentContainer.viewContext)
-            self?.updateBudgetSliceEntity(sliceEntity, with: slice, in: budgetEntity)
-            return sliceEntity
-        })
-    }
-
-    private func updateBudgetSliceEntity(_ sliceEntity: BudgetSliceEntity, with slice: BudgetSlice, in budgetEntity: BudgetEntity) {
-        sliceEntity.identifier = slice.id
-        sliceEntity.name = slice.name
-        sliceEntity.amount = NSDecimalNumber(decimal: slice.amount.value)
-        sliceEntity.budget = budgetEntity
     }
 
     // MARK: Private saving methods

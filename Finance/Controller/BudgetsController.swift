@@ -26,12 +26,12 @@ final class BudgetsController: ObservableObject {
             case .success(let budgets):
                 self?.budgets = Budgets(list: budgets)
             case .failure(let error):
-                print(error.localizedDescription)
+                fatalError(error.localizedDescription)
             }
         }
     }
 
-    func save(budget: Budget, completion: @escaping (Result<Void, DomainError>) -> Void) {
+    func add(budget: Budget, completion: @escaping (Result<Void, DomainError>) -> Void) {
         do {
             try budgets.canAdd(budget: budget)
             budgetProvider?.add(budget: budget) { [weak self] result in
@@ -43,10 +43,26 @@ final class BudgetsController: ObservableObject {
         }
     }
 
-    func delete(budget: Budget, completion: @escaping (Result<Void, DomainError>) -> Void) {
+    func delete(budgetsAt offsets: IndexSet, completion: @escaping (Result<Void, DomainError>) -> Void) {
+        let list = budgets.list
+        let budgetsToDelete = offsets.compactMap { index -> Budget? in
+            guard list.indices.contains(index) else {
+                return nil
+            }
+            return list[index]
+        }
+
+        guard !budgetsToDelete.isEmpty else {
+            completion(.failure(.budgets(error: .budgetDoesntExist)))
+            return
+        }
+
         do {
-            try budgets.canRemove(budget: budget)
-            budgetProvider?.delete(budget: budget) { [weak self] result in
+            try budgetsToDelete.forEach { budget in
+                try budgets.canRemove(budget: budget)
+            }
+
+            budgetProvider?.delete(budgets: budgetsToDelete) { [weak self] result in
                 self?.fetch()
                 completion(result)
             }

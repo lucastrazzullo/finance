@@ -10,11 +10,16 @@ import Foundation
 struct Budget: Identifiable, AmountHolder {
 
     let id: UUID
+
     private(set) var name: String
     private(set) var slices: [BudgetSlice]
 
     var amount: MoneyValue {
         return slices.totalAmount
+    }
+
+    var yearlyAmount: MoneyValue {
+        return Self.yearlyAmount(for: amount)
     }
 
     // MARK: Object life cycle
@@ -50,13 +55,19 @@ struct Budget: Identifiable, AmountHolder {
     }
 
     mutating func add(newSlice: BudgetSlice) throws {
-        try canAdd(newSlice: newSlice)
+        try Self.canAdd(newSlice: newSlice, to: slices)
         slices.append(newSlice)
     }
 
     mutating func remove(slice: BudgetSlice) throws {
-        try canRemove(slice: slice)
+        try Self.canRemove(slice: slice, from: slices)
         slices.removeAll(where: { $0.id == slice.id })
+    }
+
+    // MARK: Helpers
+
+    static func yearlyAmount(for montlyAmount: MoneyValue) -> MoneyValue {
+        montlyAmount * .value(12)
     }
 
     // MARK: Checking methods
@@ -69,25 +80,25 @@ struct Budget: Identifiable, AmountHolder {
 
     static func canUse(slices: [BudgetSlice]) throws {
         guard !slices.isEmpty else {
-            throw DomainError.budget(error: .thereMustBeAtLeastOneSlice)
+            throw DomainError.budget(error: .slicesNotValid(reason: .thereMustBeAtLeastOneSlice))
         }
         if let duplicatedSlice = slices.firstDuplicate() {
-            throw DomainError.budget(error: .sliceAlreadyExistsWith(name: duplicatedSlice.name))
+            throw DomainError.budget(error: .slicesNotValid(reason: .sliceAlreadyExistsWith(name: duplicatedSlice.name)))
         }
     }
 
-    func canAdd(newSlice: BudgetSlice) throws {
+    static func canAdd(newSlice: BudgetSlice, to slices: [BudgetSlice]) throws {
         var newSlices = slices
         newSlices.append(newSlice)
         try Self.canUse(slices: newSlices)
     }
 
-    func canRemove(slice: BudgetSlice) throws {
+    static func canRemove(slice: BudgetSlice, from slices: [BudgetSlice]) throws {
         guard slices.count > 1 else {
-            throw DomainError.budget(error: .thereMustBeAtLeastOneSlice)
+            throw DomainError.budget(error: .slicesNotValid(reason: .thereMustBeAtLeastOneSlice))
         }
         guard slices.contains(where: { $0.id == slice.id }) else {
-            throw DomainError.budget(error: .sliceDoesntExist)
+            throw DomainError.budget(error: .slicesNotValid(reason: .sliceDoesntExist))
         }
     }
 }

@@ -9,34 +9,15 @@ import SwiftUI
 
 struct NewBudgetView: View {
 
-    private enum InlineError {
-        case budgetError(BudgetError)
-        case unknown
+    typealias OnSubmitErrorHandler = (DomainError?) -> Void
 
-        var budgetError: BudgetError? {
-            if case .budgetError(let error) = self {
-                return error
-            } else {
-                return nil
-            }
-        }
-
-        init(error: Error) {
-            if let domainError = error as? DomainError, case .budget(let budgetError) = domainError {
-                self = .budgetError(budgetError)
-            } else {
-                self = .unknown
-            }
-        }
-    }
-
-    let onSubmit: (Budget) -> ()
+    let onSubmit: (Budget, @escaping OnSubmitErrorHandler) -> Void
 
     @State private var budgetName: String = ""
     @State private var budgetAmount: String = ""
     @State private var budgetSlices: [BudgetSlice] = []
-    @State private var budgetInlineError: InlineError?
 
+    @State private var presentedError: DomainError?
     @State private var isInsertNewBudgetSlicePresented: Bool = false
 
     var body: some View {
@@ -46,10 +27,8 @@ struct NewBudgetView: View {
                 VStack(alignment: .leading) {
                     TextField("Name", text: $budgetName)
 
-                    if let inlineError = budgetInlineError?.budgetError, case .nameNotValid = inlineError {
-                        Text("Please insert a valid name")
-                            .font(.caption2)
-                            .foregroundColor(.teal)
+                    if let error = presentedError, case .budget(let inlineError) = error, case .nameNotValid = inlineError {
+                        Color.red.frame(height: 2)
                     }
                 }
 
@@ -57,15 +36,13 @@ struct NewBudgetView: View {
                     VStack(alignment: .leading) {
                         InsertAmountField(amountValue: $budgetAmount, title: "Monthly Amount", prompt: nil)
 
-                        if let inlineError = budgetInlineError?.budgetError, case .amountNotValid = inlineError  {
-                            Text("Please insert a valid amount or add at least one slice")
-                                .font(.caption2)
-                                .foregroundColor(.teal)
+                        if let error = presentedError, case .budget(let inlineError) = error, case .amountNotValid = inlineError  {
+                            Color.red.frame(height: 2)
                         }
                     }
                 } else {
                     AmountCollectionItem(title: "Monthly total",
-                                         caption: nil,
+                                         caption: "\(Budget.yearlyAmount(for: budgetSlices.totalAmount).localizedDescription) per year",
                                          amount: budgetSlices.totalAmount,
                                          color: .green)
                 }
@@ -86,10 +63,8 @@ struct NewBudgetView: View {
                         }
                     }
 
-                    if let inlineError = budgetInlineError?.budgetError, case .sliceAlreadyExistsWith = inlineError {
-                        Text("There's more than one slice with the same name.")
-                            .font(.caption2)
-                            .foregroundColor(.teal)
+                    if let error = presentedError, case .budget(let inlineError) = error, case .slicesNotValid = inlineError {
+                        Color.red.frame(height: 2)
                     }
                 }
                 Button(action: { isInsertNewBudgetSlicePresented = true }) {
@@ -98,33 +73,38 @@ struct NewBudgetView: View {
             }
 
             Section {
-                if let inlineError = budgetInlineError, case .unknown = inlineError {
-                    Text("Something is wrong in the data you added")
-                        .font(.caption2)
-                        .foregroundColor(.teal)
+                if let error = presentedError {
+                    InlineErrorView(error: error)
                 }
 
                 Button("Save") {
                     do {
-                        budgetInlineError = nil
-
                         if !budgetSlices.isEmpty {
-                            onSubmit(try Budget(id: .init(), name: budgetName, slices: budgetSlices))
+                            onSubmit(try Budget(id: .init(), name: budgetName, slices: budgetSlices)) { error in
+                                presentedError = error
+                            }
                         } else {
-                            onSubmit(try Budget(id: .init(), name: budgetName, amount: budgetAmount))
+                            onSubmit(try Budget(id: .init(), name: budgetName, amount: budgetAmount)) { error in
+                                presentedError = error
+                            }
                         }
                     } catch {
-                        budgetInlineError = .init(error: error)
+                        presentedError = error as? DomainError ?? .budget(error: .cannotCreateTheBudget(underlyingError: error))
                     }
                 }
             }
         }
-        .sheet(isPresented: $isInsertNewBudgetSlicePresented, onDismiss: {}, content: {
-            NewBudgetSliceView { slice in
-                budgetSlices.append(slice)
-                isInsertNewBudgetSlicePresented = false
+        .sheet(isPresented: $isInsertNewBudgetSlicePresented) {
+            NewBudgetSliceView { slice, onErrorHandler in
+                do {
+                    try Budget.canAdd(newSlice: slice, to: budgetSlices)
+                    budgetSlices.append(slice)
+                    isInsertNewBudgetSlicePresented = false
+                } catch {
+                    onErrorHandler(error as? DomainError ?? .underlying(error: error))
+                }
             }
-        })
+        }
     }
 }
 
@@ -133,6 +113,6 @@ struct NewBudgetView: View {
 struct NewBudgetView_Previews: PreviewProvider {
 
     static var previews: some View {
-        NewBudgetView { _ in }
+        NewBudgetView { _, _ in }
     }
 }
