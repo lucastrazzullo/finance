@@ -106,6 +106,6 @@ struct UpdateBudgetView: View {
 
 struct UpdateBudgetView_Previews: PreviewProvider {
     static var previews: some View {
-        UpdateBudgetView(budget: Mocks.budgets.all()[0]) { _, _ in }
+        UpdateBudgetView(budget: Mocks.budgets[0]) { _, _ in }
     }
 }

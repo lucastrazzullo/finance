@@ -9,13 +9,13 @@ import Foundation
 
 final class BudgetsController: ObservableObject {
 
-    @Published var budgets: Budgets
+    @Published var budgets: [Budget]
 
-    private(set) weak var budgetProvider: BudgetProvider?
+    private(set) var budgetProvider: BudgetProvider?
 
     init(budgetProvider: BudgetProvider) {
         self.budgetProvider = budgetProvider
-        self.budgets = Budgets()
+        self.budgets = []
     }
 
     // MARK: Internal methods
@@ -24,7 +24,7 @@ final class BudgetsController: ObservableObject {
         budgetProvider?.fetchBudgets { [weak self] result in
             switch result {
             case .success(let budgets):
-                self?.budgets = Budgets(list: budgets)
+                self?.budgets = budgets
             case .failure(let error):
                 fatalError(error.localizedDescription)
             }
@@ -32,24 +32,23 @@ final class BudgetsController: ObservableObject {
     }
 
     func add(budget: Budget, completion: @escaping (Result<Void, DomainError>) -> Void) {
-        do {
-            try budgets.add(budget: budget)
-            budgetProvider?.add(budget: budget) { [weak self] result in
-                self?.fetch()
-                completion(result)
+        budgetProvider?.add(budget: budget) { [weak self] result in
+            switch result {
+            case .success(let budgets):
+                self?.budgets = budgets
+                completion(.success(()))
+            case .failure(let error):
+                completion(.failure(error))
             }
-        } catch {
-            completion(.failure(.with(error: error)))
         }
     }
 
     func delete(budgetsAt offsets: IndexSet, completion: @escaping (Result<Void, DomainError>) -> Void) {
-        let list = budgets.all()
         let budgetsToDelete = offsets.compactMap { index -> Budget? in
-            guard list.indices.contains(index) else {
+            guard budgets.indices.contains(index) else {
                 return nil
             }
-            return list[index]
+            return budgets[index]
         }
 
         guard !budgetsToDelete.isEmpty else {
@@ -57,17 +56,14 @@ final class BudgetsController: ObservableObject {
             return
         }
 
-        do {
-            try budgetsToDelete.forEach { budget in
-                try budgets.remove(budget: budget)
+        budgetProvider?.delete(budgets: budgetsToDelete) { [weak self] result in
+            switch result {
+            case .success(let budgets):
+                self?.budgets = budgets
+                completion(.success(()))
+            case .failure(let error):
+                completion(.failure(error))
             }
-
-            budgetProvider?.delete(budgets: budgetsToDelete) { [weak self] result in
-                self?.fetch()
-                completion(result)
-            }
-        } catch {
-            completion(.failure(.with(error: error)))
         }
     }
 }

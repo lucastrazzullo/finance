@@ -80,9 +80,10 @@ struct BudgetView: View {
 
 struct BudgetView_Previews: PreviewProvider {
     static var previews: some View {
-        let budgetProvider = MockBudgetProvider()
+        let storageProvider = MockBudgetStorageProvider()
+        let budgetProvider = BudgetProvider(storageProvider: storageProvider)
         NavigationView {
-            BudgetView(budget: Mocks.budgets.all()[0], budgetProvider: budgetProvider)
+            BudgetView(budget: Mocks.budgets[0], budgetProvider: budgetProvider)
         }
     }
 }

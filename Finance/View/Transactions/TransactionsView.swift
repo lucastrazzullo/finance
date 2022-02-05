@@ -61,7 +61,7 @@ struct TransactionsView: View {
         }
 
         private func allBudgets() -> [Budget] {
-            Mocks.budgets.all()
+            Mocks.budgets
         }
     }
 

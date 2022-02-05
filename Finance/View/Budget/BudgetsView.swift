@@ -16,7 +16,7 @@ struct BudgetsView: View {
 
     var body: some View {
         List {
-            ForEach(controller.budgets.all()) { budget in
+            ForEach(controller.budgets) { budget in
                 if let budgetProvider = controller.budgetProvider {
                     NavigationLink(destination: BudgetView(budget: budget, budgetProvider: budgetProvider)) {
                         AmountListItem(label: budget.name, amount: budget.amount)
@@ -67,7 +67,7 @@ struct BudgetsView: View {
 // MARK: - Previews
 
 struct BudgetsView_Previews: PreviewProvider {
-    static let budgetStorageProvider = MockBudgetProvider()
+    static let budgetStorageProvider = BudgetProvider(storageProvider: MockBudgetStorageProvider())
     static var previews: some View {
         NavigationView {
             BudgetsView(budgetProvider: budgetStorageProvider).navigationTitle("Budgets")

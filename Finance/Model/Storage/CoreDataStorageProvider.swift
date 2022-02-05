@@ -1,5 +1,5 @@
 //
-//  StorageProvider.swift
+//  CoreDataStorageProvider.swift
 //  Finance
 //
 //  Created by Luca Strazzullo on 22/01/2022.
@@ -7,13 +7,13 @@
 
 import CoreData
 
-final class StorageProvider: ObservableObject {
+final class CoreDataStorageProvider: ObservableObject {
 
     private static let storageContainerName = "Finance"
 
     private let persistentContainer: NSPersistentContainer
 
-    lazy var budgetProvider: BudgetProvider = {
+    lazy var budgetStorageProvider: BudgetStorageProvider = {
         CoreDataBudgetStorageProvider(persistentContainer: persistentContainer)
     }()
 

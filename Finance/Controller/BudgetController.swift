@@ -11,7 +11,7 @@ final class BudgetController: ObservableObject {
 
     @Published var budget: Budget
 
-    private weak var budgetProvider: BudgetProvider?
+    private var budgetProvider: BudgetProvider?
 
     init(budget: Budget, budgetProvider: BudgetProvider) {
         self.budget = budget
@@ -33,8 +33,13 @@ final class BudgetController: ObservableObject {
 
     func update(budget: Budget, completion: @escaping (Result<Void, DomainError>) -> Void) {
         budgetProvider?.update(budget: budget) { [weak self] result in
-            self?.fetch()
-            completion(result)
+            switch result {
+            case .success(let budget):
+                self?.budget = budget
+                completion(.success(()))
+            case .failure(let error):
+                completion(.failure(error))
+            }
         }
     }
 }

@@ -15,7 +15,7 @@ struct CategorisedTransactionsView: View {
 
         @Published var budgets: [Budget] = []
 
-        private(set) weak var budgetProvider: BudgetProvider?
+        private(set) var budgetProvider: BudgetProvider?
 
         init(budgetProvider: BudgetProvider) {
             self.budgetProvider = budgetProvider
@@ -118,7 +118,7 @@ struct CategorisedTransactionsView: View {
 // MARK: - Previews
 
 struct CategorisedTransactionsView_Previews: PreviewProvider {
-    static let budgetStorageProvider = MockBudgetProvider()
+    static let budgetStorageProvider = BudgetProvider(storageProvider: MockBudgetStorageProvider())
     static var previews: some View {
         NavigationView {
             CategorisedTransactionsView(budgetProvider: budgetStorageProvider)
