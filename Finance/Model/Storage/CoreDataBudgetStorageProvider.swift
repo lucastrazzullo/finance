@@ -44,7 +44,7 @@ final class CoreDataBudgetStorageProvider: BudgetStorageProvider {
         let budgetEntity = BudgetEntity(context: persistentContainer.viewContext)
         budgetEntity.identifier = budget.id
         budgetEntity.name = budget.name
-        budgetEntity.slices = NSSet(array: budget.slices.all().map { slice in
+        budgetEntity.slices = NSSet(array: budget.slices.map { slice in
             let sliceEntity = BudgetSliceEntity(context: persistentContainer.viewContext)
             sliceEntity.identifier = slice.id
             sliceEntity.name = slice.name
@@ -258,11 +258,9 @@ private extension Budget {
                   throw DomainError.budgetProvider(error: .cannotCreateBudgetWithEntity)
         }
 
-        let list = slices
+        let budgetSlices = slices
             .compactMap { $0 as? BudgetSliceEntity }
             .compactMap { BudgetSlice.with(budgetSliceEntity: $0) }
-
-        let budgetSlices = try BudgetSlices(list: list)
 
         return try Budget(id: identifier, name: name, slices: budgetSlices)
     }

@@ -9,14 +9,14 @@ import SwiftUI
 
 struct UpdateBudgetView: View {
 
-    typealias OnSubmitErrorHandler = (DomainError?) -> Void
+    typealias OnSubmitErrorHandler = (DomainError) -> Void
 
     let onSubmit: (Budget, @escaping OnSubmitErrorHandler) -> Void
 
     private let budgetId: Budget.ID
 
     @State private var budgetName: String
-    @State private var budgetSlices: BudgetSlices
+    @State private var budgetSlices: [BudgetSlice]
 
     @State private var presentedError: DomainError?
     @State private var isInsertNewBudgetSlicePresented: Bool = false
@@ -25,27 +25,24 @@ struct UpdateBudgetView: View {
         VStack {
             AmountCollectionItem(title: "Monthly total",
                                  caption: nil,
-                                 amount: budgetSlices.amount,
+                                 amount: budgetSlices.totalAmount,
                                  color: .gray.opacity(0.4))
                 .padding()
 
             Form {
                 Section(header: Text("Budget Name")) {
                     TextField("Name", text: $budgetName)
-
-                    if let error = presentedError, case .budget(let inlineError) = error, case .nameNotValid = inlineError {
-                        Color.red.frame(height: 2)
-                    }
                 }
 
                 Section(header: Text("Slices")) {
                     List {
-                        ForEach(budgetSlices.all()) { slice in
+                        ForEach(budgetSlices) { slice in
                             AmountListItem(label: slice.name, amount: slice.amount)
                                 .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                                     Button(role: .destructive) {
                                         do {
-                                            try budgetSlices.remove(slice: slice)
+                                            try Budget.canRemove(slice: slice, from: budgetSlices)
+                                            budgetSlices.removeAll(where: { $0.id == slice.id })
                                         } catch {
                                             presentedError = error as? DomainError ?? .budgetSlices(error: .cannotUpdateTheSlices(underlyingError: error))
                                         }
@@ -54,10 +51,6 @@ struct UpdateBudgetView: View {
                                     }
                                 }
                         }
-                    }
-
-                    if let error = presentedError, case .budgetSlices = error {
-                        Color.red.frame(height: 2)
                     }
 
                     Button(action: { isInsertNewBudgetSlicePresented = true }) {
@@ -85,10 +78,10 @@ struct UpdateBudgetView: View {
         .sheet(isPresented: $isInsertNewBudgetSlicePresented) {
             NewBudgetSliceView { slice, onErrorHandler in
                 do {
-                    try budgetSlices.add(newSlice: slice)
+                    try Budget.canAdd(slice: slice, to: budgetSlices)
                     isInsertNewBudgetSlicePresented = false
                 } catch {
-                    onErrorHandler(error as? DomainError ?? .underlying(error: error))
+                    onErrorHandler(error as? DomainError ?? .budgetSlices(error: .cannotUpdateTheSlices(underlyingError: error)))
                 }
             }
         }
@@ -98,7 +91,7 @@ struct UpdateBudgetView: View {
         self.onSubmit = onSubmit
         self.budgetId = budget.id
         self._budgetName = State<String>(wrappedValue: budget.name)
-        self._budgetSlices = State<BudgetSlices>(wrappedValue: budget.slices)
+        self._budgetSlices = State<[BudgetSlice]>(wrappedValue: budget.slices)
     }
 }
 

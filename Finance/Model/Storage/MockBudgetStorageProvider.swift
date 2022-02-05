@@ -20,11 +20,11 @@ enum Mocks {
         ]
     }()
 
-    static let slices: BudgetSlices = {
-        try! BudgetSlices(list: [
+    static let slices: [BudgetSlice] = {
+        [
             try! BudgetSlice(id: .init(), name: "Mortgage", amount: .value(120.23)),
             try! BudgetSlice(id: .init(), name: "Furnitures", amount: .value(120.23))
-        ])
+        ]
     }()
 
     // MARK: - Transactions
@@ -32,7 +32,7 @@ enum Mocks {
     static let incomingTransactions: [Transaction] = {
         budgets
             .map { budget in
-                budget.slices.all().map { slice in
+                budget.slices.map { slice in
                     [
                         Transaction(transfer: .income(amount: .value(100.02)), budgetId: budget.id, budgetSliceId: slice.id),
                         Transaction(transfer: .income(amount: .value(200.02)), budgetId: budget.id, budgetSliceId: slice.id),
@@ -47,7 +47,7 @@ enum Mocks {
     static let outgoingTransactions: [Transaction] = {
         budgets
             .map { budget in
-                budget.slices.all().map { slice in
+                budget.slices.map { slice in
                     [
                         Transaction(transfer: .expense(amount: .value(100.02)), budgetId: budget.id, budgetSliceId: slice.id),
                         Transaction(transfer: .expense(amount: .value(200.02)), budgetId: budget.id, budgetSliceId: slice.id),
@@ -107,34 +107,40 @@ final class MockBudgetStorageProvider: BudgetStorageProvider {
             return
         }
 
-        var budget = budgets.remove(at: budgetIndex)
+        let oldBudget = budgets.remove(at: budgetIndex)
+        var slices = oldBudget.slices
+        slices.append(budgetSlice)
+        
         do {
-            try budget.add(newSlice: budgetSlice)
-            completion(.success(budget))
+            let newBudget = try Budget(id: oldBudget.id, name: oldBudget.name, slices: slices)
+            budgets.insert(newBudget, at: budgetIndex)
+            completion(.success(newBudget))
         } catch {
+            budgets.insert(oldBudget, at: budgetIndex)
             completion(.failure(.budgetProvider(error: .underlying(error: Error.mock))))
             return
         }
-
-        budgets.insert(budget, at: budgetIndex)
     }
 
     func delete(budgetSlice: BudgetSlice, fromBudgetWith budgetId: Budget.ID, completion: @escaping BudgetProvider.BudgetCompletion) {
-        guard let budgetIndex = budgets.firstIndex(where: { $0.slices.all().contains(where: { $0.id == budgetSlice.id}) }) else {
+        guard let budgetIndex = budgets.firstIndex(where: { $0.slices.contains(where: { $0.id == budgetSlice.id}) }) else {
             completion(.failure(.budgetProvider(error: .underlying(error: Error.mock))))
             return
         }
 
-        var budget = budgets.remove(at: budgetIndex)
+        let oldBudget = budgets.remove(at: budgetIndex)
+        var slices = oldBudget.slices
+        slices.removeAll(where: { $0.id == budgetSlice.id })
+
         do {
-            try budget.remove(slice: budgetSlice)
-            completion(.success(budget))
+            let newBudget = try Budget(id: oldBudget.id, name: oldBudget.name, slices: slices)
+            budgets.insert(newBudget, at: budgetIndex)
+            completion(.success(newBudget))
         } catch {
+            budgets.insert(oldBudget, at: budgetIndex)
             completion(.failure(.budgetProvider(error: .underlying(error: Error.mock))))
             return
         }
-
-        budgets.insert(budget, at: budgetIndex)
     }
 }
 #endif

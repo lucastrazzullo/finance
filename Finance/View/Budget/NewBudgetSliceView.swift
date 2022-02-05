@@ -9,7 +9,7 @@ import SwiftUI
 
 struct NewBudgetSliceView: View {
 
-    typealias OnSubmitErrorHandler = (DomainError?) -> Void
+    typealias OnSubmitErrorHandler = (DomainError) -> Void
 
     let onSubmit: (BudgetSlice, OnSubmitErrorHandler) -> Void
 
@@ -23,18 +23,10 @@ struct NewBudgetSliceView: View {
 
                 VStack(alignment: .leading) {
                     TextField("Name", text: $newBudgetSliceName)
-
-                    if let error = newBudgetSlicePresentedError, case .budgetSlice(let inlineError) = error, case .nameNotValid = inlineError {
-                        Color.red.frame(height: 2)
-                    }
                 }
 
                 VStack(alignment: .leading) {
                     InsertAmountField(amountValue: $newBudgetSliceAmount, title: "Monthly Amount", prompt: nil)
-
-                    if let error = newBudgetSlicePresentedError, case .budgetSlice(let inlineError) = error, case .amountNotValid = inlineError {
-                        Color.red.frame(height: 2)
-                    }
                 }
             }
 

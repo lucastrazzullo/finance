@@ -9,7 +9,7 @@ import SwiftUI
 
 struct NewBudgetView: View {
 
-    typealias OnSubmitErrorHandler = (DomainError?) -> Void
+    typealias OnSubmitErrorHandler = (DomainError) -> Void
 
     let onSubmit: (Budget, @escaping OnSubmitErrorHandler) -> Void
 
@@ -24,22 +24,10 @@ struct NewBudgetView: View {
         Form {
             Section(header: Text("New budget")) {
 
-                VStack(alignment: .leading) {
-                    TextField("Name", text: $budgetName)
-
-                    if let error = presentedError, case .budget(let inlineError) = error, case .nameNotValid = inlineError {
-                        Color.red.frame(height: 2)
-                    }
-                }
+                TextField("Name", text: $budgetName)
 
                 if budgetSlices.isEmpty {
-                    VStack(alignment: .leading) {
-                        InsertAmountField(amountValue: $budgetAmount, title: "Monthly Amount", prompt: nil)
-
-                        if let error = presentedError, case .budget(let inlineError) = error, case .amountNotValid = inlineError  {
-                            Color.red.frame(height: 2)
-                        }
-                    }
+                    InsertAmountField(amountValue: $budgetAmount, title: "Monthly Amount", prompt: nil)
                 } else {
                     AmountCollectionItem(title: "Monthly total",
                                          caption: "\(Budget.yearlyAmount(for: budgetSlices.totalAmount).localizedDescription) per year",
@@ -55,16 +43,17 @@ struct NewBudgetView: View {
                             AmountListItem(label: slice.name, amount: slice.amount)
                                 .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                                     Button(role: .destructive) {
-                                        budgetSlices.removeAll(where: { $0.id == slice.id })
+                                        do {
+                                            try Budget.canRemove(slice: slice, from: budgetSlices)
+                                            budgetSlices.removeAll(where: { $0.id == slice.id })
+                                        } catch {
+                                            presentedError = error as? DomainError ?? .budgetSlices(error: .cannotUpdateTheSlices(underlyingError: error))
+                                        }
                                     } label: {
                                         Label("Delete", systemImage: "trash")
                                     }
                                 }
                         }
-                    }
-
-                    if let error = presentedError, case .budgetSlices = error {
-                        Color.red.frame(height: 2)
                     }
                 }
                 Button(action: { isInsertNewBudgetSlicePresented = true }) {
@@ -80,8 +69,7 @@ struct NewBudgetView: View {
                 Button("Save") {
                     do {
                         if !budgetSlices.isEmpty {
-                            let slices = try BudgetSlices(list: budgetSlices)
-                            let budget = try Budget(id: .init(), name: budgetName, slices: slices)
+                            let budget = try Budget(id: .init(), name: budgetName, slices: budgetSlices)
                             onSubmit(budget) { error in
                                 presentedError = error
                             }
@@ -100,16 +88,11 @@ struct NewBudgetView: View {
         .sheet(isPresented: $isInsertNewBudgetSlicePresented) {
             NewBudgetSliceView { newSlice, onErrorHandler in
                 do {
-                    if budgetSlices.isEmpty {
-                        budgetSlices.append(newSlice)
-                    } else {
-                        var slices = try BudgetSlices(list: [newSlice])
-                        try slices.add(newSlice: newSlice)
-                        budgetSlices = slices.all()
-                    }
+                    try Budget.canAdd(slice: newSlice, to: budgetSlices)
+                    budgetSlices.append(newSlice)
                     isInsertNewBudgetSlicePresented = false
                 } catch {
-                    onErrorHandler(error as? DomainError ?? .underlying(error: error))
+                    onErrorHandler(error as? DomainError ?? .budgetSlices(error: .cannotUpdateTheSlices(underlyingError: error)))
                 }
             }
         }

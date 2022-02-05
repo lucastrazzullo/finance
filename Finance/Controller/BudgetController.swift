@@ -32,6 +32,13 @@ final class BudgetController: ObservableObject {
     }
 
     func update(budget: Budget, completion: @escaping (Result<Void, DomainError>) -> Void) {
-        fatalError()
+        budgetProvider?.update(budget: budget) { [weak self] result in
+            switch result {
+            case .success(let budget):
+                self?.budget = budget
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
     }
 }

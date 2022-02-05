@@ -10,12 +10,11 @@ import Foundation
 struct Budget: Identifiable, AmountHolder {
 
     let id: UUID
-
-    private(set) var name: String
-    private(set) var slices: BudgetSlices
+    let name: String
+    let slices: [BudgetSlice]
 
     var amount: MoneyValue {
-        return slices.amount
+        return slices.totalAmount
     }
 
     var yearlyAmount: MoneyValue {
@@ -32,33 +31,23 @@ struct Budget: Identifiable, AmountHolder {
     }
 
     init(id: ID, name: String, amount: MoneyValue = .zero) throws {
-        let slices = try BudgetSlices(list: [
+        let slices = [
             BudgetSlice.default(amount: amount)
-        ])
+        ]
         try self.init(id: id, name: name, slices: slices)
     }
 
-    init(id: ID, name: String, slices: BudgetSlices) throws {
-        try Self.canUse(name: name)
+    init(id: ID, name: String, slices: [BudgetSlice]) throws {
+        guard !name.isEmpty else {
+            throw DomainError.budget(error: .nameNotValid)
+        }
+        guard !slices.isEmpty else {
+            throw DomainError.budgetSlices(error: .thereMustBeAtLeastOneSlice)
+        }
 
         self.id = id
         self.name = name
         self.slices = slices
-    }
-
-    // MARK: Mutating methods
-
-    mutating func update(name newName: String) throws {
-        try Self.canUse(name: newName)
-        name = newName
-    }
-
-    mutating func add(newSlice: BudgetSlice) throws {
-        try slices.add(newSlice: newSlice)
-    }
-
-    mutating func remove(slice: BudgetSlice) throws {
-        try slices.remove(slice: slice)
     }
 
     // MARK: Helpers
@@ -67,11 +56,18 @@ struct Budget: Identifiable, AmountHolder {
         montlyAmount * .value(12)
     }
 
-    // MARK: Checking methods
+    static func canAdd(slice: BudgetSlice, to slices: [BudgetSlice]) throws {
+        guard !slices.contains(where: { $0.name == slice.name }) else {
+            throw DomainError.budgetSlices(error: .sliceAlreadyExistsWith(name: slice.name))
+        }
+    }
 
-    private static func canUse(name: String) throws {
-        guard !name.isEmpty else {
-            throw DomainError.budget(error: .nameNotValid)
+    static func canRemove(slice: BudgetSlice, from slices: [BudgetSlice]) throws {
+        guard slices.contains(where: { $0.id == slice.id }) else {
+            throw DomainError.budgetSlices(error: .sliceDoesntExist)
+        }
+        guard slices.count > 1 else {
+            throw DomainError.budgetSlices(error: .thereMustBeAtLeastOneSlice)
         }
     }
 }

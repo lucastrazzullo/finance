@@ -67,6 +67,39 @@ final class BudgetProvider {
         storageProvider.fetchBudget(with: id, completion: completion)
     }
 
+    func update(budget: Budget, completion: @escaping BudgetCompletion) {
+        canUpdate(budget: budget) { result in
+            switch result {
+            case .success:
+                fatalError("To be implemented")
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
+    }
+
+    func add(budgetSlice: BudgetSlice, toBudgetWith id: Budget.ID, completion: @escaping BudgetCompletion) {
+        canAdd(budgetSlice: budgetSlice, toBudgetWith: id) { [weak self] result in
+            switch result {
+            case .success:
+                self?.storageProvider.add(budgetSlice: budgetSlice, toBudgetWith: id, completion: completion)
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
+    }
+
+    func delete(budgetSlice: BudgetSlice, fromBudgetWith id: Budget.ID, completion: @escaping BudgetCompletion) {
+        canDelete(budgetSlice: budgetSlice, fromBudgetWith: id) { [weak self] result in
+            switch result {
+            case .success:
+                self?.storageProvider.delete(budgetSlice: budgetSlice, fromBudgetWith: id, completion: completion)
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
+    }
+
     // MARK: Private helper methods
 
     private func canAdd(budget: Budget, completion: @escaping (Result<Void, DomainError>) -> Void) {
@@ -78,6 +111,53 @@ final class BudgetProvider {
                     return
                 }
                 completion(.success(()))
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
+    }
+
+    private func canUpdate(budget: Budget, completion: @escaping (Result<Void, DomainError>) -> Void) {
+        storageProvider.fetchBudgets { result in
+            switch result {
+            case .success(let budgets):
+                guard !budgets.contains(where: { $0.id != budget.id && $0.name == budget.name }) else {
+                    completion(.failure(DomainError.budgets(error: .budgetAlreadyExistsWith(name: budget.name))))
+                    return
+                }
+                completion(.success(()))
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
+    }
+
+    private func canAdd(budgetSlice: BudgetSlice, toBudgetWith id: Budget.ID, completion: @escaping (Result<Void, DomainError>) -> Void) {
+        storageProvider.fetchBudget(with: id) { result in
+            switch result {
+            case .success(let budget):
+                do {
+                    try Budget.canAdd(slice: budgetSlice, to: budget.slices)
+                    completion(.success(()))
+                } catch {
+                    completion(.failure(error as? DomainError ?? .budgetProvider(error: .underlying(error: error))))
+                }
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
+    }
+
+    private func canDelete(budgetSlice: BudgetSlice, fromBudgetWith id: Budget.ID, completion: @escaping (Result<Void, DomainError>) -> Void) {
+        storageProvider.fetchBudget(with: id) { result in
+            switch result {
+            case .success(let budget):
+                do {
+                    try Budget.canRemove(slice: budgetSlice, from: budget.slices)
+                    completion(.success(()))
+                } catch {
+                    completion(.failure(error as? DomainError ?? .budgetProvider(error: .underlying(error: error))))
+                }
             case .failure(let error):
                 completion(.failure(error))
             }
