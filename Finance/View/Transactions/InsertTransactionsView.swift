@@ -26,7 +26,7 @@ struct InsertTransactionsView: View {
         }()
 
         lazy var budgetSlicesId: [BudgetSlice.ID] = {
-            budget.slices.map(\.id)
+            budget.slices.all().map(\.id)
         }()
     }
 
@@ -87,7 +87,7 @@ struct InsertTransactionsView: View {
                     Picker("Subcategory", selection: $newTransactionBudgetSliceIndex) {
                         ForEach(controller.budgetSlicesId.enumerated().map(\.offset), id: \.self) { index in
                             let sliceIdentifier = controller.budgetSlicesId[index]
-                            if let slice = controller.budget.slices.first(where: { $0.id == sliceIdentifier }) {
+                            if let slice = controller.budget.slices.all().first(where: { $0.id == sliceIdentifier }) {
                                 AmountListItem(label: slice.name, amount: slice.amount)
                             }
                         }
@@ -148,11 +148,11 @@ struct InsertTransactionsView: View {
 
 struct InsertTransactionsView_Previews: PreviewProvider {
     static var previews: some View {
-        let budget = try! Budget(id: UUID(), name: "Test", slices: [
+        let budget = try! Budget(id: UUID(), name: "Test", slices: try! BudgetSlices(list: [
             .init(id: .init(), name: "", amount: .value(200)),
             .init(id: .init(), name: "", amount: .value(100)),
             .init(id: .init(), name: "", amount: .value(500))
-        ])
+        ]))
         return InsertTransactionsView(budget: budget)
     }
 }

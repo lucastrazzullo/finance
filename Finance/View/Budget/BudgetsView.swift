@@ -16,7 +16,7 @@ struct BudgetsView: View {
 
     var body: some View {
         List {
-            ForEach(controller.budgets.list) { budget in
+            ForEach(controller.budgets.all()) { budget in
                 if let budgetProvider = controller.budgetProvider {
                     NavigationLink(destination: BudgetView(budget: budget, budgetProvider: budgetProvider)) {
                         AmountListItem(label: budget.name, amount: budget.amount)

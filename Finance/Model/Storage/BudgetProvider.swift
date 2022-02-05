@@ -44,7 +44,7 @@ final class BudgetStorageProvider: BudgetProvider {
         let budgetEntity = BudgetEntity(context: persistentContainer.viewContext)
         budgetEntity.identifier = budget.id
         budgetEntity.name = budget.name
-        budgetEntity.slices = NSSet(array: budget.slices.map { slice in
+        budgetEntity.slices = NSSet(array: budget.slices.all().map { slice in
             let sliceEntity = BudgetSliceEntity(context: persistentContainer.viewContext)
             sliceEntity.identifier = slice.id
             sliceEntity.name = slice.name
@@ -249,10 +249,25 @@ private extension Budget {
                   throw DomainError.budgetProvider(error: .cannotCreateBudgetWithEntity)
         }
 
-        let budgetSlices = slices
+        let list = slices
             .compactMap { $0 as? BudgetSliceEntity }
             .compactMap { BudgetSlice.with(budgetSliceEntity: $0) }
 
+        let budgetSlices = try BudgetSlices(list: list)
+
         return try Budget(id: identifier, name: name, slices: budgetSlices)
+    }
+}
+
+private extension BudgetSlice {
+
+    static func with(budgetSliceEntity: BudgetSliceEntity) -> Self? {
+        guard let identifier = budgetSliceEntity.identifier,
+              let name = budgetSliceEntity.name,
+              let amountDecimal = budgetSliceEntity.amount else {
+            return nil
+        }
+
+        return try? BudgetSlice(id: identifier, name: name, amount: .value(amountDecimal.decimalValue))
     }
 }

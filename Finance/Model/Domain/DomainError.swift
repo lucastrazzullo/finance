@@ -15,6 +15,7 @@ enum DomainError: Error, Identifiable {
 
     case budgets(error: BudgetsError)
     case budget(error: BudgetError)
+    case budgetSlices(error: BudgetSlicesError)
     case budgetSlice(error: BudgetSliceError)
     case budgetProvider(error: BudgetStorageProviderError)
 
@@ -30,6 +31,8 @@ enum DomainError: Error, Identifiable {
             return "budgets"
         case .budget:
             return "budget"
+        case .budgetSlices:
+            return "budgetSlices"
         case .budgetSlice:
             return "budgetSlice"
         case .budgetProvider:
@@ -44,6 +47,8 @@ enum DomainError: Error, Identifiable {
         case .budgets(let error):
             return error.description
         case .budget(let error):
+            return error.description
+        case .budgetSlices(let error):
             return error.description
         case .budgetSlice(let error):
             return error.description
@@ -71,15 +76,8 @@ enum BudgetsError: DomainUnderlyingError {
 
 enum BudgetError: DomainUnderlyingError {
 
-    enum SlicesErrorReason {
-        case sliceAlreadyExistsWith(name: String)
-        case sliceDoesntExist
-        case thereMustBeAtLeastOneSlice
-    }
-
     case nameNotValid
     case amountNotValid
-    case slicesNotValid(reason: SlicesErrorReason)
     case cannotUpdateTheBudget(underlyingError: Error)
     case cannotCreateTheBudget(underlyingError: Error)
 
@@ -89,15 +87,6 @@ enum BudgetError: DomainUnderlyingError {
             return "Please use a valid name"
         case .amountNotValid:
             return "Please use a valid amount"
-        case .slicesNotValid(let reason):
-            switch reason {
-            case .sliceAlreadyExistsWith(let name):
-                return "A slice named: \(name) already exists."
-            case .sliceDoesntExist:
-                return "The slice you're trying to modify or delete doesn't exist"
-            case .thereMustBeAtLeastOneSlice:
-                return "There must be at least one slice."
-            }
         case .cannotUpdateTheBudget:
             return "This budget cannot be updated!"
         case .cannotCreateTheBudget:
@@ -106,7 +95,29 @@ enum BudgetError: DomainUnderlyingError {
     }
 }
 
+enum BudgetSlicesError: DomainUnderlyingError {
+
+    case sliceAlreadyExistsWith(name: String)
+    case sliceDoesntExist
+    case thereMustBeAtLeastOneSlice
+    case cannotUpdateTheSlices(underlyingError: Error)
+
+    var description: String {
+        switch self {
+        case .sliceAlreadyExistsWith(let name):
+            return "A slice named: \(name) already exists."
+        case .sliceDoesntExist:
+            return "The slice you're trying to modify or delete doesn't exist"
+        case .thereMustBeAtLeastOneSlice:
+            return "There must be at least one slice."
+        case .cannotUpdateTheSlices:
+            return "Something went wrong updating the slices!"
+        }
+    }
+}
+
 enum BudgetSliceError: DomainUnderlyingError {
+
     case nameNotValid
     case amountNotValid
     case cannotCreateTheSlice(underlyingError: Error)

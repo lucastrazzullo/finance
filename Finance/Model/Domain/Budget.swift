@@ -12,10 +12,10 @@ struct Budget: Identifiable, AmountHolder {
     let id: UUID
 
     private(set) var name: String
-    private(set) var slices: [BudgetSlice]
+    private(set) var slices: BudgetSlices
 
     var amount: MoneyValue {
-        return slices.totalAmount
+        return slices.amount
     }
 
     var yearlyAmount: MoneyValue {
@@ -32,15 +32,14 @@ struct Budget: Identifiable, AmountHolder {
     }
 
     init(id: ID, name: String, amount: MoneyValue = .zero) throws {
-        let slices = [
+        let slices = try BudgetSlices(list: [
             BudgetSlice.default(amount: amount)
-        ]
+        ])
         try self.init(id: id, name: name, slices: slices)
     }
 
-    init(id: ID, name: String, slices: [BudgetSlice]) throws {
+    init(id: ID, name: String, slices: BudgetSlices) throws {
         try Self.canUse(name: name)
-        try Self.canUse(slices: slices)
 
         self.id = id
         self.name = name
@@ -55,13 +54,11 @@ struct Budget: Identifiable, AmountHolder {
     }
 
     mutating func add(newSlice: BudgetSlice) throws {
-        try Self.canAdd(newSlice: newSlice, to: slices)
-        slices.append(newSlice)
+        try slices.add(newSlice: newSlice)
     }
 
     mutating func remove(slice: BudgetSlice) throws {
-        try Self.canRemove(slice: slice, from: slices)
-        slices.removeAll(where: { $0.id == slice.id })
+        try slices.remove(slice: slice)
     }
 
     // MARK: Helpers
@@ -72,34 +69,9 @@ struct Budget: Identifiable, AmountHolder {
 
     // MARK: Checking methods
 
-    static func canUse(name: String) throws {
+    private static func canUse(name: String) throws {
         guard !name.isEmpty else {
             throw DomainError.budget(error: .nameNotValid)
         }
     }
-
-    static func canUse(slices: [BudgetSlice]) throws {
-        guard !slices.isEmpty else {
-            throw DomainError.budget(error: .slicesNotValid(reason: .thereMustBeAtLeastOneSlice))
-        }
-        if let duplicatedSlice = slices.firstDuplicate() {
-            throw DomainError.budget(error: .slicesNotValid(reason: .sliceAlreadyExistsWith(name: duplicatedSlice.name)))
-        }
-    }
-
-    static func canAdd(newSlice: BudgetSlice, to slices: [BudgetSlice]) throws {
-        var newSlices = slices
-        newSlices.append(newSlice)
-        try Self.canUse(slices: newSlices)
-    }
-
-    static func canRemove(slice: BudgetSlice, from slices: [BudgetSlice]) throws {
-        guard slices.count > 1 else {
-            throw DomainError.budget(error: .slicesNotValid(reason: .thereMustBeAtLeastOneSlice))
-        }
-        guard slices.contains(where: { $0.id == slice.id }) else {
-            throw DomainError.budget(error: .slicesNotValid(reason: .sliceDoesntExist))
-        }
-    }
 }
-

@@ -13,7 +13,7 @@ final class MockBudgetProvider: BudgetProvider {
         case mock
     }
 
-    private var budgets: [Budget] = Mocks.budgets
+    private var budgets: [Budget] = Mocks.budgets.all()
 
     // MARK: Add
 
@@ -55,7 +55,7 @@ final class MockBudgetProvider: BudgetProvider {
     }
 
     func delete(budgetSlice: BudgetSlice, completion: @escaping MutateCompletion) {
-        guard let budgetIndex = budgets.firstIndex(where: { $0.slices.contains(where: { $0.id == budgetSlice.id}) }) else {
+        guard let budgetIndex = budgets.firstIndex(where: { $0.slices.all().contains(where: { $0.id == budgetSlice.id}) }) else {
             completion(.failure(.budgetProvider(error: .underlying(error: Error.mock))))
             return
         }

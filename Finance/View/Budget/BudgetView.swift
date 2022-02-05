@@ -28,8 +28,8 @@ struct BudgetView: View {
 
             List {
                 Section(header: Text("Slices")) {
-                    if controller.budget.slices.count > 0 {
-                        ForEach(controller.budget.slices) { slice in
+                    if controller.budget.slices.all().count > 0 {
+                        ForEach(controller.budget.slices.all()) { slice in
                             HStack {
                                 AmountListItem(label: slice.name, amount: slice.amount)
                                 Text(makePercentageStringFor(amount: slice.amount)).font(.caption)
@@ -82,7 +82,7 @@ struct BudgetView_Previews: PreviewProvider {
     static var previews: some View {
         let budgetProvider = MockBudgetProvider()
         NavigationView {
-            BudgetView(budget: Mocks.budgets.last!, budgetProvider: budgetProvider)
+            BudgetView(budget: Mocks.budgets.all()[0], budgetProvider: budgetProvider)
         }
     }
 }

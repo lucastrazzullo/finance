@@ -33,7 +33,7 @@ final class BudgetsController: ObservableObject {
 
     func add(budget: Budget, completion: @escaping (Result<Void, DomainError>) -> Void) {
         do {
-            try budgets.canAdd(budget: budget)
+            try budgets.add(budget: budget)
             budgetProvider?.add(budget: budget) { [weak self] result in
                 self?.fetch()
                 completion(result)
@@ -44,7 +44,7 @@ final class BudgetsController: ObservableObject {
     }
 
     func delete(budgetsAt offsets: IndexSet, completion: @escaping (Result<Void, DomainError>) -> Void) {
-        let list = budgets.list
+        let list = budgets.all()
         let budgetsToDelete = offsets.compactMap { index -> Budget? in
             guard list.indices.contains(index) else {
                 return nil
@@ -59,7 +59,7 @@ final class BudgetsController: ObservableObject {
 
         do {
             try budgetsToDelete.forEach { budget in
-                try budgets.canRemove(budget: budget)
+                try budgets.remove(budget: budget)
             }
 
             budgetProvider?.delete(budgets: budgetsToDelete) { [weak self] result in

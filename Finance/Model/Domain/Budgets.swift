@@ -9,21 +9,35 @@ import Foundation
 
 struct Budgets {
 
-    let list: [Budget]
+    private var list: [Budget]
 
     init(list: [Budget] = []) {
         self.list = list
     }
 
-    func canAdd(budget: Budget) throws {
+    // MARK: Getters
+
+    func all() -> [Budget] {
+        return list
+    }
+
+    func budget(with id: Budget.ID) -> Budget? {
+        return list.first(where: { $0.id == id })
+    }
+
+    // MARK: Mutating methods
+
+    mutating func add(budget: Budget) throws {
         guard !list.contains(where: { $0.name == budget.name }) else {
             throw DomainError.budgets(error: .budgetAlreadyExistsWith(name: budget.name))
         }
+        list.append(budget)
     }
 
-    func canRemove(budget: Budget) throws {
+    mutating func remove(budget: Budget) throws {
         guard list.contains(where: { $0.id == budget.id }) else {
             throw DomainError.budgets(error: .budgetDoesntExist)
         }
+        list.removeAll(where: { $0.id == budget.id })
     }
 }

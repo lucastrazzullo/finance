@@ -38,7 +38,7 @@ struct TransactionsView: View {
         }
 
         func slices(forBudgetWith id: Budget.ID) -> [BudgetSlice] {
-            return budget(with: id)?.slices ?? []
+            return budget(with: id)?.slices.all() ?? []
         }
 
         func transactions(forBudgetWith id: Budget.ID) -> [Transaction] {
@@ -61,7 +61,7 @@ struct TransactionsView: View {
         }
 
         private func allBudgets() -> [Budget] {
-            Mocks.budgets
+            Mocks.budgets.all()
         }
     }
 

@@ -47,37 +47,3 @@ struct BudgetSlice: Identifiable, Hashable, AmountHolder {
         hasher.combine(amount.value)
     }
 }
-
-extension BudgetSlice {
-
-    static func with(budgetSliceEntity: BudgetSliceEntity) -> Self? {
-        guard let identifier = budgetSliceEntity.identifier,
-              let name = budgetSliceEntity.name,
-              let amountDecimal = budgetSliceEntity.amount else {
-            return nil
-        }
-
-        return try? BudgetSlice(id: identifier, name: name, amount: .value(amountDecimal.decimalValue))
-    }
-}
-
-extension Array where Element == BudgetSlice {
-
-    func firstDuplicate() -> Element? {
-        var firstDuplicate: Element? = nil
-        var uniqueNames: Set<String> = []
-
-        self.forEach { budgetSlice in
-            guard firstDuplicate == nil else {
-                return
-            }
-            if uniqueNames.contains(budgetSlice.name) {
-                firstDuplicate = budgetSlice
-            } else {
-                uniqueNames.insert(budgetSlice.name)
-            }
-        }
-
-        return firstDuplicate
-    }
-}

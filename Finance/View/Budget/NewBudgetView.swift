@@ -63,7 +63,7 @@ struct NewBudgetView: View {
                         }
                     }
 
-                    if let error = presentedError, case .budget(let inlineError) = error, case .slicesNotValid = inlineError {
+                    if let error = presentedError, case .budgetSlices = error {
                         Color.red.frame(height: 2)
                     }
                 }
@@ -80,11 +80,14 @@ struct NewBudgetView: View {
                 Button("Save") {
                     do {
                         if !budgetSlices.isEmpty {
-                            onSubmit(try Budget(id: .init(), name: budgetName, slices: budgetSlices)) { error in
+                            let slices = try BudgetSlices(list: budgetSlices)
+                            let budget = try Budget(id: .init(), name: budgetName, slices: slices)
+                            onSubmit(budget) { error in
                                 presentedError = error
                             }
                         } else {
-                            onSubmit(try Budget(id: .init(), name: budgetName, amount: budgetAmount)) { error in
+                            let budget = try Budget(id: .init(), name: budgetName, amount: budgetAmount)
+                            onSubmit(budget) { error in
                                 presentedError = error
                             }
                         }
@@ -95,10 +98,15 @@ struct NewBudgetView: View {
             }
         }
         .sheet(isPresented: $isInsertNewBudgetSlicePresented) {
-            NewBudgetSliceView { slice, onErrorHandler in
+            NewBudgetSliceView { newSlice, onErrorHandler in
                 do {
-                    try Budget.canAdd(newSlice: slice, to: budgetSlices)
-                    budgetSlices.append(slice)
+                    if budgetSlices.isEmpty {
+                        budgetSlices.append(newSlice)
+                    } else {
+                        var slices = try BudgetSlices(list: [newSlice])
+                        try slices.add(newSlice: newSlice)
+                        budgetSlices = slices.all()
+                    }
                     isInsertNewBudgetSlicePresented = false
                 } catch {
                     onErrorHandler(error as? DomainError ?? .underlying(error: error))
