@@ -45,7 +45,8 @@ struct NewBudgetSliceView: View {
 
                 Button("Save") {
                     do {
-                        onSubmit(try BudgetSlice(id: .init(), name: newBudgetSliceName, amount: newBudgetSliceAmount)) { error in
+                        let slice = try BudgetSlice(id: .init(), name: newBudgetSliceName, amount: newBudgetSliceAmount)
+                        onSubmit(slice) { error in
                             newBudgetSlicePresentedError = error
                         }
                     } catch {

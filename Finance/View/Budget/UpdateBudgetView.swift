@@ -85,7 +85,7 @@ struct UpdateBudgetView: View {
         .sheet(isPresented: $isInsertNewBudgetSlicePresented) {
             NewBudgetSliceView { slice, onErrorHandler in
                 do {
-                    try budgetSlices.remove(slice: slice)
+                    try budgetSlices.add(newSlice: slice)
                     isInsertNewBudgetSlicePresented = false
                 } catch {
                     onErrorHandler(error as? DomainError ?? .underlying(error: error))
