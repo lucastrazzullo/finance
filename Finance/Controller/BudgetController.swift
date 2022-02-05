@@ -36,6 +36,7 @@ final class BudgetController: ObservableObject {
             switch result {
             case .success(let budget):
                 self?.budget = budget
+                completion(.success(()))
             case .failure(let error):
                 completion(.failure(error))
             }

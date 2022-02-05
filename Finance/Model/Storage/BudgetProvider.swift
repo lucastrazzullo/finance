@@ -19,8 +19,7 @@ protocol BudgetStorageProvider: AnyObject {
     // MARK: Budget
 
     func fetchBudget(with identifier: Budget.ID, completion: @escaping BudgetProvider.BudgetCompletion)
-    func add(budgetSlice: BudgetSlice, toBudgetWith budgetId: Budget.ID, completion: @escaping BudgetProvider.BudgetCompletion)
-    func delete(budgetSlice: BudgetSlice, fromBudgetWith budgetId: Budget.ID, completion: @escaping BudgetProvider.BudgetCompletion)
+    func updateBudget(budget: Budget, completion: @escaping BudgetProvider.BudgetCompletion)
 }
 
 final class BudgetProvider {
@@ -68,32 +67,10 @@ final class BudgetProvider {
     }
 
     func update(budget: Budget, completion: @escaping BudgetCompletion) {
-        canUpdate(budget: budget) { result in
+        canUpdate(budget: budget) { [weak self] result in
             switch result {
             case .success:
-                fatalError("To be implemented")
-            case .failure(let error):
-                completion(.failure(error))
-            }
-        }
-    }
-
-    func add(budgetSlice: BudgetSlice, toBudgetWith id: Budget.ID, completion: @escaping BudgetCompletion) {
-        canAdd(budgetSlice: budgetSlice, toBudgetWith: id) { [weak self] result in
-            switch result {
-            case .success:
-                self?.storageProvider.add(budgetSlice: budgetSlice, toBudgetWith: id, completion: completion)
-            case .failure(let error):
-                completion(.failure(error))
-            }
-        }
-    }
-
-    func delete(budgetSlice: BudgetSlice, fromBudgetWith id: Budget.ID, completion: @escaping BudgetCompletion) {
-        canDelete(budgetSlice: budgetSlice, fromBudgetWith: id) { [weak self] result in
-            switch result {
-            case .success:
-                self?.storageProvider.delete(budgetSlice: budgetSlice, fromBudgetWith: id, completion: completion)
+                self?.storageProvider.updateBudget(budget: budget, completion: completion)
             case .failure(let error):
                 completion(.failure(error))
             }

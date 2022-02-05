@@ -137,48 +137,32 @@ final class CoreDataBudgetStorageProvider: BudgetStorageProvider {
         }
     }
 
-    func add(budgetSlice: BudgetSlice, toBudgetWith budgetId: Budget.ID, completion: @escaping BudgetProvider.BudgetCompletion) {
-        fetchBudgetEntity(with: budgetId) { [weak self] result in
-            guard let self = self else {
-                completion(.failure(.budgetProvider(error: .budgetEntityNotFound)))
-                return
-            }
-
+    func updateBudget(budget: Budget, completion: @escaping BudgetProvider.BudgetCompletion) {
+        fetchBudgetEntity(with: budget.id) { result in
             switch result {
             case .success(let budgetEntity):
-                let sliceEntity = BudgetSliceEntity(context: self.persistentContainer.viewContext)
-                sliceEntity.identifier = budgetSlice.id
-                sliceEntity.name = budgetSlice.name
-                sliceEntity.amount = NSDecimalNumber(decimal: budgetSlice.amount.value)
-                sliceEntity.budget = budgetEntity
-                self.saveOrRollback { result in
-                    switch result {
-                    case .success:
-                        self.fetchBudget(with: budgetId, completion: completion)
-                    case .failure(let error):
-                        completion(.failure(error))
+                budgetEntity.name = budget.name
+
+                let entitySlices = budgetEntity.slices?.compactMap { $0 as? BudgetSliceEntity } ?? []
+
+                entitySlices.forEach { sliceEntity in
+                    if !budget.slices.contains(where: { $0.id == sliceEntity.identifier }) {
+                        self.persistentContainer.viewContext.delete(sliceEntity)
                     }
                 }
-            case .failure(let error):
-                completion(.failure(error))
-            }
-        }
-    }
-
-    func delete(budgetSlice: BudgetSlice, fromBudgetWith budgetId: Budget.ID, completion: @escaping BudgetProvider.BudgetCompletion) {
-        fetchBudgetSliceEntity(with: budgetSlice.id) { [weak self] result in
-            guard let self = self else {
-                completion(.failure(.budgetProvider(error: .budgetEntityNotFound)))
-                return
-            }
-
-            switch result {
-            case .success(let budgetSliceEntity):
-                self.persistentContainer.viewContext.delete(budgetSliceEntity)
+                budget.slices.forEach { slice in
+                    if !entitySlices.contains(where: { $0.identifier == slice.id }) {
+                        let sliceEntity = BudgetSliceEntity(context: self.persistentContainer.viewContext)
+                        sliceEntity.identifier = slice.id
+                        sliceEntity.name = slice.name
+                        sliceEntity.amount = NSDecimalNumber(decimal: slice.amount.value)
+                        sliceEntity.budget = budgetEntity
+                    }
+                }
                 self.saveOrRollback { result in
                     switch result {
                     case .success:
-                        self.fetchBudget(with: budgetId, completion: completion)
+                        self.fetchBudget(with: budget.id, completion: completion)
                     case .failure(let error):
                         completion(.failure(error))
                     }

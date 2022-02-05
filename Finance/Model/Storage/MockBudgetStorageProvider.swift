@@ -101,46 +101,15 @@ final class MockBudgetStorageProvider: BudgetStorageProvider {
         }
     }
 
-    func add(budgetSlice: BudgetSlice, toBudgetWith budgetId: Budget.ID, completion: @escaping BudgetProvider.BudgetCompletion) {
-        guard let budgetIndex = budgets.firstIndex(where: { $0.id == budgetId }) else {
+    func updateBudget(budget: Budget, completion: @escaping BudgetProvider.BudgetCompletion) {
+        guard let budgetIndex = budgets.firstIndex(where: { $0.id == budget.id }) else {
             completion(.failure(.budgetProvider(error: .underlying(error: Error.mock))))
             return
         }
 
-        let oldBudget = budgets.remove(at: budgetIndex)
-        var slices = oldBudget.slices
-        slices.append(budgetSlice)
-        
-        do {
-            let newBudget = try Budget(id: oldBudget.id, name: oldBudget.name, slices: slices)
-            budgets.insert(newBudget, at: budgetIndex)
-            completion(.success(newBudget))
-        } catch {
-            budgets.insert(oldBudget, at: budgetIndex)
-            completion(.failure(.budgetProvider(error: .underlying(error: Error.mock))))
-            return
-        }
-    }
-
-    func delete(budgetSlice: BudgetSlice, fromBudgetWith budgetId: Budget.ID, completion: @escaping BudgetProvider.BudgetCompletion) {
-        guard let budgetIndex = budgets.firstIndex(where: { $0.slices.contains(where: { $0.id == budgetSlice.id}) }) else {
-            completion(.failure(.budgetProvider(error: .underlying(error: Error.mock))))
-            return
-        }
-
-        let oldBudget = budgets.remove(at: budgetIndex)
-        var slices = oldBudget.slices
-        slices.removeAll(where: { $0.id == budgetSlice.id })
-
-        do {
-            let newBudget = try Budget(id: oldBudget.id, name: oldBudget.name, slices: slices)
-            budgets.insert(newBudget, at: budgetIndex)
-            completion(.success(newBudget))
-        } catch {
-            budgets.insert(oldBudget, at: budgetIndex)
-            completion(.failure(.budgetProvider(error: .underlying(error: Error.mock))))
-            return
-        }
+        budgets.remove(at: budgetIndex)
+        budgets.insert(budget, at: budgetIndex)
+        completion(.success(budget))
     }
 }
 #endif

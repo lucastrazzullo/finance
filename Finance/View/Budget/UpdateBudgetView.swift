@@ -79,6 +79,7 @@ struct UpdateBudgetView: View {
             NewBudgetSliceView { slice, onErrorHandler in
                 do {
                     try Budget.canAdd(slice: slice, to: budgetSlices)
+                    budgetSlices.append(slice)
                     isInsertNewBudgetSlicePresented = false
                 } catch {
                     onErrorHandler(error as? DomainError ?? .budgetSlices(error: .cannotUpdateTheSlices(underlyingError: error)))
