@@ -101,17 +101,6 @@ final class MockBudgetStorageProvider: BudgetStorageProvider {
         }
     }
 
-    func update(budget: Budget, completion: @escaping BudgetProvider.BudgetCompletion) {
-        guard let budgetIndex = budgets.firstIndex(where: { $0.id == budget.id }) else {
-            completion(.failure(.budgetProvider(error: .underlying(error: Error.mock))))
-            return
-        }
-
-        budgets.remove(at: budgetIndex)
-        budgets.insert(budget, at: budgetIndex)
-        completion(.success(budget))
-    }
-
     func add(budgetSlice: BudgetSlice, toBudgetWith budgetId: Budget.ID, completion: @escaping BudgetProvider.BudgetCompletion) {
         guard let budgetIndex = budgets.firstIndex(where: { $0.id == budgetId }) else {
             completion(.failure(.budgetProvider(error: .underlying(error: Error.mock))))

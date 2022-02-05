@@ -19,7 +19,6 @@ protocol BudgetStorageProvider: AnyObject {
     // MARK: Budget
 
     func fetchBudget(with identifier: Budget.ID, completion: @escaping BudgetProvider.BudgetCompletion)
-    func update(budget: Budget, completion: @escaping BudgetProvider.BudgetCompletion)
     func add(budgetSlice: BudgetSlice, toBudgetWith budgetId: Budget.ID, completion: @escaping BudgetProvider.BudgetCompletion)
     func delete(budgetSlice: BudgetSlice, fromBudgetWith budgetId: Budget.ID, completion: @escaping BudgetProvider.BudgetCompletion)
 }
@@ -66,10 +65,6 @@ final class BudgetProvider {
 
     func fetchBudget(with id: Budget.ID, completion: @escaping BudgetCompletion) {
         storageProvider.fetchBudget(with: id, completion: completion)
-    }
-
-    func update(budget: Budget, completion: @escaping BudgetCompletion) {
-        storageProvider.update(budget: budget, completion: completion)
     }
 
     // MARK: Private helper methods

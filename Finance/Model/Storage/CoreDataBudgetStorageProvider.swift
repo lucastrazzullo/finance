@@ -189,10 +189,6 @@ final class CoreDataBudgetStorageProvider: BudgetStorageProvider {
         }
     }
 
-    func update(budget: Budget, completion: @escaping BudgetProvider.BudgetCompletion) {
-        fatalError("To implement")
-    }
-
     // MARK: Private fetching methods
 
     private func fetchBudgetEntities(completion: @escaping (Result<[BudgetEntity], DomainError>) -> Void) {
