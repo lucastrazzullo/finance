@@ -11,7 +11,7 @@ final class BudgetController: ObservableObject {
 
     @Published var budget: Budget
 
-    private var budgetProvider: BudgetProvider?
+    private var budgetProvider: BudgetProvider
 
     init(budget: Budget, budgetProvider: BudgetProvider) {
         self.budget = budget
@@ -21,24 +21,34 @@ final class BudgetController: ObservableObject {
     // MARK: Budget
 
     func fetch() {
-        budgetProvider?.fetchBudget(with: budget.id) { [weak self] result in
-            switch result {
-            case .success(let budget):
-                self?.budget = budget
-            case .failure(let error):
+        let budgetId = budget.id
+        Task { [weak self] in
+            do {
+                guard let budget = try await self?.budgetProvider.fetchBudget(with: budgetId) else {
+                    throw DomainError.budget(error: .cannotFetchTheBudget(id: budgetId))
+                }
+                DispatchQueue.main.async { [weak self] in
+                    self?.budget = budget
+                }
+            } catch {
                 fatalError(error.localizedDescription)
             }
         }
     }
 
     func update(budget: Budget, completion: @escaping (Result<Void, DomainError>) -> Void) {
-        budgetProvider?.update(budget: budget) { [weak self] result in
-            switch result {
-            case .success(let budget):
-                self?.budget = budget
-                completion(.success(()))
-            case .failure(let error):
-                completion(.failure(error))
+        let budget = budget
+        Task { [weak self] in
+            do {
+                guard let budget = try await self?.budgetProvider.update(budget: budget) else {
+                    throw DomainError.budget(error: .cannotUpdateTheBudget(underlyingError: nil))
+                }
+                DispatchQueue.main.async { [weak self] in
+                    self?.budget = budget
+                    completion(.success(()))
+                }
+            } catch {
+                completion(.failure(error as? DomainError ?? .underlying(error: error)))
             }
         }
     }

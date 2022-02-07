@@ -25,12 +25,14 @@ struct CategorisedTransactionsView: View {
         // MARK: Public methods
 
         func fetch() {
-            budgetProvider?.fetchBudgets { [weak self] result in
-                switch result {
-                case .success(let budgets):
-                    self?.budgets = budgets
-                case .failure:
-                    break
+            Task {
+                do {
+                    let budgets = try await budgetProvider?.fetchBudgets() ?? []
+                    DispatchQueue.main.async { [weak self] in
+                        self?.budgets = budgets
+                    }
+                } catch {
+                    fatalError(error.localizedDescription)
                 }
             }
         }

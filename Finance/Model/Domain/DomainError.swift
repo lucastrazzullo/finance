@@ -58,18 +58,25 @@ enum DomainError: Error, Identifiable {
             return "Something went wrong!"
         }
     }
+
+    var localizedDescription: String {
+        return description
+    }
 }
 
 enum BudgetsError: DomainUnderlyingError {
     case budgetAlreadyExistsWith(name: String)
     case budgetDoesntExist
+    case cannotFetchTheBudgets
 
     var description: String {
         switch self {
         case .budgetAlreadyExistsWith(let name):
-            return "A budget named: \(name) already exists."
+            return "A budget named: \(name) already exists"
         case .budgetDoesntExist:
             return "The budget you are looking for doesn't exist"
+        case .cannotFetchTheBudgets:
+            return "Budgets cannot be fetched right now"
         }
     }
 }
@@ -78,8 +85,9 @@ enum BudgetError: DomainUnderlyingError {
 
     case nameNotValid
     case amountNotValid
-    case cannotUpdateTheBudget(underlyingError: Error)
-    case cannotCreateTheBudget(underlyingError: Error)
+    case cannotFetchTheBudget(id: Budget.ID)
+    case cannotUpdateTheBudget(underlyingError: Error?)
+    case cannotCreateTheBudget(underlyingError: Error?)
 
     var description: String {
         switch self {
@@ -87,6 +95,8 @@ enum BudgetError: DomainUnderlyingError {
             return "Please use a valid name"
         case .amountNotValid:
             return "Please use a valid amount"
+        case .cannotFetchTheBudget(let id):
+            return "The budget with id: \(id) cannot be fetched!"
         case .cannotUpdateTheBudget:
             return "This budget cannot be updated!"
         case .cannotCreateTheBudget:
@@ -100,7 +110,7 @@ enum BudgetSlicesError: DomainUnderlyingError {
     case sliceAlreadyExistsWith(name: String)
     case sliceDoesntExist
     case thereMustBeAtLeastOneSlice
-    case cannotUpdateTheSlices(underlyingError: Error)
+    case cannotUpdateTheSlices(underlyingError: Error?)
 
     var description: String {
         switch self {
@@ -120,7 +130,7 @@ enum BudgetSliceError: DomainUnderlyingError {
 
     case nameNotValid
     case amountNotValid
-    case cannotCreateTheSlice(underlyingError: Error)
+    case cannotCreateTheSlice(underlyingError: Error?)
 
     var description: String {
         switch self {

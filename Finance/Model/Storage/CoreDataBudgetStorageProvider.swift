@@ -22,7 +22,7 @@ final class CoreDataBudgetStorageProvider: BudgetStorageProvider {
 
     // MARK: Budget list
 
-    func fetchBudgets(completion: @escaping BudgetProvider.BudgetListCompletion) {
+    func fetchBudgets(completion: @escaping BudgetListCompletion) {
         fetchBudgetEntities { result in
             switch result {
             case .success(let budgetEntities):
@@ -40,7 +40,7 @@ final class CoreDataBudgetStorageProvider: BudgetStorageProvider {
         }
     }
 
-    func add(budget: Budget, completion: @escaping BudgetProvider.BudgetListCompletion) {
+    func add(budget: Budget, completion: @escaping BudgetListCompletion) {
         let budgetEntity = BudgetEntity(context: persistentContainer.viewContext)
         budgetEntity.identifier = budget.id
         budgetEntity.name = budget.name
@@ -63,7 +63,7 @@ final class CoreDataBudgetStorageProvider: BudgetStorageProvider {
         }
     }
 
-    func delete(budget: Budget, completion: @escaping BudgetProvider.BudgetListCompletion) {
+    func delete(budget: Budget, completion: @escaping BudgetListCompletion) {
         fetchBudgetEntity(with: budget.id) { [weak self] result in
             guard let self = self else {
                 completion(.failure(.budgetProvider(error: .budgetEntityNotFound)))
@@ -87,7 +87,7 @@ final class CoreDataBudgetStorageProvider: BudgetStorageProvider {
         }
     }
 
-    func delete(budgets: [Budget], completion: @escaping BudgetProvider.BudgetListCompletion) {
+    func delete(budgets: [Budget], completion: @escaping BudgetListCompletion) {
         fetchBudgetEntities { [weak self] result in
             guard let self = self else {
                 completion(.failure(.budgetProvider(error: .budgetEntityNotFound)))
@@ -119,7 +119,7 @@ final class CoreDataBudgetStorageProvider: BudgetStorageProvider {
 
     // MARK: Budget
 
-    func fetchBudget(with identifier: Budget.ID, completion: @escaping BudgetProvider.BudgetCompletion) {
+    func fetchBudget(with identifier: Budget.ID, completion: @escaping BudgetCompletion) {
         fetchBudgetEntity(with: identifier) { result in
             switch result {
             case .success(let budgetEntity):
@@ -137,7 +137,7 @@ final class CoreDataBudgetStorageProvider: BudgetStorageProvider {
         }
     }
 
-    func updateBudget(budget: Budget, completion: @escaping BudgetProvider.BudgetCompletion) {
+    func updateBudget(budget: Budget, completion: @escaping BudgetCompletion) {
         fetchBudgetEntity(with: budget.id) { result in
             switch result {
             case .success(let budgetEntity):

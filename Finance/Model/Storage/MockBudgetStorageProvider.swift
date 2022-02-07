@@ -70,21 +70,21 @@ final class MockBudgetStorageProvider: BudgetStorageProvider {
 
     // MARK: Budget list
 
-    func fetchBudgets(completion: @escaping BudgetProvider.BudgetListCompletion) {
+    func fetchBudgets(completion: @escaping BudgetListCompletion) {
         completion(.success(budgets))
     }
 
-    func add(budget: Budget, completion: @escaping BudgetProvider.BudgetListCompletion) {
+    func add(budget: Budget, completion: @escaping BudgetListCompletion) {
         budgets.append(budget)
         completion(.success(budgets))
     }
 
-    func delete(budget: Budget, completion: @escaping BudgetProvider.BudgetListCompletion) {
+    func delete(budget: Budget, completion: @escaping BudgetListCompletion) {
         budgets.removeAll(where: { $0.id == budget.id })
         completion(.success(budgets))
     }
 
-    func delete(budgets: [Budget], completion: @escaping BudgetProvider.BudgetListCompletion) {
+    func delete(budgets: [Budget], completion: @escaping BudgetListCompletion) {
         budgets.forEach { budget in
             self.budgets.removeAll(where: { $0.id == budget.id })
         }
@@ -93,7 +93,7 @@ final class MockBudgetStorageProvider: BudgetStorageProvider {
 
     // MARK: Budget
 
-    func fetchBudget(with identifier: Budget.ID, completion: @escaping BudgetProvider.BudgetCompletion) {
+    func fetchBudget(with identifier: Budget.ID, completion: @escaping BudgetCompletion) {
         if let budget = budgets.first(where: { $0.id == identifier }) {
             completion(.success(budget))
         } else {
@@ -101,7 +101,7 @@ final class MockBudgetStorageProvider: BudgetStorageProvider {
         }
     }
 
-    func updateBudget(budget: Budget, completion: @escaping BudgetProvider.BudgetCompletion) {
+    func updateBudget(budget: Budget, completion: @escaping BudgetCompletion) {
         guard let budgetIndex = budgets.firstIndex(where: { $0.id == budget.id }) else {
             completion(.failure(.budgetProvider(error: .underlying(error: Error.mock))))
             return

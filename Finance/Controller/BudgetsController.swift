@@ -11,7 +11,7 @@ final class BudgetsController: ObservableObject {
 
     @Published var budgets: [Budget]
 
-    private(set) var budgetProvider: BudgetProvider?
+    private(set) var budgetProvider: BudgetProvider
 
     init(budgetProvider: BudgetProvider) {
         self.budgetProvider = budgetProvider
@@ -21,48 +21,60 @@ final class BudgetsController: ObservableObject {
     // MARK: Internal methods
 
     func fetch() {
-        budgetProvider?.fetchBudgets { [weak self] result in
-            switch result {
-            case .success(let budgets):
-                self?.budgets = budgets
-            case .failure(let error):
+        Task { [weak self] in
+            do {
+                guard let budgets = try await self?.budgetProvider.fetchBudgets() else {
+                    throw DomainError.budgets(error: .cannotFetchTheBudgets)
+                }
+                DispatchQueue.main.async { [weak self] in
+                    self?.budgets = budgets
+                }
+            } catch {
                 fatalError(error.localizedDescription)
             }
         }
     }
 
     func add(budget: Budget, completion: @escaping (Result<Void, DomainError>) -> Void) {
-        budgetProvider?.add(budget: budget) { [weak self] result in
-            switch result {
-            case .success(let budgets):
-                self?.budgets = budgets
-                completion(.success(()))
-            case .failure(let error):
-                completion(.failure(error))
+        Task { [weak self] in
+            do {
+                guard let budgets = try await self?.budgetProvider.add(budget: budget) else {
+                    throw DomainError.budgets(error: .budgetDoesntExist)
+                }
+                DispatchQueue.main.async { [weak self] in
+                    self?.budgets = budgets
+                    completion(.success(()))
+                }
+            } catch {
+                completion(.failure(error as? DomainError ?? .underlying(error: error)))
             }
         }
     }
 
     func delete(budgetsAt offsets: IndexSet, completion: @escaping (Result<Void, DomainError>) -> Void) {
-        let budgetsToDelete = offsets.compactMap { index -> Budget? in
-            guard budgets.indices.contains(index) else {
-                return nil
+        Task { [weak self] in
+            let budgetsToDelete = offsets.compactMap { index -> Budget? in
+                guard budgets.indices.contains(index) else {
+                    return nil
+                }
+                return budgets[index]
             }
-            return budgets[index]
-        }
 
-        guard !budgetsToDelete.isEmpty else {
-            completion(.failure(.budgets(error: .budgetDoesntExist)))
-            return
-        }
+            guard !budgetsToDelete.isEmpty else {
+                completion(.failure(.budgets(error: .budgetDoesntExist)))
+                return
+            }
 
-        budgetProvider?.delete(budgets: budgetsToDelete) { [weak self] result in
-            switch result {
-            case .success(let budgets):
-                self?.budgets = budgets
-                completion(.success(()))
-            case .failure(let error):
-                completion(.failure(error))
+            do {
+                guard let budgets = try await self?.budgetProvider.delete(budgets: budgetsToDelete) else {
+                    throw DomainError.budgets(error: .budgetDoesntExist)
+                }
+                DispatchQueue.main.async { [weak self] in
+                    self?.budgets = budgets
+                    completion(.success(()))
+                }
+            } catch {
+                completion(.failure(error as? DomainError ?? .underlying(error: error)))
             }
         }
     }

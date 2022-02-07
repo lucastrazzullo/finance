@@ -9,23 +9,23 @@ import Foundation
 
 protocol BudgetStorageProvider: AnyObject {
 
+    typealias BudgetListCompletion = (Result<[Budget], DomainError>) -> Void
+    typealias BudgetCompletion = (Result<Budget, DomainError>) -> Void
+
     // MARK: Budget list
 
-    func fetchBudgets(completion: @escaping BudgetProvider.BudgetListCompletion)
-    func add(budget: Budget, completion: @escaping BudgetProvider.BudgetListCompletion)
-    func delete(budget: Budget, completion: @escaping BudgetProvider.BudgetListCompletion)
-    func delete(budgets: [Budget], completion: @escaping BudgetProvider.BudgetListCompletion)
+    func fetchBudgets(completion: @escaping BudgetListCompletion)
+    func add(budget: Budget, completion: @escaping BudgetListCompletion)
+    func delete(budget: Budget, completion: @escaping BudgetListCompletion)
+    func delete(budgets: [Budget], completion: @escaping BudgetListCompletion)
 
     // MARK: Budget
 
-    func fetchBudget(with identifier: Budget.ID, completion: @escaping BudgetProvider.BudgetCompletion)
-    func updateBudget(budget: Budget, completion: @escaping BudgetProvider.BudgetCompletion)
+    func fetchBudget(with identifier: Budget.ID, completion: @escaping BudgetCompletion)
+    func updateBudget(budget: Budget, completion: @escaping BudgetCompletion)
 }
 
 final class BudgetProvider {
-
-    typealias BudgetListCompletion = (Result<[Budget], DomainError>) -> Void
-    typealias BudgetCompletion = (Result<Budget, DomainError>) -> Void
 
     // MARK: Instance properties
 
@@ -37,42 +37,96 @@ final class BudgetProvider {
 
     // MARK: Budget list
 
-    func fetchBudgets(completion: @escaping BudgetListCompletion) {
-        storageProvider.fetchBudgets(completion: completion)
-    }
-
-    func add(budget: Budget, completion: @escaping BudgetListCompletion) {
-        canAdd(budget: budget) { [weak self] result in
-            switch result {
-            case .success:
-                self?.storageProvider.add(budget: budget, completion: completion)
-            case .failure(let error):
-                completion(.failure(error))
+    func fetchBudgets() async throws -> [Budget] {
+        return try await withCheckedThrowingContinuation { [weak self] continuation in
+            self?.storageProvider.fetchBudgets { result in
+                switch result {
+                case .success(let budgets):
+                    continuation.resume(returning: budgets)
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
             }
         }
     }
 
-    func delete(budget: Budget, completion: @escaping BudgetListCompletion) {
-        storageProvider.delete(budget: budget, completion: completion)
+    func add(budget: Budget) async throws -> [Budget] {
+        return try await withCheckedThrowingContinuation { [weak self] continuation in
+            self?.canAdd(budget: budget) { [weak self] result in
+                switch result {
+                case .success:
+                    self?.storageProvider.add(budget: budget) { result in
+                        switch result {
+                        case .success(let budgets):
+                            continuation.resume(returning: budgets)
+                        case .failure(let error):
+                            continuation.resume(throwing: error)
+                        }
+                    }
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
     }
 
-    func delete(budgets: [Budget], completion: @escaping BudgetListCompletion) {
-        storageProvider.delete(budgets: budgets, completion: completion)
+    func delete(budget: Budget) async throws -> [Budget] {
+        return try await withCheckedThrowingContinuation { [weak self] continuation in
+            self?.storageProvider.delete(budget: budget) { result in
+                switch result {
+                case .success(let budgets):
+                    continuation.resume(returning: budgets)
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
+    }
+
+    func delete(budgets: [Budget]) async throws -> [Budget] {
+        return try await withCheckedThrowingContinuation { [weak self] continuation in
+            self?.storageProvider.delete(budgets: budgets) { result in
+                switch result {
+                case .success(let budgets):
+                    continuation.resume(returning: budgets)
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
     }
 
     // MARK: Budget
 
-    func fetchBudget(with id: Budget.ID, completion: @escaping BudgetCompletion) {
-        storageProvider.fetchBudget(with: id, completion: completion)
+    func fetchBudget(with id: Budget.ID) async throws -> Budget {
+        return try await withCheckedThrowingContinuation { [weak self] continuation in
+            self?.storageProvider.fetchBudget(with: id) { result in
+                switch result {
+                case .success(let budget):
+                    continuation.resume(returning: budget)
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
     }
 
-    func update(budget: Budget, completion: @escaping BudgetCompletion) {
-        canUpdate(budget: budget) { [weak self] result in
-            switch result {
-            case .success:
-                self?.storageProvider.updateBudget(budget: budget, completion: completion)
-            case .failure(let error):
-                completion(.failure(error))
+    func update(budget: Budget) async throws -> Budget {
+        return try await withCheckedThrowingContinuation { [weak self] continuation in
+            self?.canUpdate(budget: budget) { [weak self] result in
+                switch result {
+                case .success:
+                    self?.storageProvider.updateBudget(budget: budget) { result in
+                        switch result {
+                        case .success(let budget):
+                            continuation.resume(returning: budget)
+                        case .failure(let error):
+                            continuation.resume(throwing: error)
+                        }
+                    }
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
             }
         }
     }
