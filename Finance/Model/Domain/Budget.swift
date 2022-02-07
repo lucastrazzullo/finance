@@ -9,6 +9,8 @@ import Foundation
 
 struct Budget: Identifiable, AmountHolder {
 
+    private static let defaultSliceName: String = "Default"
+
     let id: UUID
     let name: String
     let slices: [BudgetSlice]
@@ -32,7 +34,7 @@ struct Budget: Identifiable, AmountHolder {
 
     init(id: ID, name: String, amount: MoneyValue = .zero) throws {
         let slices = [
-            BudgetSlice.default(amount: amount)
+            try BudgetSlice(id: .init(), name: Self.defaultSliceName, amount: amount)
         ]
         try self.init(id: id, name: name, slices: slices)
     }

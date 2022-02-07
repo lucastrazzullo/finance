@@ -13,13 +13,7 @@ struct BudgetSlice: Identifiable, Hashable, AmountHolder {
     let name: String
     let amount: MoneyValue
 
-    static let defaultName: String = "Default"
-
     // MARK: Object life cycle
-
-    static func `default`(amount: MoneyValue) -> Self {
-        try! BudgetSlice(id: .init(), name: defaultName, amount: amount)
-    }
 
     init(id: UUID, name: String, amount: String) throws {
         guard let amount = MoneyValue.string(amount) else {
