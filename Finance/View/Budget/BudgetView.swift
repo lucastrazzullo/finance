@@ -60,6 +60,7 @@ struct BudgetView: View {
             }
         }
         .navigationTitle(controller.budget.name)
+        .onAppear(perform: controller.fetch)
     }
 
     // MARK: - Private factory methods
@@ -71,7 +72,7 @@ struct BudgetView: View {
 
     // MARK: - Object life cycle
 
-    init(budget: Budget, budgetProvider: BudgetProvider) {
+    init(budget: Budget, budgetProvider: ReportProvider) {
         self.controller = BudgetController(budget: budget, budgetProvider: budgetProvider)
     }
 }
@@ -81,7 +82,7 @@ struct BudgetView: View {
 struct BudgetView_Previews: PreviewProvider {
     static var previews: some View {
         let storageProvider = MockBudgetStorageProvider()
-        let budgetProvider = BudgetProvider(storageProvider: storageProvider)
+        let budgetProvider = ReportProvider(storageProvider: storageProvider)
         NavigationView {
             BudgetView(budget: Mocks.budgets[0], budgetProvider: budgetProvider)
         }

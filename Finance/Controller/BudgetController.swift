@@ -11,9 +11,9 @@ final class BudgetController: ObservableObject {
 
     @Published var budget: Budget
 
-    private var budgetProvider: BudgetProvider
+    private var budgetProvider: ReportProvider
 
-    init(budget: Budget, budgetProvider: BudgetProvider) {
+    init(budget: Budget, budgetProvider: ReportProvider) {
         self.budget = budget
         self.budgetProvider = budgetProvider
     }

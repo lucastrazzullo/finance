@@ -8,7 +8,7 @@
 import Foundation
 import CoreData
 
-final class CoreDataBudgetStorageProvider: BudgetStorageProvider {
+final class CoreDataReportStorageProvider: ReportStorageProvider {
 
     // MARK: Types
 
@@ -20,15 +20,16 @@ final class CoreDataBudgetStorageProvider: BudgetStorageProvider {
         self.persistentContainer = persistentContainer
     }
 
-    // MARK: Budget list
+    // MARK: Report
 
-    func fetchBudgets() async throws -> [Budget] {
+    func fetchReport() async throws -> Report {
         let budgetEntities = try fetchBudgetEntities()
         let budgets = try budgetEntities.compactMap(Budget.with(budgetEntity:))
-        return budgets
+        let report = Report(budgets: budgets)
+        return report
     }
 
-    func add(budget: Budget) async throws -> [Budget] {
+    func add(budget: Budget) async throws -> Report {
         let budgetEntity = BudgetEntity(context: persistentContainer.viewContext)
         budgetEntity.identifier = budget.id
         budgetEntity.name = budget.name
@@ -42,18 +43,18 @@ final class CoreDataBudgetStorageProvider: BudgetStorageProvider {
         })
 
         try saveOrRollback()
-        return try await fetchBudgets()
+        return try await fetchReport()
     }
 
-    func delete(budget: Budget) async throws -> [Budget] {
+    func delete(budget: Budget) async throws -> Report {
         let budgetEntity = try fetchBudgetEntity(with: budget.id)
         persistentContainer.viewContext.delete(budgetEntity)
 
         try saveOrRollback()
-        return try await fetchBudgets()
+        return try await fetchReport()
     }
 
-    func delete(budgets: [Budget]) async throws -> [Budget] {
+    func delete(budgets: [Budget]) async throws -> Report {
         let budgetsEntities = try fetchBudgetEntities()
         let idsToRemove = Set(budgets.map(\.id))
         budgetsEntities.forEach { budgetEntity in
@@ -63,7 +64,7 @@ final class CoreDataBudgetStorageProvider: BudgetStorageProvider {
         }
 
         try saveOrRollback()
-        return try await fetchBudgets()
+        return try await fetchReport()
     }
 
     // MARK: Budget

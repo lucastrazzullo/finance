@@ -47,7 +47,7 @@ struct NewBudgetView: View {
                                             try Budget.canRemove(slice: slice, from: budgetSlices)
                                             budgetSlices.removeAll(where: { $0.id == slice.id })
                                         } catch {
-                                            presentedError = error as? DomainError ?? .budgetSlices(error: .cannotUpdateTheSlices(underlyingError: error))
+                                            presentedError = error as? DomainError ?? .budget(error: .cannotDeleteSlice(underlyingError: error))
                                         }
                                     } label: {
                                         Label("Delete", systemImage: "trash")
@@ -92,7 +92,7 @@ struct NewBudgetView: View {
                     budgetSlices.append(newSlice)
                     isInsertNewBudgetSlicePresented = false
                 } catch {
-                    onErrorHandler(error as? DomainError ?? .budgetSlices(error: .cannotUpdateTheSlices(underlyingError: error)))
+                    onErrorHandler(error as? DomainError ?? .budget(error: .cannotAddSlice(underlyingError: error)))
                 }
             }
         }

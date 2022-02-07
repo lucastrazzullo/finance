@@ -29,11 +29,11 @@ struct DashboardView: View {
                 .padding()
 
                 List {
-                    NavigationLink(destination: BudgetsView(budgetProvider: BudgetProvider(storageProvider:  storageProvider.budgetStorageProvider)).navigationTitle("Budgets 2022")) {
+                    NavigationLink(destination: ReportView(budgetProvider: ReportProvider(storageProvider:  storageProvider.reporttorageProvider))) {
                         Text("Budgets")
                     }
 
-                    NavigationLink(destination: CategorisedTransactionsView(budgetProvider: BudgetProvider(storageProvider:  storageProvider.budgetStorageProvider)).navigationTitle("Transactions 2022")) {
+                    NavigationLink(destination: CategorisedTransactionsView(budgetProvider: ReportProvider(storageProvider:  storageProvider.reporttorageProvider)).navigationTitle("Transactions 2022")) {
                         Text("Transactions")
                     }
                 }

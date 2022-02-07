@@ -1,5 +1,5 @@
 //
-//  BudgetsView.swift
+//  ReportView.swift
 //  Finance
 //
 //  Created by luca strazzullo on 3/11/21.
@@ -7,16 +7,16 @@
 
 import SwiftUI
 
-struct BudgetsView: View {
+struct ReportView: View {
 
-    @ObservedObject private var controller: BudgetsController
+    @ObservedObject private var controller: ReportController
 
     @State private var isAddNewBudgetPresented: Bool = false
     @State private var updateBudgetsError: DomainError?
 
     var body: some View {
         List {
-            ForEach(controller.budgets) { budget in
+            ForEach(controller.report.budgets) { budget in
                 if let budgetProvider = controller.budgetProvider {
                     NavigationLink(destination: BudgetView(budget: budget, budgetProvider: budgetProvider)) {
                         AmountListItem(label: budget.name, amount: budget.amount)
@@ -56,21 +56,22 @@ struct BudgetsView: View {
         .toolbar {
             EditButton()
         }
+        .navigationTitle(controller.report.name)
         .onAppear(perform: controller.fetch)
     }
 
-    init(budgetProvider: BudgetProvider) {
-        self.controller = BudgetsController(budgetProvider: budgetProvider)
+    init(budgetProvider: ReportProvider) {
+        self.controller = ReportController(budgetProvider: budgetProvider)
     }
 }
 
 // MARK: - Previews
 
 struct BudgetsView_Previews: PreviewProvider {
-    static let budgetStorageProvider = BudgetProvider(storageProvider: MockBudgetStorageProvider())
+    static let budgetStorageProvider = ReportProvider(storageProvider: MockBudgetStorageProvider())
     static var previews: some View {
         NavigationView {
-            BudgetsView(budgetProvider: budgetStorageProvider).navigationTitle("Budgets")
+            ReportView(budgetProvider: budgetStorageProvider)
         }
     }
 }

@@ -60,7 +60,7 @@ enum Mocks {
     }()
 }
 
-final class MockBudgetStorageProvider: BudgetStorageProvider {
+final class MockBudgetStorageProvider: ReportStorageProvider {
 
     private enum Error: Swift.Error {
         case mock
@@ -70,25 +70,25 @@ final class MockBudgetStorageProvider: BudgetStorageProvider {
 
     // MARK: Budget list
 
-    func fetchBudgets() async throws -> [Budget] {
-        return budgets
+    func fetchReport() async throws -> Report {
+        return Report(budgets: budgets)
     }
 
-    func add(budget: Budget) async throws -> [Budget] {
+    func add(budget: Budget) async throws -> Report {
         budgets.append(budget)
-        return budgets
+        return Report(budgets: budgets)
     }
 
-    func delete(budget: Budget) async throws -> [Budget] {
+    func delete(budget: Budget) async throws -> Report {
         budgets.removeAll(where: { $0.id == budget.id })
-        return budgets
+        return Report(budgets: budgets)
     }
 
-    func delete(budgets: [Budget]) async throws -> [Budget] {
+    func delete(budgets: [Budget]) async throws -> Report {
         budgets.forEach { budget in
             self.budgets.removeAll(where: { $0.id == budget.id })
         }
-        return budgets
+        return Report(budgets: budgets)
     }
 
     // MARK: Budget

@@ -44,7 +44,10 @@ struct Budget: Identifiable, AmountHolder {
             throw DomainError.budget(error: .nameNotValid)
         }
         guard !slices.isEmpty else {
-            throw DomainError.budgetSlices(error: .thereMustBeAtLeastOneSlice)
+            throw DomainError.budget(error: .thereMustBeAtLeastOneSlice)
+        }
+        guard !slices.containsDuplicates() else {
+            throw DomainError.budget(error: .multipleSlicesWithSameName)
         }
 
         self.id = id
@@ -58,18 +61,18 @@ struct Budget: Identifiable, AmountHolder {
         montlyAmount * .value(12)
     }
 
-    static func canAdd(slice: BudgetSlice, to slices: [BudgetSlice]) throws {
-        guard !slices.contains(where: { $0.name == slice.name }) else {
-            throw DomainError.budgetSlices(error: .sliceAlreadyExistsWith(name: slice.name))
+    static func canAdd(slice: BudgetSlice, to list: [BudgetSlice]) throws {
+        guard !list.contains(where: { $0.name == slice.name }) else {
+            throw DomainError.budget(error: .sliceAlreadyExistsWith(name: slice.name))
         }
     }
 
     static func canRemove(slice: BudgetSlice, from slices: [BudgetSlice]) throws {
         guard slices.contains(where: { $0.id == slice.id }) else {
-            throw DomainError.budgetSlices(error: .sliceDoesntExist)
+            throw DomainError.budget(error: .sliceDoesntExistWith(name: slice.name))
         }
         guard slices.count > 1 else {
-            throw DomainError.budgetSlices(error: .thereMustBeAtLeastOneSlice)
+            throw DomainError.budget(error: .thereMustBeAtLeastOneSlice)
         }
     }
 }

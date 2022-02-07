@@ -41,3 +41,12 @@ struct BudgetSlice: Identifiable, Hashable, AmountHolder {
         hasher.combine(amount.value)
     }
 }
+
+extension Array where Element == BudgetSlice {
+
+    func containsDuplicates() -> Bool {
+        let allNames = self.map(\.name)
+        let uniqueNames = Set(allNames)
+        return allNames.count > uniqueNames.count
+    }
+}

@@ -13,9 +13,8 @@ protocol DomainUnderlyingError {
 
 enum DomainError: Error, Identifiable {
 
-    case budgets(error: BudgetsError)
+    case report(error: ReportError)
     case budget(error: BudgetError)
-    case budgetSlices(error: BudgetSlicesError)
     case budgetSlice(error: BudgetSliceError)
     case budgetProvider(error: BudgetStorageProviderError)
 
@@ -27,12 +26,10 @@ enum DomainError: Error, Identifiable {
 
     var id: String {
         switch self {
-        case .budgets:
-            return "budgets"
+        case .report:
+            return "Report"
         case .budget:
             return "budget"
-        case .budgetSlices:
-            return "budgetSlices"
         case .budgetSlice:
             return "budgetSlice"
         case .budgetProvider:
@@ -44,11 +41,9 @@ enum DomainError: Error, Identifiable {
 
     var description: String {
         switch self {
-        case .budgets(let error):
+        case .report(let error):
             return error.description
         case .budget(let error):
-            return error.description
-        case .budgetSlices(let error):
             return error.description
         case .budgetSlice(let error):
             return error.description
@@ -64,13 +59,17 @@ enum DomainError: Error, Identifiable {
     }
 }
 
-enum BudgetsError: DomainUnderlyingError {
+enum ReportError: DomainUnderlyingError {
+
+    case nameNotValid
     case budgetAlreadyExistsWith(name: String)
     case budgetDoesntExist
     case cannotFetchTheBudgets
 
     var description: String {
         switch self {
+        case .nameNotValid:
+            return "Name not valid!"
         case .budgetAlreadyExistsWith(let name):
             return "A budget named: \(name) already exists"
         case .budgetDoesntExist:
@@ -85,6 +84,12 @@ enum BudgetError: DomainUnderlyingError {
 
     case nameNotValid
     case amountNotValid
+    case multipleSlicesWithSameName
+    case sliceAlreadyExistsWith(name: String)
+    case thereMustBeAtLeastOneSlice
+    case sliceDoesntExistWith(name: String)
+    case cannotAddSlice(underlyingError: Error?)
+    case cannotDeleteSlice(underlyingError: Error?)
     case cannotFetchTheBudget(id: Budget.ID)
     case cannotUpdateTheBudget(underlyingError: Error?)
     case cannotCreateTheBudget(underlyingError: Error?)
@@ -95,33 +100,24 @@ enum BudgetError: DomainUnderlyingError {
             return "Please use a valid name"
         case .amountNotValid:
             return "Please use a valid amount"
+        case .multipleSlicesWithSameName:
+            return "The budget cannot have slices with the same name"
+        case .sliceAlreadyExistsWith(let name):
+            return "A slice named \(name) already exists!"
+        case .sliceDoesntExistWith(let name):
+            return "A slice named \(name) doesn't exist"
+        case .thereMustBeAtLeastOneSlice:
+            return "There must be at least one slice."
+        case .cannotAddSlice:
+            return "Cannot add the slice"
+        case .cannotDeleteSlice:
+            return "Cannot delete the slice"
         case .cannotFetchTheBudget(let id):
             return "The budget with id: \(id) cannot be fetched!"
         case .cannotUpdateTheBudget:
             return "This budget cannot be updated!"
         case .cannotCreateTheBudget:
             return "This budget cannot be created!"
-        }
-    }
-}
-
-enum BudgetSlicesError: DomainUnderlyingError {
-
-    case sliceAlreadyExistsWith(name: String)
-    case sliceDoesntExist
-    case thereMustBeAtLeastOneSlice
-    case cannotUpdateTheSlices(underlyingError: Error?)
-
-    var description: String {
-        switch self {
-        case .sliceAlreadyExistsWith(let name):
-            return "A slice named: \(name) already exists."
-        case .sliceDoesntExist:
-            return "The slice you're trying to modify or delete doesn't exist"
-        case .thereMustBeAtLeastOneSlice:
-            return "There must be at least one slice."
-        case .cannotUpdateTheSlices:
-            return "Something went wrong updating the slices!"
         }
     }
 }

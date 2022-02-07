@@ -1,5 +1,5 @@
 //
-//  BudgetsController.swift
+//  ReportController.swift
 //  Finance
 //
 //  Created by Luca Strazzullo on 25/01/2022.
@@ -7,15 +7,15 @@
 
 import Foundation
 
-final class BudgetsController: ObservableObject {
+final class ReportController: ObservableObject {
 
-    @Published var budgets: [Budget]
+    @Published var report: Report
 
-    private(set) var budgetProvider: BudgetProvider
+    private(set) var budgetProvider: ReportProvider
 
-    init(budgetProvider: BudgetProvider) {
+    init(budgetProvider: ReportProvider) {
         self.budgetProvider = budgetProvider
-        self.budgets = []
+        self.report = Report(budgets: [])
     }
 
     // MARK: Internal methods
@@ -23,11 +23,11 @@ final class BudgetsController: ObservableObject {
     func fetch() {
         Task { [weak self] in
             do {
-                guard let budgets = try await self?.budgetProvider.fetchBudgets() else {
-                    throw DomainError.budgets(error: .cannotFetchTheBudgets)
+                guard let report = try await self?.budgetProvider.fetchReport() else {
+                    throw DomainError.report(error: .cannotFetchTheBudgets)
                 }
                 DispatchQueue.main.async { [weak self] in
-                    self?.budgets = budgets
+                    self?.report = report
                 }
             } catch {
                 fatalError(error.localizedDescription)
@@ -38,11 +38,11 @@ final class BudgetsController: ObservableObject {
     func add(budget: Budget, completion: @escaping (Result<Void, DomainError>) -> Void) {
         Task { [weak self] in
             do {
-                guard let budgets = try await self?.budgetProvider.add(budget: budget) else {
-                    throw DomainError.budgets(error: .budgetDoesntExist)
+                guard let report = try await self?.budgetProvider.add(budget: budget) else {
+                    throw DomainError.report(error: .budgetDoesntExist)
                 }
                 DispatchQueue.main.async { [weak self] in
-                    self?.budgets = budgets
+                    self?.report = report
                     completion(.success(()))
                 }
             } catch {
@@ -53,24 +53,18 @@ final class BudgetsController: ObservableObject {
 
     func delete(budgetsAt offsets: IndexSet, completion: @escaping (Result<Void, DomainError>) -> Void) {
         Task { [weak self] in
-            let budgetsToDelete = offsets.compactMap { index -> Budget? in
-                guard budgets.indices.contains(index) else {
-                    return nil
-                }
-                return budgets[index]
-            }
-
+            let budgetsToDelete = report.budgets(at: offsets)
             guard !budgetsToDelete.isEmpty else {
-                completion(.failure(.budgets(error: .budgetDoesntExist)))
+                completion(.failure(.report(error: .budgetDoesntExist)))
                 return
             }
 
             do {
-                guard let budgets = try await self?.budgetProvider.delete(budgets: budgetsToDelete) else {
-                    throw DomainError.budgets(error: .budgetDoesntExist)
+                guard let report = try await self?.budgetProvider.delete(budgets: budgetsToDelete) else {
+                    throw DomainError.report(error: .budgetDoesntExist)
                 }
                 DispatchQueue.main.async { [weak self] in
-                    self?.budgets = budgets
+                    self?.report = report
                     completion(.success(()))
                 }
             } catch {
