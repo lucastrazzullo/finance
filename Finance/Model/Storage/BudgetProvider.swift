@@ -9,23 +9,20 @@ import Foundation
 
 protocol BudgetStorageProvider: AnyObject {
 
-    typealias BudgetListCompletion = (Result<[Budget], DomainError>) -> Void
-    typealias BudgetCompletion = (Result<Budget, DomainError>) -> Void
-
     // MARK: Budget list
 
-    func fetchBudgets(completion: @escaping BudgetListCompletion)
-    func add(budget: Budget, completion: @escaping BudgetListCompletion)
-    func delete(budget: Budget, completion: @escaping BudgetListCompletion)
-    func delete(budgets: [Budget], completion: @escaping BudgetListCompletion)
+    func fetchBudgets() async throws -> [Budget]
+    func add(budget: Budget) async throws -> [Budget]
+    func delete(budget: Budget) async throws -> [Budget]
+    func delete(budgets: [Budget]) async throws -> [Budget]
 
     // MARK: Budget
 
-    func fetchBudget(with identifier: Budget.ID, completion: @escaping BudgetCompletion)
-    func updateBudget(budget: Budget, completion: @escaping BudgetCompletion)
+    func fetchBudget(with identifier: Budget.ID) async throws -> Budget
+    func updateBudget(budget: Budget) async throws -> Budget
 }
 
-final class BudgetProvider {
+final actor BudgetProvider {
 
     // MARK: Instance properties
 
@@ -38,121 +35,46 @@ final class BudgetProvider {
     // MARK: Budget list
 
     func fetchBudgets() async throws -> [Budget] {
-        return try await withCheckedThrowingContinuation { [weak self] continuation in
-            self?.storageProvider.fetchBudgets { result in
-                switch result {
-                case .success(let budgets):
-                    continuation.resume(returning: budgets)
-                case .failure(let error):
-                    continuation.resume(throwing: error)
-                }
-            }
-        }
+        return try await storageProvider.fetchBudgets()
     }
 
     func add(budget: Budget) async throws -> [Budget] {
         try await canAdd(budget: budget)
-
-        return try await withCheckedThrowingContinuation { [weak self] continuation in
-            self?.storageProvider.add(budget: budget) { result in
-                switch result {
-                case .success(let budgets):
-                    continuation.resume(returning: budgets)
-                case .failure(let error):
-                    continuation.resume(throwing: error)
-                }
-            }
-        }
+        return try await storageProvider.add(budget: budget)
     }
 
     func delete(budget: Budget) async throws -> [Budget] {
-        return try await withCheckedThrowingContinuation { [weak self] continuation in
-            self?.storageProvider.delete(budget: budget) { result in
-                switch result {
-                case .success(let budgets):
-                    continuation.resume(returning: budgets)
-                case .failure(let error):
-                    continuation.resume(throwing: error)
-                }
-            }
-        }
+        return try await storageProvider.delete(budget: budget)
     }
 
     func delete(budgets: [Budget]) async throws -> [Budget] {
-        return try await withCheckedThrowingContinuation { [weak self] continuation in
-            self?.storageProvider.delete(budgets: budgets) { result in
-                switch result {
-                case .success(let budgets):
-                    continuation.resume(returning: budgets)
-                case .failure(let error):
-                    continuation.resume(throwing: error)
-                }
-            }
+        return try await storageProvider.delete(budgets: budgets)
+    }
+
+    private func canAdd(budget: Budget) async throws {
+        let budgets = try await storageProvider.fetchBudgets()
+
+        guard !budgets.contains(where: { $0.name == budget.name }) else {
+            throw DomainError.budgets(error: .budgetAlreadyExistsWith(name: budget.name))
         }
     }
 
     // MARK: Budget
 
     func fetchBudget(with id: Budget.ID) async throws -> Budget {
-        return try await withCheckedThrowingContinuation { [weak self] continuation in
-            self?.storageProvider.fetchBudget(with: id) { result in
-                switch result {
-                case .success(let budget):
-                    continuation.resume(returning: budget)
-                case .failure(let error):
-                    continuation.resume(throwing: error)
-                }
-            }
-        }
+        return try await storageProvider.fetchBudget(with: id)
     }
 
     func update(budget: Budget) async throws -> Budget {
         try await canUpdate(budget: budget)
-        return try await withCheckedThrowingContinuation { [weak self] continuation in
-            self?.storageProvider.updateBudget(budget: budget) { result in
-                switch result {
-                case .success(let budget):
-                    continuation.resume(returning: budget)
-                case .failure(let error):
-                    continuation.resume(throwing: error)
-                }
-            }
-        }
-    }
-
-    // MARK: Private helper methods
-
-    private func canAdd(budget: Budget) async throws {
-        return try await withCheckedThrowingContinuation { [weak self] continuation in
-            self?.storageProvider.fetchBudgets { result in
-                switch result {
-                case .success(let budgets):
-                    guard !budgets.contains(where: { $0.name == budget.name }) else {
-                        continuation.resume(throwing: DomainError.budgets(error: .budgetAlreadyExistsWith(name: budget.name)))
-                        return
-                    }
-                    continuation.resume(returning: ())
-                case .failure(let error):
-                    continuation.resume(throwing: error)
-                }
-            }
-        }
+        return try await storageProvider.updateBudget(budget: budget)
     }
 
     private func canUpdate(budget: Budget) async throws {
-        return try await withCheckedThrowingContinuation { [weak self] continuation in
-            self?.storageProvider.fetchBudgets { result in
-                switch result {
-                case .success(let budgets):
-                    guard !budgets.contains(where: { $0.id != budget.id && $0.name == budget.name }) else {
-                        continuation.resume(throwing: DomainError.budgets(error: .budgetAlreadyExistsWith(name: budget.name)))
-                        return
-                    }
-                    continuation.resume(returning: ())
-                case .failure(let error):
-                    continuation.resume(throwing: error)
-                }
-            }
+        let budgets = try await storageProvider.fetchBudgets()
+
+        guard !budgets.contains(where: { $0.id != budget.id && $0.name == budget.name }) else {
+            throw DomainError.budgets(error: .budgetAlreadyExistsWith(name: budget.name))
         }
     }
 }

@@ -22,25 +22,13 @@ final class CoreDataBudgetStorageProvider: BudgetStorageProvider {
 
     // MARK: Budget list
 
-    func fetchBudgets(completion: @escaping BudgetListCompletion) {
-        fetchBudgetEntities { result in
-            switch result {
-            case .success(let budgetEntities):
-                do {
-                    let budgets = try budgetEntities.compactMap(Budget.with(budgetEntity:))
-                    completion(.success(budgets))
-                } catch let error as DomainError {
-                    completion(.failure(error))
-                } catch {
-                    completion(.failure(.budgetProvider(error: .underlying(error: error))))
-                }
-            case .failure(let error):
-                completion(.failure(error))
-            }
-        }
+    func fetchBudgets() async throws -> [Budget] {
+        let budgetEntities = try fetchBudgetEntities()
+        let budgets = try budgetEntities.compactMap(Budget.with(budgetEntity:))
+        return budgets
     }
 
-    func add(budget: Budget, completion: @escaping BudgetListCompletion) {
+    func add(budget: Budget) async throws -> [Budget] {
         let budgetEntity = BudgetEntity(context: persistentContainer.viewContext)
         budgetEntity.identifier = budget.id
         budgetEntity.name = budget.name
@@ -53,180 +41,120 @@ final class CoreDataBudgetStorageProvider: BudgetStorageProvider {
             return sliceEntity
         })
 
-        saveOrRollback { result in
-            switch result {
-            case .success:
-                fetchBudgets(completion: completion)
-            case .failure(let error):
-                completion(.failure(error))
-            }
-        }
+        try saveOrRollback()
+        return try await fetchBudgets()
     }
 
-    func delete(budget: Budget, completion: @escaping BudgetListCompletion) {
-        fetchBudgetEntity(with: budget.id) { [weak self] result in
-            guard let self = self else {
-                completion(.failure(.budgetProvider(error: .budgetEntityNotFound)))
-                return
-            }
+    func delete(budget: Budget) async throws -> [Budget] {
+        let budgetEntity = try fetchBudgetEntity(with: budget.id)
+        persistentContainer.viewContext.delete(budgetEntity)
 
-            switch result {
-            case .success(let budgetEntity):
+        try saveOrRollback()
+        return try await fetchBudgets()
+    }
+
+    func delete(budgets: [Budget]) async throws -> [Budget] {
+        let budgetsEntities = try fetchBudgetEntities()
+        let idsToRemove = Set(budgets.map(\.id))
+        budgetsEntities.forEach { budgetEntity in
+            if let identifier = budgetEntity.identifier, idsToRemove.contains(identifier) {
                 self.persistentContainer.viewContext.delete(budgetEntity)
-                self.saveOrRollback { result in
-                    switch result {
-                    case .success:
-                        self.fetchBudgets(completion: completion)
-                    case .failure(let error):
-                        completion(.failure(error))
-                    }
-                }
-            case .failure(let error):
-                completion(.failure(error))
             }
         }
-    }
 
-    func delete(budgets: [Budget], completion: @escaping BudgetListCompletion) {
-        fetchBudgetEntities { [weak self] result in
-            guard let self = self else {
-                completion(.failure(.budgetProvider(error: .budgetEntityNotFound)))
-                return
-            }
-
-            let idsToRemove = Set(budgets.map(\.id))
-
-            switch result {
-            case .success(let budgetsEntities):
-                budgetsEntities.forEach { budgetEntity in
-                    if let identifier = budgetEntity.identifier, idsToRemove.contains(identifier) {
-                        self.persistentContainer.viewContext.delete(budgetEntity)
-                    }
-                }
-                self.saveOrRollback { result in
-                    switch result {
-                    case .success:
-                        self.fetchBudgets(completion: completion)
-                    case .failure(let error):
-                        completion(.failure(error))
-                    }
-                }
-            case .failure(let error):
-                completion(.failure(error))
-            }
-        }
+        try saveOrRollback()
+        return try await fetchBudgets()
     }
 
     // MARK: Budget
 
-    func fetchBudget(with identifier: Budget.ID, completion: @escaping BudgetCompletion) {
-        fetchBudgetEntity(with: identifier) { result in
-            switch result {
-            case .success(let budgetEntity):
-                do {
-                    let budget = try Budget.with(budgetEntity: budgetEntity)
-                    completion(.success(budget))
-                } catch let error as DomainError {
-                    completion(.failure(error))
-                } catch {
-                    completion(.failure(.budgetProvider(error: .underlying(error: error))))
-                }
-            case .failure(let error):
-                completion(.failure(error))
-            }
+    func fetchBudget(with identifier: Budget.ID) async throws -> Budget {
+        let budgetEntity = try fetchBudgetEntity(with: identifier)
+
+        do {
+            return try Budget.with(budgetEntity: budgetEntity)
+        } catch let error as DomainError {
+            throw error
+        } catch {
+            throw DomainError.budgetProvider(error: .underlying(error: error))
         }
     }
 
-    func updateBudget(budget: Budget, completion: @escaping BudgetCompletion) {
-        fetchBudgetEntity(with: budget.id) { result in
-            switch result {
-            case .success(let budgetEntity):
-                budgetEntity.name = budget.name
+    func updateBudget(budget: Budget) async throws -> Budget {
+        let budgetEntity = try fetchBudgetEntity(with: budget.id)
+        budgetEntity.name = budget.name
 
-                let entitySlices = budgetEntity.slices?.compactMap { $0 as? BudgetSliceEntity } ?? []
-
-                entitySlices.forEach { sliceEntity in
-                    if !budget.slices.contains(where: { $0.id == sliceEntity.identifier }) {
-                        self.persistentContainer.viewContext.delete(sliceEntity)
-                    }
-                }
-                budget.slices.forEach { slice in
-                    if !entitySlices.contains(where: { $0.identifier == slice.id }) {
-                        let sliceEntity = BudgetSliceEntity(context: self.persistentContainer.viewContext)
-                        sliceEntity.identifier = slice.id
-                        sliceEntity.name = slice.name
-                        sliceEntity.amount = NSDecimalNumber(decimal: slice.amount.value)
-                        sliceEntity.budget = budgetEntity
-                    }
-                }
-                self.saveOrRollback { result in
-                    switch result {
-                    case .success:
-                        self.fetchBudget(with: budget.id, completion: completion)
-                    case .failure(let error):
-                        completion(.failure(error))
-                    }
-                }
-            case .failure(let error):
-                completion(.failure(error))
+        let entitySlices = budgetEntity.slices?.compactMap { $0 as? BudgetSliceEntity } ?? []
+        entitySlices.forEach { sliceEntity in
+            if !budget.slices.contains(where: { $0.id == sliceEntity.identifier }) {
+                self.persistentContainer.viewContext.delete(sliceEntity)
             }
         }
+        budget.slices.forEach { slice in
+            if !entitySlices.contains(where: { $0.identifier == slice.id }) {
+                let sliceEntity = BudgetSliceEntity(context: self.persistentContainer.viewContext)
+                sliceEntity.identifier = slice.id
+                sliceEntity.name = slice.name
+                sliceEntity.amount = NSDecimalNumber(decimal: slice.amount.value)
+                sliceEntity.budget = budgetEntity
+            }
+        }
+
+        try saveOrRollback()
+        return try await fetchBudget(with: budget.id)
     }
 
     // MARK: Private fetching methods
 
-    private func fetchBudgetEntities(completion: @escaping (Result<[BudgetEntity], DomainError>) -> Void) {
+    private func fetchBudgetEntities() throws -> [BudgetEntity] {
         let fetchBudgetsRequest: NSFetchRequest<BudgetEntity> = BudgetEntity.fetchRequest()
 
         do {
             let entities = try persistentContainer.viewContext.fetch(fetchBudgetsRequest)
-            completion(.success(entities))
+            return entities
         } catch {
-            completion(.failure(.budgetProvider(error: .underlying(error: error))))
+            throw DomainError.budgetProvider(error: .underlying(error: error))
         }
     }
 
-    private func fetchBudgetEntity(with identifier: Budget.ID, completion: @escaping (Result<BudgetEntity, DomainError>) -> Void) {
+    private func fetchBudgetEntity(with identifier: Budget.ID) throws -> BudgetEntity {
         let predicate = NSPredicate(format: "%K == %@", #keyPath(BudgetEntity.identifier), identifier as CVarArg)
         let fetchBudgetsRequest: NSFetchRequest<BudgetEntity> = BudgetEntity.fetchRequest()
         fetchBudgetsRequest.predicate = predicate
 
         do {
             guard let budgetEntity = try persistentContainer.viewContext.fetch(fetchBudgetsRequest).first else {
-                completion(.failure(.budgetProvider(error: .budgetEntityNotFound)))
-                return
+                throw DomainError.budgetProvider(error: .budgetEntityNotFound)
             }
-            completion(.success(budgetEntity))
+            return budgetEntity
         } catch {
-            completion(.failure(.budgetProvider(error: .underlying(error: error))))
+            throw DomainError.budgetProvider(error: .underlying(error: error))
         }
     }
 
-    private func fetchBudgetSliceEntity(with identifier: BudgetSlice.ID, completion: @escaping (Result<BudgetSliceEntity, DomainError>) -> Void) {
+    private func fetchBudgetSliceEntity(with identifier: BudgetSlice.ID) throws -> BudgetSliceEntity {
         let predicate = NSPredicate(format: "%K == %@", #keyPath(BudgetSliceEntity.identifier), identifier as CVarArg)
         let fetchBudgetSlicesRequest: NSFetchRequest<BudgetSliceEntity> = BudgetSliceEntity.fetchRequest()
         fetchBudgetSlicesRequest.predicate = predicate
 
         do {
             guard let budgetSliceEntity = try persistentContainer.viewContext.fetch(fetchBudgetSlicesRequest).first else {
-                completion(.failure(.budgetProvider(error: .budgetEntityNotFound)))
-                return
+                throw DomainError.budgetProvider(error: .budgetEntityNotFound)
             }
-            completion(.success(budgetSliceEntity))
+            return budgetSliceEntity
         } catch {
-            completion(.failure(.budgetProvider(error: .underlying(error: error))))
+            throw DomainError.budgetProvider(error: .underlying(error: error))
         }
     }
 
     // MARK: Private saving methods
 
-    private func saveOrRollback(completion: ((Result<Void, DomainError>) -> Void)) {
+    private func saveOrRollback() throws {
         do {
             try persistentContainer.viewContext.save()
-            completion(.success(Void()))
         } catch {
             persistentContainer.viewContext.rollback()
-            completion(.failure(.budgetProvider(error: .underlying(error: error))))
+            throw DomainError.budgetProvider(error: .underlying(error: error))
         }
     }
 }

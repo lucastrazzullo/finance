@@ -70,46 +70,46 @@ final class MockBudgetStorageProvider: BudgetStorageProvider {
 
     // MARK: Budget list
 
-    func fetchBudgets(completion: @escaping BudgetListCompletion) {
-        completion(.success(budgets))
+    func fetchBudgets() async throws -> [Budget] {
+        return budgets
     }
 
-    func add(budget: Budget, completion: @escaping BudgetListCompletion) {
+    func add(budget: Budget) async throws -> [Budget] {
         budgets.append(budget)
-        completion(.success(budgets))
+        return budgets
     }
 
-    func delete(budget: Budget, completion: @escaping BudgetListCompletion) {
+    func delete(budget: Budget) async throws -> [Budget] {
         budgets.removeAll(where: { $0.id == budget.id })
-        completion(.success(budgets))
+        return budgets
     }
 
-    func delete(budgets: [Budget], completion: @escaping BudgetListCompletion) {
+    func delete(budgets: [Budget]) async throws -> [Budget] {
         budgets.forEach { budget in
             self.budgets.removeAll(where: { $0.id == budget.id })
         }
-        completion(.success(budgets))
+        return budgets
     }
 
     // MARK: Budget
 
-    func fetchBudget(with identifier: Budget.ID, completion: @escaping BudgetCompletion) {
+    func fetchBudget(with identifier: Budget.ID) async throws -> Budget {
         if let budget = budgets.first(where: { $0.id == identifier }) {
-            completion(.success(budget))
+            return budget
         } else {
-            completion(.failure(.budgetProvider(error: .budgetEntityNotFound)))
+            throw DomainError.budgetProvider(error: .budgetEntityNotFound)
         }
     }
 
-    func updateBudget(budget: Budget, completion: @escaping BudgetCompletion) {
+    func updateBudget(budget: Budget) async throws -> Budget {
         guard let budgetIndex = budgets.firstIndex(where: { $0.id == budget.id }) else {
-            completion(.failure(.budgetProvider(error: .underlying(error: Error.mock))))
-            return
+            throw DomainError.budgetProvider(error: .underlying(error: Error.mock))
         }
 
         budgets.remove(at: budgetIndex)
         budgets.insert(budget, at: budgetIndex)
-        completion(.success(budget))
+
+        return budget
     }
 }
 #endif
