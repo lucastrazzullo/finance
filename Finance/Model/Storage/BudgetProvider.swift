@@ -51,18 +51,13 @@ final class BudgetProvider {
     }
 
     func add(budget: Budget) async throws -> [Budget] {
+        try await canAdd(budget: budget)
+
         return try await withCheckedThrowingContinuation { [weak self] continuation in
-            self?.canAdd(budget: budget) { [weak self] result in
+            self?.storageProvider.add(budget: budget) { result in
                 switch result {
-                case .success:
-                    self?.storageProvider.add(budget: budget) { result in
-                        switch result {
-                        case .success(let budgets):
-                            continuation.resume(returning: budgets)
-                        case .failure(let error):
-                            continuation.resume(throwing: error)
-                        }
-                    }
+                case .success(let budgets):
+                    continuation.resume(returning: budgets)
                 case .failure(let error):
                     continuation.resume(throwing: error)
                 }
@@ -112,18 +107,12 @@ final class BudgetProvider {
     }
 
     func update(budget: Budget) async throws -> Budget {
+        try await canUpdate(budget: budget)
         return try await withCheckedThrowingContinuation { [weak self] continuation in
-            self?.canUpdate(budget: budget) { [weak self] result in
+            self?.storageProvider.updateBudget(budget: budget) { result in
                 switch result {
-                case .success:
-                    self?.storageProvider.updateBudget(budget: budget) { result in
-                        switch result {
-                        case .success(let budget):
-                            continuation.resume(returning: budget)
-                        case .failure(let error):
-                            continuation.resume(throwing: error)
-                        }
-                    }
+                case .success(let budget):
+                    continuation.resume(returning: budget)
                 case .failure(let error):
                     continuation.resume(throwing: error)
                 }
@@ -133,64 +122,36 @@ final class BudgetProvider {
 
     // MARK: Private helper methods
 
-    private func canAdd(budget: Budget, completion: @escaping (Result<Void, DomainError>) -> Void) {
-        storageProvider.fetchBudgets { result in
-            switch result {
-            case .success(let budgets):
-                guard !budgets.contains(where: { $0.name == budget.name }) else {
-                    completion(.failure(DomainError.budgets(error: .budgetAlreadyExistsWith(name: budget.name))))
-                    return
+    private func canAdd(budget: Budget) async throws {
+        return try await withCheckedThrowingContinuation { [weak self] continuation in
+            self?.storageProvider.fetchBudgets { result in
+                switch result {
+                case .success(let budgets):
+                    guard !budgets.contains(where: { $0.name == budget.name }) else {
+                        continuation.resume(throwing: DomainError.budgets(error: .budgetAlreadyExistsWith(name: budget.name)))
+                        return
+                    }
+                    continuation.resume(returning: ())
+                case .failure(let error):
+                    continuation.resume(throwing: error)
                 }
-                completion(.success(()))
-            case .failure(let error):
-                completion(.failure(error))
             }
         }
     }
 
-    private func canUpdate(budget: Budget, completion: @escaping (Result<Void, DomainError>) -> Void) {
-        storageProvider.fetchBudgets { result in
-            switch result {
-            case .success(let budgets):
-                guard !budgets.contains(where: { $0.id != budget.id && $0.name == budget.name }) else {
-                    completion(.failure(DomainError.budgets(error: .budgetAlreadyExistsWith(name: budget.name))))
-                    return
+    private func canUpdate(budget: Budget) async throws {
+        return try await withCheckedThrowingContinuation { [weak self] continuation in
+            self?.storageProvider.fetchBudgets { result in
+                switch result {
+                case .success(let budgets):
+                    guard !budgets.contains(where: { $0.id != budget.id && $0.name == budget.name }) else {
+                        continuation.resume(throwing: DomainError.budgets(error: .budgetAlreadyExistsWith(name: budget.name)))
+                        return
+                    }
+                    continuation.resume(returning: ())
+                case .failure(let error):
+                    continuation.resume(throwing: error)
                 }
-                completion(.success(()))
-            case .failure(let error):
-                completion(.failure(error))
-            }
-        }
-    }
-
-    private func canAdd(budgetSlice: BudgetSlice, toBudgetWith id: Budget.ID, completion: @escaping (Result<Void, DomainError>) -> Void) {
-        storageProvider.fetchBudget(with: id) { result in
-            switch result {
-            case .success(let budget):
-                do {
-                    try Budget.canAdd(slice: budgetSlice, to: budget.slices)
-                    completion(.success(()))
-                } catch {
-                    completion(.failure(error as? DomainError ?? .budgetProvider(error: .underlying(error: error))))
-                }
-            case .failure(let error):
-                completion(.failure(error))
-            }
-        }
-    }
-
-    private func canDelete(budgetSlice: BudgetSlice, fromBudgetWith id: Budget.ID, completion: @escaping (Result<Void, DomainError>) -> Void) {
-        storageProvider.fetchBudget(with: id) { result in
-            switch result {
-            case .success(let budget):
-                do {
-                    try Budget.canRemove(slice: budgetSlice, from: budget.slices)
-                    completion(.success(()))
-                } catch {
-                    completion(.failure(error as? DomainError ?? .budgetProvider(error: .underlying(error: error))))
-                }
-            case .failure(let error):
-                completion(.failure(error))
             }
         }
     }
