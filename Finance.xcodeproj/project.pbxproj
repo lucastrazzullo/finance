@@ -11,6 +11,7 @@
 		811F7BD8278C473E00F1B8C9 /* CategorisedTransactionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 811F7BD7278C473E00F1B8C9 /* CategorisedTransactionsView.swift */; };
 		81542BD82795812100A05B77 /* TransactionListItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81542BD72795812100A05B77 /* TransactionListItem.swift */; };
 		817033E227B1B7BB001686FA /* Report.swift in Sources */ = {isa = PBXBuildFile; fileRef = 817033E127B1B7BB001686FA /* Report.swift */; };
+		817033EC27B25F9F001686FA /* FinanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 817033EB27B25F9F001686FA /* FinanceTests.swift */; };
 		81735ACC279A2B8D007C9AA3 /* Array+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81735ACB279A2B8D007C9AA3 /* Array+Extensions.swift */; };
 		81735ACF279B2179007C9AA3 /* Months.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81735ACE279B2179007C9AA3 /* Months.swift */; };
 		81735AD1279B3BEC007C9AA3 /* TransferHolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81735AD0279B3BEC007C9AA3 /* TransferHolder.swift */; };
@@ -47,11 +48,23 @@
 		81FC8752279B77240031D3AC /* CoreDataStorageProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81FC8751279B77240031D3AC /* CoreDataStorageProvider.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		817033ED27B25F9F001686FA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 81947E9F27327FCE001C2AC9 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 81947EA627327FCF001C2AC9;
+			remoteInfo = Finance;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		811F7BD2278C2A3500F1B8C9 /* BudgetSlice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetSlice.swift; sourceTree = "<group>"; };
 		811F7BD7278C473E00F1B8C9 /* CategorisedTransactionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategorisedTransactionsView.swift; sourceTree = "<group>"; };
 		81542BD72795812100A05B77 /* TransactionListItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionListItem.swift; sourceTree = "<group>"; };
 		817033E127B1B7BB001686FA /* Report.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Report.swift; sourceTree = "<group>"; };
+		817033E927B25F9F001686FA /* FinanceTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FinanceTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		817033EB27B25F9F001686FA /* FinanceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceTests.swift; sourceTree = "<group>"; };
 		81735ACB279A2B8D007C9AA3 /* Array+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+Extensions.swift"; sourceTree = "<group>"; };
 		81735ACE279B2179007C9AA3 /* Months.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Months.swift; sourceTree = "<group>"; };
 		81735AD0279B3BEC007C9AA3 /* TransferHolder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferHolder.swift; sourceTree = "<group>"; };
@@ -93,6 +106,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		817033E627B25F9F001686FA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		81947EA427327FCF001C2AC9 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -161,6 +181,35 @@
 			path = Amount;
 			sourceTree = "<group>";
 		};
+		817033E327B25E5E001686FA /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				81947EAA27327FCF001C2AC9 /* FinanceApp.swift */,
+				81CB8BEE2746B91900A64785 /* Model */,
+				81CB8BED2746B91100A64785 /* View */,
+				81B284E427A0010700EE51EB /* Controller */,
+			);
+			path = Classes;
+			sourceTree = "<group>";
+		};
+		817033E427B25F2C001686FA /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				81FC874D279B63E90031D3AC /* Data */,
+				81947EAE27327FD1001C2AC9 /* Assets.xcassets */,
+				81947EB027327FD1001C2AC9 /* Preview Content */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		817033EA27B25F9F001686FA /* FinanceTests */ = {
+			isa = PBXGroup;
+			children = (
+				817033EB27B25F9F001686FA /* FinanceTests.swift */,
+			);
+			path = FinanceTests;
+			sourceTree = "<group>";
+		};
 		81735ACD279A2DE3007C9AA3 /* Repository */ = {
 			isa = PBXGroup;
 			children = (
@@ -175,6 +224,7 @@
 			isa = PBXGroup;
 			children = (
 				81947EA927327FCF001C2AC9 /* Finance */,
+				817033EA27B25F9F001686FA /* FinanceTests */,
 				81947EA827327FCF001C2AC9 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -183,6 +233,7 @@
 			isa = PBXGroup;
 			children = (
 				81947EA727327FCF001C2AC9 /* Finance.app */,
+				817033E927B25F9F001686FA /* FinanceTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -190,13 +241,8 @@
 		81947EA927327FCF001C2AC9 /* Finance */ = {
 			isa = PBXGroup;
 			children = (
-				81947EAA27327FCF001C2AC9 /* FinanceApp.swift */,
-				81CB8BEE2746B91900A64785 /* Model */,
-				81CB8BED2746B91100A64785 /* View */,
-				81B284E427A0010700EE51EB /* Controller */,
-				81FC874D279B63E90031D3AC /* Data */,
-				81947EAE27327FD1001C2AC9 /* Assets.xcassets */,
-				81947EB027327FD1001C2AC9 /* Preview Content */,
+				817033E327B25E5E001686FA /* Classes */,
+				817033E427B25F2C001686FA /* Resources */,
 			);
 			path = Finance;
 			sourceTree = "<group>";
@@ -263,6 +309,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		817033E827B25F9F001686FA /* FinanceTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 817033EF27B25F9F001686FA /* Build configuration list for PBXNativeTarget "FinanceTests" */;
+			buildPhases = (
+				817033E527B25F9F001686FA /* Sources */,
+				817033E627B25F9F001686FA /* Frameworks */,
+				817033E727B25F9F001686FA /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				817033EE27B25F9F001686FA /* PBXTargetDependency */,
+			);
+			name = FinanceTests;
+			productName = FinanceTests;
+			productReference = 817033E927B25F9F001686FA /* FinanceTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		81947EA627327FCF001C2AC9 /* Finance */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 81947EB527327FD1001C2AC9 /* Build configuration list for PBXNativeTarget "Finance" */;
@@ -287,9 +351,13 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1310;
+				LastSwiftUpdateCheck = 1320;
 				LastUpgradeCheck = 1310;
 				TargetAttributes = {
+					817033E827B25F9F001686FA = {
+						CreatedOnToolsVersion = 13.2.1;
+						TestTargetID = 81947EA627327FCF001C2AC9;
+					};
 					81947EA627327FCF001C2AC9 = {
 						CreatedOnToolsVersion = 13.1;
 					};
@@ -309,11 +377,19 @@
 			projectRoot = "";
 			targets = (
 				81947EA627327FCF001C2AC9 /* Finance */,
+				817033E827B25F9F001686FA /* FinanceTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		817033E727B25F9F001686FA /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		81947EA527327FCF001C2AC9 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -326,6 +402,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		817033E527B25F9F001686FA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				817033EC27B25F9F001686FA /* FinanceTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		81947EA327327FCF001C2AC9 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -371,7 +455,51 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		817033EE27B25F9F001686FA /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 81947EA627327FCF001C2AC9 /* Finance */;
+			targetProxy = 817033ED27B25F9F001686FA /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		817033F027B25F9F001686FA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lucastrazzullo.FinanceTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Finance.app/Finance";
+			};
+			name = Debug;
+		};
+		817033F127B25F9F001686FA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lucastrazzullo.FinanceTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Finance.app/Finance";
+			};
+			name = Release;
+		};
 		81947EB327327FD1001C2AC9 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -495,7 +623,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"Finance/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"Finance/Resources/Preview Content\"";
 				DEVELOPMENT_TEAM = UC9U5RZ8UF;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -524,7 +652,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"Finance/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"Finance/Resources/Preview Content\"";
 				DEVELOPMENT_TEAM = UC9U5RZ8UF;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -549,6 +677,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		817033EF27B25F9F001686FA /* Build configuration list for PBXNativeTarget "FinanceTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				817033F027B25F9F001686FA /* Debug */,
+				817033F127B25F9F001686FA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		81947EA227327FCE001C2AC9 /* Build configuration list for PBXProject "Finance" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
