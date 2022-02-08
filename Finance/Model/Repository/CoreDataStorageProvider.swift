@@ -7,7 +7,7 @@
 
 import CoreData
 
-final class CoreDataStorageProvider: ObservableObject, ReportStorageProvider {
+final class CoreDataStorageProvider: ObservableObject, StorageProvider {
 
     private static let storageContainerName = "Finance"
 

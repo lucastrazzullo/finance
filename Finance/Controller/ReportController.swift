@@ -11,10 +11,12 @@ final class ReportController: ObservableObject {
 
     @Published var report: Report
 
-    private(set) var budgetProvider: ReportProvider
+    let storageProvider: StorageProvider
+    private let repository: Repository
 
-    init(budgetProvider: ReportProvider) {
-        self.budgetProvider = budgetProvider
+    init(storageProvider: StorageProvider) {
+        self.storageProvider = storageProvider
+        self.repository = Repository(storageProvider: storageProvider)
         self.report = Report(budgets: [])
     }
 
@@ -23,7 +25,7 @@ final class ReportController: ObservableObject {
     func fetch() {
         Task { [weak self] in
             do {
-                guard let report = try await self?.budgetProvider.fetchReport() else {
+                guard let report = try await self?.repository.fetchReport() else {
                     throw DomainError.report(error: .cannotFetchTheBudgets)
                 }
                 DispatchQueue.main.async { [weak self] in
@@ -38,7 +40,7 @@ final class ReportController: ObservableObject {
     func add(budget: Budget, completion: @escaping (Result<Void, DomainError>) -> Void) {
         Task { [weak self] in
             do {
-                guard let report = try await self?.budgetProvider.add(budget: budget) else {
+                guard let report = try await self?.repository.add(budget: budget) else {
                     throw DomainError.report(error: .budgetDoesntExist)
                 }
                 DispatchQueue.main.async { [weak self] in
@@ -60,7 +62,7 @@ final class ReportController: ObservableObject {
             }
 
             do {
-                guard let report = try await self?.budgetProvider.delete(budgets: budgetsToDelete) else {
+                guard let report = try await self?.repository.delete(budgets: budgetsToDelete) else {
                     throw DomainError.report(error: .budgetDoesntExist)
                 }
                 DispatchQueue.main.async { [weak self] in

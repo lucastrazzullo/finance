@@ -15,10 +15,10 @@ struct CategorisedTransactionsView: View {
 
         @Published var budgets: [Budget] = []
 
-        private(set) var budgetProvider: ReportProvider?
+        private(set) var repository: Repository
 
-        init(budgetProvider: ReportProvider) {
-            self.budgetProvider = budgetProvider
+        init(repository: Repository) {
+            self.repository = repository
             self.budgets = []
         }
 
@@ -27,8 +27,8 @@ struct CategorisedTransactionsView: View {
         func fetch() {
             Task {
                 do {
-                    let report = try await budgetProvider?.fetchReport()
-                    let budgets = report?.budgets ?? []
+                    let report = try await repository.fetchReport()
+                    let budgets = report.budgets
                     DispatchQueue.main.async { [weak self] in
                         self?.budgets = budgets
                     }
@@ -113,18 +113,18 @@ struct CategorisedTransactionsView: View {
             }
     }
 
-    init(budgetProvider: ReportProvider) {
-        self.controller = Controller(budgetProvider: budgetProvider)
+    init(repository: Repository) {
+        self.controller = Controller(repository: repository)
     }
 }
 
 // MARK: - Previews
 
 struct CategorisedTransactionsView_Previews: PreviewProvider {
-    static let budgetStorageProvider = ReportProvider(storageProvider: MockBudgetStorageProvider())
+    static let repository = Repository(storageProvider: MockStorageProvider())
     static var previews: some View {
         NavigationView {
-            CategorisedTransactionsView(budgetProvider: budgetStorageProvider)
+            CategorisedTransactionsView(repository: repository)
                 .navigationTitle("Transactions 2022")
         }
     }

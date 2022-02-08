@@ -11,11 +11,11 @@ final class BudgetController: ObservableObject {
 
     @Published var budget: Budget
 
-    private var budgetProvider: ReportProvider
+    private var repository: Repository
 
-    init(budget: Budget, budgetProvider: ReportProvider) {
+    init(budget: Budget, storageProvider: StorageProvider) {
         self.budget = budget
-        self.budgetProvider = budgetProvider
+        self.repository = Repository(storageProvider: storageProvider)
     }
 
     // MARK: Budget
@@ -24,7 +24,7 @@ final class BudgetController: ObservableObject {
         let budgetId = budget.id
         Task { [weak self] in
             do {
-                guard let budget = try await self?.budgetProvider.fetchBudget(with: budgetId) else {
+                guard let budget = try await self?.repository.fetchBudget(with: budgetId) else {
                     throw DomainError.budget(error: .cannotFetchTheBudget(id: budgetId))
                 }
                 DispatchQueue.main.async { [weak self] in
@@ -40,7 +40,7 @@ final class BudgetController: ObservableObject {
         let budget = budget
         Task { [weak self] in
             do {
-                guard let budget = try await self?.budgetProvider.update(budget: budget) else {
+                guard let budget = try await self?.repository.update(budget: budget) else {
                     throw DomainError.budget(error: .cannotUpdateTheBudget(underlyingError: nil))
                 }
                 DispatchQueue.main.async { [weak self] in

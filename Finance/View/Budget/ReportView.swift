@@ -17,10 +17,8 @@ struct ReportView: View {
     var body: some View {
         List {
             ForEach(controller.report.budgets) { budget in
-                if let budgetProvider = controller.budgetProvider {
-                    NavigationLink(destination: BudgetView(budget: budget, budgetProvider: budgetProvider)) {
-                        AmountListItem(label: budget.name, amount: budget.amount)
-                    }
+                NavigationLink(destination: BudgetView(budget: budget, storageProvider: controller.storageProvider)) {
+                    AmountListItem(label: budget.name, amount: budget.amount)
                 }
             }
             .onDelete { offsets in
@@ -60,18 +58,18 @@ struct ReportView: View {
         .onAppear(perform: controller.fetch)
     }
 
-    init(budgetProvider: ReportProvider) {
-        self.controller = ReportController(budgetProvider: budgetProvider)
+    init(storageProvider: StorageProvider) {
+        self.controller = ReportController(storageProvider: storageProvider)
     }
 }
 
 // MARK: - Previews
 
 struct BudgetsView_Previews: PreviewProvider {
-    static let budgetStorageProvider = ReportProvider(storageProvider: MockBudgetStorageProvider())
+    static let storageProvider = MockStorageProvider()
     static var previews: some View {
         NavigationView {
-            ReportView(budgetProvider: budgetStorageProvider)
+            ReportView(storageProvider: storageProvider)
         }
     }
 }

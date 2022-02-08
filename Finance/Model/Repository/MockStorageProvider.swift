@@ -1,5 +1,5 @@
 //
-//  MockBudgetStorageProvider.swift
+//  MockStorageProvider.swift
 //  Finance
 //
 //  Created by Luca Strazzullo on 23/01/2022.
@@ -60,7 +60,7 @@ enum Mocks {
     }()
 }
 
-final class MockBudgetStorageProvider: ReportStorageProvider {
+final class MockStorageProvider: StorageProvider {
 
     private enum Error: Swift.Error {
         case mock

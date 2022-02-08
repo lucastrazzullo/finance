@@ -1,5 +1,5 @@
 //
-//  ReportProvider.swift
+//  Repository.swift
 //  Finance
 //
 //  Created by Luca Strazzullo on 20/01/2022.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol ReportStorageProvider: AnyObject {
+protocol StorageProvider: AnyObject {
 
     // MARK: Report
 
@@ -22,13 +22,13 @@ protocol ReportStorageProvider: AnyObject {
     func updateBudget(budget: Budget) async throws -> Budget
 }
 
-final actor ReportProvider {
+final actor Repository {
 
     // MARK: Instance properties
 
-    private let storageProvider: ReportStorageProvider
+    private let storageProvider: StorageProvider
 
-    init(storageProvider: ReportStorageProvider) {
+    init(storageProvider: StorageProvider) {
         self.storageProvider = storageProvider
     }
 
