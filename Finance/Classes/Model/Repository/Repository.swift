@@ -13,13 +13,13 @@ protocol StorageProvider: AnyObject {
 
     func fetchReport() async throws -> Report
     func add(budget: Budget) async throws -> Report
-    func delete(budget: Budget) async throws -> Report
-    func delete(budgets: [Budget]) async throws -> Report
+    func delete(budgetWith identifier: Budget.ID) async throws -> Report
+    func delete(budgetsWith identifiers: Set<Budget.ID>) async throws -> Report
 
     // MARK: Budget
 
-    func fetchBudget(with identifier: Budget.ID) async throws -> Budget
-    func updateBudget(budget: Budget) async throws -> Budget
+    func fetch(budgetWith identifier: Budget.ID) async throws -> Budget
+    func update(budget: Budget) async throws -> Budget
 }
 
 final actor Repository {
@@ -38,29 +38,29 @@ final actor Repository {
         return try await storageProvider.fetchReport()
     }
 
+    // MARK: Budget
+
+    func fetch(budgetWith id: Budget.ID) async throws -> Budget {
+        return try await storageProvider.fetch(budgetWith: id)
+    }
+
+    func delete(budgetWith identifier: Budget.ID) async throws -> Report {
+        return try await storageProvider.delete(budgetWith: identifier)
+    }
+
+    func delete(budgetsWith identifiers: Set<Budget.ID>) async throws -> Report {
+        return try await storageProvider.delete(budgetsWith: identifiers)
+    }
+
     func add(budget: Budget) async throws -> Report {
         let report = try await storageProvider.fetchReport()
         try report.canAdd(budget: budget)
         return try await storageProvider.add(budget: budget)
     }
 
-    func delete(budget: Budget) async throws -> Report {
-        return try await storageProvider.delete(budget: budget)
-    }
-
-    func delete(budgets: [Budget]) async throws -> Report {
-        return try await storageProvider.delete(budgets: budgets)
-    }
-
-    // MARK: Budget
-
-    func fetchBudget(with id: Budget.ID) async throws -> Budget {
-        return try await storageProvider.fetchBudget(with: id)
-    }
-
     func update(budget: Budget) async throws -> Budget {
         let report = try await storageProvider.fetchReport()
         try report.canUpdate(budget: budget)
-        return try await storageProvider.updateBudget(budget: budget)
+        return try await storageProvider.update(budget: budget)
     }
 }

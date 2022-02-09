@@ -24,7 +24,7 @@ final class BudgetController: ObservableObject {
         let budgetId = budget.id
         Task { [weak self] in
             do {
-                guard let budget = try await self?.repository.fetchBudget(with: budgetId) else {
+                guard let budget = try await self?.repository.fetch(budgetWith: budgetId) else {
                     throw DomainError.budget(error: .cannotFetchTheBudget(id: budgetId))
                 }
                 DispatchQueue.main.async { [weak self] in

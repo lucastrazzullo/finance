@@ -31,6 +31,41 @@ final class CoreDataStorageProvider: ObservableObject, StorageProvider {
         return report
     }
 
+    // MARK: Budget
+
+    func fetch(budgetWith identifier: Budget.ID) async throws -> Budget {
+        let budgetEntity = try fetchBudgetEntity(with: identifier)
+
+        do {
+            return try Budget.with(budgetEntity: budgetEntity)
+        } catch let error as DomainError {
+            throw error
+        } catch {
+            throw DomainError.storageProvider(error: .underlying(error: error))
+        }
+    }
+
+    func delete(budgetWith identifier: Budget.ID) async throws -> Report {
+        if let budgetEntity = try? fetchBudgetEntity(with: identifier) {
+            persistentContainer.viewContext.delete(budgetEntity)
+        }
+
+        try saveOrRollback()
+        return try await fetchReport()
+    }
+
+    func delete(budgetsWith identifiers: Set<Budget.ID>) async throws -> Report {
+        let budgetsEntities = try fetchBudgetEntities()
+        budgetsEntities.forEach { budgetEntity in
+            if let identifier = budgetEntity.identifier, identifiers.contains(identifier) {
+                self.persistentContainer.viewContext.delete(budgetEntity)
+            }
+        }
+
+        try saveOrRollback()
+        return try await fetchReport()
+    }
+
     func add(budget: Budget) async throws -> Report {
         let budgetEntity = BudgetEntity(context: persistentContainer.viewContext)
         budgetEntity.identifier = budget.id
@@ -48,42 +83,7 @@ final class CoreDataStorageProvider: ObservableObject, StorageProvider {
         return try await fetchReport()
     }
 
-    func delete(budget: Budget) async throws -> Report {
-        let budgetEntity = try fetchBudgetEntity(with: budget.id)
-        persistentContainer.viewContext.delete(budgetEntity)
-
-        try saveOrRollback()
-        return try await fetchReport()
-    }
-
-    func delete(budgets: [Budget]) async throws -> Report {
-        let budgetsEntities = try fetchBudgetEntities()
-        let idsToRemove = Set(budgets.map(\.id))
-        budgetsEntities.forEach { budgetEntity in
-            if let identifier = budgetEntity.identifier, idsToRemove.contains(identifier) {
-                self.persistentContainer.viewContext.delete(budgetEntity)
-            }
-        }
-
-        try saveOrRollback()
-        return try await fetchReport()
-    }
-
-    // MARK: Budget
-
-    func fetchBudget(with identifier: Budget.ID) async throws -> Budget {
-        let budgetEntity = try fetchBudgetEntity(with: identifier)
-
-        do {
-            return try Budget.with(budgetEntity: budgetEntity)
-        } catch let error as DomainError {
-            throw error
-        } catch {
-            throw DomainError.budgetProvider(error: .underlying(error: error))
-        }
-    }
-
-    func updateBudget(budget: Budget) async throws -> Budget {
+    func update(budget: Budget) async throws -> Budget {
         let budgetEntity = try fetchBudgetEntity(with: budget.id)
         budgetEntity.name = budget.name
 
@@ -104,7 +104,7 @@ final class CoreDataStorageProvider: ObservableObject, StorageProvider {
         }
 
         try saveOrRollback()
-        return try await fetchBudget(with: budget.id)
+        return try await fetch(budgetWith: budget.id)
     }
 
     // MARK: Private fetching methods
@@ -116,7 +116,7 @@ final class CoreDataStorageProvider: ObservableObject, StorageProvider {
             let entities = try persistentContainer.viewContext.fetch(fetchBudgetsRequest)
             return entities
         } catch {
-            throw DomainError.budgetProvider(error: .underlying(error: error))
+            throw DomainError.storageProvider(error: .underlying(error: error))
         }
     }
 
@@ -127,11 +127,11 @@ final class CoreDataStorageProvider: ObservableObject, StorageProvider {
 
         do {
             guard let budgetEntity = try persistentContainer.viewContext.fetch(fetchBudgetsRequest).first else {
-                throw DomainError.budgetProvider(error: .budgetEntityNotFound)
+                throw DomainError.storageProvider(error: .budgetEntityNotFound)
             }
             return budgetEntity
         } catch {
-            throw DomainError.budgetProvider(error: .underlying(error: error))
+            throw DomainError.storageProvider(error: .underlying(error: error))
         }
     }
 
@@ -142,11 +142,11 @@ final class CoreDataStorageProvider: ObservableObject, StorageProvider {
 
         do {
             guard let budgetSliceEntity = try persistentContainer.viewContext.fetch(fetchBudgetSlicesRequest).first else {
-                throw DomainError.budgetProvider(error: .budgetEntityNotFound)
+                throw DomainError.storageProvider(error: .budgetEntityNotFound)
             }
             return budgetSliceEntity
         } catch {
-            throw DomainError.budgetProvider(error: .underlying(error: error))
+            throw DomainError.storageProvider(error: .underlying(error: error))
         }
     }
 
@@ -157,7 +157,7 @@ final class CoreDataStorageProvider: ObservableObject, StorageProvider {
             try persistentContainer.viewContext.save()
         } catch {
             persistentContainer.viewContext.rollback()
-            throw DomainError.budgetProvider(error: .underlying(error: error))
+            throw DomainError.storageProvider(error: .underlying(error: error))
         }
     }
 }
@@ -170,7 +170,7 @@ private extension Budget {
         guard let identifier = budgetEntity.identifier,
               let name = budgetEntity.name,
               let slices = budgetEntity.slices else {
-                  throw DomainError.budgetProvider(error: .cannotCreateBudgetWithEntity)
+                  throw DomainError.storageProvider(error: .cannotCreateBudgetWithEntity)
         }
 
         let budgetSlices = slices

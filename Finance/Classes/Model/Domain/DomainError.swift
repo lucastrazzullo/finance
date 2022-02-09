@@ -16,7 +16,7 @@ enum DomainError: Error, Identifiable {
     case report(error: ReportError)
     case budget(error: BudgetError)
     case budgetSlice(error: BudgetSliceError)
-    case budgetProvider(error: BudgetStorageProviderError)
+    case storageProvider(error: StorageProviderError)
 
     case underlying(error: Error)
 
@@ -32,7 +32,7 @@ enum DomainError: Error, Identifiable {
             return "budget"
         case .budgetSlice:
             return "budgetSlice"
-        case .budgetProvider:
+        case .storageProvider:
             return "budgetProvider"
         case .underlying:
             return "underlying"
@@ -47,7 +47,7 @@ enum DomainError: Error, Identifiable {
             return error.description
         case .budgetSlice(let error):
             return error.description
-        case .budgetProvider(let error):
+        case .storageProvider(let error):
             return error.description
         case .underlying(_):
             return "Something went wrong!"
@@ -140,7 +140,7 @@ enum BudgetSliceError: DomainUnderlyingError {
     }
 }
 
-enum BudgetStorageProviderError: DomainUnderlyingError {
+enum StorageProviderError: DomainUnderlyingError {
     case budgetEntityNotFound
     case cannotCreateBudgetWithEntity
     case underlying(error: Error)

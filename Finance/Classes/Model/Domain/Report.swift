@@ -29,7 +29,7 @@ struct Report: Identifiable {
     }
 
     func budgets(at offsets: IndexSet) -> [Budget] {
-        offsets.compactMap { index -> Budget? in
+        return offsets.compactMap { index -> Budget? in
             guard budgets.indices.contains(index) else {
                 return nil
             }

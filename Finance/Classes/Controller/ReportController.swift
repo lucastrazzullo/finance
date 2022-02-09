@@ -55,14 +55,14 @@ final class ReportController: ObservableObject {
 
     func delete(budgetsAt offsets: IndexSet, completion: @escaping (Result<Void, DomainError>) -> Void) {
         Task { [weak self] in
-            let budgetsToDelete = report.budgets(at: offsets)
-            guard !budgetsToDelete.isEmpty else {
+            let budgetsIdentifiersToDelete = Set(report.budgets(at: offsets).map(\.id))
+            guard !budgetsIdentifiersToDelete.isEmpty else {
                 completion(.failure(.report(error: .budgetDoesntExist)))
                 return
             }
 
             do {
-                guard let report = try await self?.repository.delete(budgets: budgetsToDelete) else {
+                guard let report = try await self?.repository.delete(budgetsWith: budgetsIdentifiersToDelete) else {
                     throw DomainError.report(error: .budgetDoesntExist)
                 }
                 DispatchQueue.main.async { [weak self] in

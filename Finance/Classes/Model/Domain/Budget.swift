@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Budget: Identifiable, AmountHolder {
+struct Budget: Identifiable, Hashable, AmountHolder {
 
     private static let defaultSliceName: String = "Default"
 
