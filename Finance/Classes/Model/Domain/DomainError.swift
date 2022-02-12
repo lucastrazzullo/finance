@@ -8,7 +8,9 @@
 import Foundation
 
 protocol DomainUnderlyingError {
+    var id: String { get }
     var description: String { get }
+    var accessibilityIdentifier: String { get }
 }
 
 enum DomainError: Error, Identifiable {
@@ -17,40 +19,36 @@ enum DomainError: Error, Identifiable {
     case budget(error: BudgetError)
     case budgetSlice(error: BudgetSliceError)
     case storageProvider(error: StorageProviderError)
-
-    case underlying(error: Error)
+    case underlying(error: AnyUnderlyingError)
 
     static func with(error: Error) -> Self {
-        return error as? DomainError ?? .underlying(error: error)
+        return error as? DomainError ?? .underlying(error: .swiftError(error: error))
     }
 
     var id: String {
-        switch self {
-        case .report:
-            return "Report"
-        case .budget:
-            return "budget"
-        case .budgetSlice:
-            return "budgetSlice"
-        case .storageProvider:
-            return "budgetProvider"
-        case .underlying:
-            return "underlying"
-        }
+        underlyingError.id
     }
 
     var description: String {
+        underlyingError.description
+    }
+
+    var accessibilityIdentifier: String {
+        underlyingError.accessibilityIdentifier
+    }
+
+    var underlyingError: DomainUnderlyingError {
         switch self {
         case .report(let error):
-            return error.description
+            return error
         case .budget(let error):
-            return error.description
+            return error
         case .budgetSlice(let error):
-            return error.description
+            return error
         case .storageProvider(let error):
-            return error.description
-        case .underlying(_):
-            return "Something went wrong!"
+            return error
+        case .underlying(let error):
+            return error
         }
     }
 
@@ -66,6 +64,10 @@ enum ReportError: DomainUnderlyingError {
     case budgetDoesntExist
     case cannotFetchTheBudgets
 
+    var id: String {
+        return "Report"
+    }
+
     var description: String {
         switch self {
         case .nameNotValid:
@@ -76,6 +78,17 @@ enum ReportError: DomainUnderlyingError {
             return "The budget you are looking for doesn't exist"
         case .cannotFetchTheBudgets:
             return "Budgets cannot be fetched right now"
+        }
+    }
+
+    var accessibilityIdentifier: String {
+        switch self {
+        case .nameNotValid:
+            return AccessibilityIdentifier.Error.invalidNameError
+        case .budgetAlreadyExistsWith:
+            return AccessibilityIdentifier.Error.sameNameError
+        default:
+            return AccessibilityIdentifier.Error.someError
         }
     }
 }
@@ -93,6 +106,10 @@ enum BudgetError: DomainUnderlyingError {
     case cannotFetchTheBudget(id: Budget.ID)
     case cannotUpdateTheBudget(underlyingError: Error?)
     case cannotCreateTheBudget(underlyingError: Error?)
+
+    var id: String {
+        return "Budget"
+    }
 
     var description: String {
         switch self {
@@ -120,6 +137,21 @@ enum BudgetError: DomainUnderlyingError {
             return "This budget cannot be created!"
         }
     }
+
+    var accessibilityIdentifier: String {
+        switch self {
+        case .nameNotValid:
+            return AccessibilityIdentifier.Error.invalidNameError
+        case .amountNotValid:
+            return AccessibilityIdentifier.Error.invalidAmountError
+        case .multipleSlicesWithSameName:
+            return AccessibilityIdentifier.Error.sameNameError
+        case .sliceAlreadyExistsWith:
+            return AccessibilityIdentifier.Error.sameNameError
+        default:
+            return AccessibilityIdentifier.Error.someError
+        }
+    }
 }
 
 enum BudgetSliceError: DomainUnderlyingError {
@@ -127,6 +159,10 @@ enum BudgetSliceError: DomainUnderlyingError {
     case nameNotValid
     case amountNotValid
     case cannotCreateTheSlice(underlyingError: Error?)
+
+    var id: String {
+        return "Budget slice"
+    }
 
     var description: String {
         switch self {
@@ -138,12 +174,27 @@ enum BudgetSliceError: DomainUnderlyingError {
             return "This slice cannot be created!"
         }
     }
+
+    var accessibilityIdentifier: String {
+        switch self {
+        case .nameNotValid:
+            return AccessibilityIdentifier.Error.invalidNameError
+        case .amountNotValid:
+            return AccessibilityIdentifier.Error.invalidAmountError
+        default:
+            return AccessibilityIdentifier.Error.someError
+        }
+    }
 }
 
 enum StorageProviderError: DomainUnderlyingError {
     case budgetEntityNotFound
     case cannotCreateBudgetWithEntity
     case underlying(error: Error)
+
+    var id: String {
+        return "Storage provider"
+    }
 
     var description: String {
         switch self {
@@ -154,5 +205,28 @@ enum StorageProviderError: DomainUnderlyingError {
         case .underlying(_):
             return "Something went wrong!"
         }
+    }
+
+    var accessibilityIdentifier: String {
+        switch self {
+        default:
+            return AccessibilityIdentifier.Error.someError
+        }
+    }
+}
+
+enum AnyUnderlyingError: DomainUnderlyingError {
+    case swiftError(error: Error)
+
+    var id: String {
+        return "Any underlying error"
+    }
+
+    var description: String {
+        return "Something went wrong!"
+    }
+
+    var accessibilityIdentifier: String {
+        return AccessibilityIdentifier.Error.someError
     }
 }

@@ -48,7 +48,7 @@ final class BudgetController: ObservableObject {
                     completion(.success(()))
                 }
             } catch {
-                completion(.failure(error as? DomainError ?? .underlying(error: error)))
+                completion(.failure(error as? DomainError ?? .underlying(error: .swiftError(error: error))))
             }
         }
     }

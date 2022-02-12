@@ -7,9 +7,9 @@
 
 import SwiftUI
 
-struct DashboardView: View {
+struct DashboardView<StorageProviderType: StorageProvider & ObservableObject>: View {
 
-    @StateObject private var storageProvider = CoreDataStorageProvider()
+    @StateObject var storageProvider: StorageProviderType
 
     private let totalStatements: MoneyValue = .value(10000)
     private let totalTransactions: MoneyValue = .value(10000)
@@ -32,6 +32,7 @@ struct DashboardView: View {
                     NavigationLink(destination: ReportView(storageProvider: storageProvider)) {
                         Text("Budgets")
                     }
+                    .accessibilityIdentifier(AccessibilityIdentifier.DashboardView.budgetsLink)
 
                     NavigationLink(destination: CategorisedTransactionsView(repository: Repository(storageProvider: storageProvider)).navigationTitle("Transactions 2022")) {
                         Text("Transactions")
@@ -45,6 +46,6 @@ struct DashboardView: View {
 
 struct DashboardView_Previews: PreviewProvider {
     static var previews: some View {
-        DashboardView()
+        DashboardView(storageProvider: MockStorageProvider())
     }
 }

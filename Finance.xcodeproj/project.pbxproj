@@ -12,6 +12,17 @@
 		81542BD82795812100A05B77 /* TransactionListItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81542BD72795812100A05B77 /* TransactionListItem.swift */; };
 		817033E227B1B7BB001686FA /* Report.swift in Sources */ = {isa = PBXBuildFile; fileRef = 817033E127B1B7BB001686FA /* Report.swift */; };
 		817033EC27B25F9F001686FA /* RepositoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 817033EB27B25F9F001686FA /* RepositoryTests.swift */; };
+		817033F927B3D218001686FA /* AddBudgetUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 817033F827B3D218001686FA /* AddBudgetUITests.swift */; };
+		8170340227B59945001686FA /* AccessibilityIdentifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8170340127B59945001686FA /* AccessibilityIdentifier.swift */; };
+		8170340527B7E0E6001686FA /* FinanceElements.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8170340427B7E0E6001686FA /* FinanceElements.swift */; };
+		8170340727B7E1DF001686FA /* XCUIElement+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8170340627B7E1DF001686FA /* XCUIElement+Extensions.swift */; };
+		8170340927B7E2F6001686FA /* UIFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8170340827B7E2F6001686FA /* UIFlow.swift */; };
+		8170340D27B7E692001686FA /* DashboardElements.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8170340C27B7E691001686FA /* DashboardElements.swift */; };
+		8170340F27B7E6A5001686FA /* ReportElements.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8170340E27B7E6A5001686FA /* ReportElements.swift */; };
+		8170341127B7E6BD001686FA /* NewBudgetElements.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8170341027B7E6BD001686FA /* NewBudgetElements.swift */; };
+		8170341327B7E6E4001686FA /* AddBudgetFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8170341227B7E6E4001686FA /* AddBudgetFlow.swift */; };
+		8170341427B7F5CA001686FA /* AccessibilityIdentifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8170340127B59945001686FA /* AccessibilityIdentifier.swift */; };
+		8170341627B7FB07001686FA /* CommonElements.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8170341527B7FB07001686FA /* CommonElements.swift */; };
 		81735ACC279A2B8D007C9AA3 /* Array+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81735ACB279A2B8D007C9AA3 /* Array+Extensions.swift */; };
 		81735ACF279B2179007C9AA3 /* Months.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81735ACE279B2179007C9AA3 /* Months.swift */; };
 		81735AD1279B3BEC007C9AA3 /* TransferHolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81735AD0279B3BEC007C9AA3 /* TransferHolder.swift */; };
@@ -56,6 +67,13 @@
 			remoteGlobalIDString = 81947EA627327FCF001C2AC9;
 			remoteInfo = Finance;
 		};
+		817033FC27B3D218001686FA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 81947E9F27327FCE001C2AC9 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 81947EA627327FCF001C2AC9;
+			remoteInfo = Finance;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
@@ -65,6 +83,17 @@
 		817033E127B1B7BB001686FA /* Report.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Report.swift; sourceTree = "<group>"; };
 		817033E927B25F9F001686FA /* FinanceTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FinanceTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		817033EB27B25F9F001686FA /* RepositoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepositoryTests.swift; sourceTree = "<group>"; };
+		817033F627B3D218001686FA /* FinanceUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FinanceUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		817033F827B3D218001686FA /* AddBudgetUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddBudgetUITests.swift; sourceTree = "<group>"; };
+		8170340127B59945001686FA /* AccessibilityIdentifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessibilityIdentifier.swift; sourceTree = "<group>"; };
+		8170340427B7E0E6001686FA /* FinanceElements.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceElements.swift; sourceTree = "<group>"; };
+		8170340627B7E1DF001686FA /* XCUIElement+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "XCUIElement+Extensions.swift"; sourceTree = "<group>"; };
+		8170340827B7E2F6001686FA /* UIFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIFlow.swift; sourceTree = "<group>"; };
+		8170340C27B7E691001686FA /* DashboardElements.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardElements.swift; sourceTree = "<group>"; };
+		8170340E27B7E6A5001686FA /* ReportElements.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportElements.swift; sourceTree = "<group>"; };
+		8170341027B7E6BD001686FA /* NewBudgetElements.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewBudgetElements.swift; sourceTree = "<group>"; };
+		8170341227B7E6E4001686FA /* AddBudgetFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddBudgetFlow.swift; sourceTree = "<group>"; };
+		8170341527B7FB07001686FA /* CommonElements.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonElements.swift; sourceTree = "<group>"; };
 		81735ACB279A2B8D007C9AA3 /* Array+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+Extensions.swift"; sourceTree = "<group>"; };
 		81735ACE279B2179007C9AA3 /* Months.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Months.swift; sourceTree = "<group>"; };
 		81735AD0279B3BEC007C9AA3 /* TransferHolder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferHolder.swift; sourceTree = "<group>"; };
@@ -113,6 +142,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		817033F327B3D218001686FA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		81947EA427327FCF001C2AC9 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -138,6 +174,7 @@
 		811F7BCF278C250E00F1B8C9 /* Domain */ = {
 			isa = PBXGroup;
 			children = (
+				8170340127B59945001686FA /* AccessibilityIdentifier.swift */,
 				81B284EF27A02FB800EE51EB /* DomainError.swift */,
 				817033E127B1B7BB001686FA /* Report.swift */,
 				81CB8BEF2746B92400A64785 /* Budget.swift */,
@@ -210,6 +247,38 @@
 			path = FinanceTests;
 			sourceTree = "<group>";
 		};
+		817033F727B3D218001686FA /* FinanceUITests */ = {
+			isa = PBXGroup;
+			children = (
+				8170340B27B7E686001686FA /* Elements */,
+				8170340A27B7E680001686FA /* Flows */,
+				817033F827B3D218001686FA /* AddBudgetUITests.swift */,
+			);
+			path = FinanceUITests;
+			sourceTree = "<group>";
+		};
+		8170340A27B7E680001686FA /* Flows */ = {
+			isa = PBXGroup;
+			children = (
+				8170340827B7E2F6001686FA /* UIFlow.swift */,
+				8170341227B7E6E4001686FA /* AddBudgetFlow.swift */,
+			);
+			path = Flows;
+			sourceTree = "<group>";
+		};
+		8170340B27B7E686001686FA /* Elements */ = {
+			isa = PBXGroup;
+			children = (
+				8170340627B7E1DF001686FA /* XCUIElement+Extensions.swift */,
+				8170340427B7E0E6001686FA /* FinanceElements.swift */,
+				8170341527B7FB07001686FA /* CommonElements.swift */,
+				8170340C27B7E691001686FA /* DashboardElements.swift */,
+				8170340E27B7E6A5001686FA /* ReportElements.swift */,
+				8170341027B7E6BD001686FA /* NewBudgetElements.swift */,
+			);
+			path = Elements;
+			sourceTree = "<group>";
+		};
 		81735ACD279A2DE3007C9AA3 /* Repository */ = {
 			isa = PBXGroup;
 			children = (
@@ -225,6 +294,7 @@
 			children = (
 				81947EA927327FCF001C2AC9 /* Finance */,
 				817033EA27B25F9F001686FA /* FinanceTests */,
+				817033F727B3D218001686FA /* FinanceUITests */,
 				81947EA827327FCF001C2AC9 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -234,6 +304,7 @@
 			children = (
 				81947EA727327FCF001C2AC9 /* Finance.app */,
 				817033E927B25F9F001686FA /* FinanceTests.xctest */,
+				817033F627B3D218001686FA /* FinanceUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -327,6 +398,24 @@
 			productReference = 817033E927B25F9F001686FA /* FinanceTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		817033F527B3D218001686FA /* FinanceUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 817033FE27B3D218001686FA /* Build configuration list for PBXNativeTarget "FinanceUITests" */;
+			buildPhases = (
+				817033F227B3D218001686FA /* Sources */,
+				817033F327B3D218001686FA /* Frameworks */,
+				817033F427B3D218001686FA /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				817033FD27B3D218001686FA /* PBXTargetDependency */,
+			);
+			name = FinanceUITests;
+			productName = FinanceUITests;
+			productReference = 817033F627B3D218001686FA /* FinanceUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 		81947EA627327FCF001C2AC9 /* Finance */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 81947EB527327FD1001C2AC9 /* Build configuration list for PBXNativeTarget "Finance" */;
@@ -358,6 +447,10 @@
 						CreatedOnToolsVersion = 13.2.1;
 						TestTargetID = 81947EA627327FCF001C2AC9;
 					};
+					817033F527B3D218001686FA = {
+						CreatedOnToolsVersion = 13.2.1;
+						TestTargetID = 81947EA627327FCF001C2AC9;
+					};
 					81947EA627327FCF001C2AC9 = {
 						CreatedOnToolsVersion = 13.1;
 					};
@@ -378,12 +471,20 @@
 			targets = (
 				81947EA627327FCF001C2AC9 /* Finance */,
 				817033E827B25F9F001686FA /* FinanceTests */,
+				817033F527B3D218001686FA /* FinanceUITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		817033E727B25F9F001686FA /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		817033F427B3D218001686FA /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -410,6 +511,23 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		817033F227B3D218001686FA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8170340527B7E0E6001686FA /* FinanceElements.swift in Sources */,
+				8170340727B7E1DF001686FA /* XCUIElement+Extensions.swift in Sources */,
+				8170340F27B7E6A5001686FA /* ReportElements.swift in Sources */,
+				817033F927B3D218001686FA /* AddBudgetUITests.swift in Sources */,
+				8170341427B7F5CA001686FA /* AccessibilityIdentifier.swift in Sources */,
+				8170341127B7E6BD001686FA /* NewBudgetElements.swift in Sources */,
+				8170341327B7E6E4001686FA /* AddBudgetFlow.swift in Sources */,
+				8170341627B7FB07001686FA /* CommonElements.swift in Sources */,
+				8170340927B7E2F6001686FA /* UIFlow.swift in Sources */,
+				8170340D27B7E692001686FA /* DashboardElements.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		81947EA327327FCF001C2AC9 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -433,6 +551,7 @@
 				81CB8BFA2746D40300A64785 /* Transaction.swift in Sources */,
 				81CB8BFE2746DA8F00A64785 /* AmountHolder.swift in Sources */,
 				81CB8BF42746BC4A00A64785 /* MoneyValue.swift in Sources */,
+				8170340227B59945001686FA /* AccessibilityIdentifier.swift in Sources */,
 				819993D52752F80C00FA3E03 /* Locale+Defaults.swift in Sources */,
 				819993DC2757692300FA3E03 /* AmountCollectionItem.swift in Sources */,
 				817033E227B1B7BB001686FA /* Report.swift in Sources */,
@@ -460,6 +579,11 @@
 			isa = PBXTargetDependency;
 			target = 81947EA627327FCF001C2AC9 /* Finance */;
 			targetProxy = 817033ED27B25F9F001686FA /* PBXContainerItemProxy */;
+		};
+		817033FD27B3D218001686FA /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 81947EA627327FCF001C2AC9 /* Finance */;
+			targetProxy = 817033FC27B3D218001686FA /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -497,6 +621,42 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Finance.app/Finance";
+			};
+			name = Release;
+		};
+		817033FF27B3D218001686FA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = UC9U5RZ8UF;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lucastrazzullo.FinanceUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Finance;
+			};
+			name = Debug;
+		};
+		8170340027B3D218001686FA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = UC9U5RZ8UF;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lucastrazzullo.FinanceUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Finance;
 			};
 			name = Release;
 		};
@@ -682,6 +842,15 @@
 			buildConfigurations = (
 				817033F027B25F9F001686FA /* Debug */,
 				817033F127B25F9F001686FA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		817033FE27B3D218001686FA /* Build configuration list for PBXNativeTarget "FinanceUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				817033FF27B3D218001686FA /* Debug */,
+				8170340027B3D218001686FA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

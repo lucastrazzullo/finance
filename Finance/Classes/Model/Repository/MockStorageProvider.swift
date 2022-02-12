@@ -60,7 +60,7 @@ enum Mocks {
     }()
 }
 
-final class MockStorageProvider: StorageProvider {
+final class MockStorageProvider: StorageProvider, ObservableObject {
 
     private enum Error: Swift.Error {
         case mock

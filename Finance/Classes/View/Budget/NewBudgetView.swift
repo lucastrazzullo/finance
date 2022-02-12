@@ -25,9 +25,11 @@ struct NewBudgetView: View {
             Section(header: Text("New budget")) {
 
                 TextField("Name", text: $budgetName)
+                    .accessibilityIdentifier(AccessibilityIdentifier.NewBudgetView.nameInputField)
 
                 if budgetSlices.isEmpty {
                     InsertAmountField(amountValue: $budgetAmount, title: "Monthly Amount", prompt: nil)
+                        .accessibilityIdentifier(AccessibilityIdentifier.NewBudgetView.amountInputField)
                 } else {
                     AmountCollectionItem(title: "Monthly total",
                                          caption: "\(Budget.yearlyAmount(for: budgetSlices.totalAmount).localizedDescription) per year",
@@ -66,23 +68,8 @@ struct NewBudgetView: View {
                     InlineErrorView(error: error)
                 }
 
-                Button("Save") {
-                    do {
-                        if !budgetSlices.isEmpty {
-                            let budget = try Budget(id: .init(), name: budgetName, slices: budgetSlices)
-                            onSubmit(budget) { error in
-                                presentedError = error
-                            }
-                        } else {
-                            let budget = try Budget(id: .init(), name: budgetName, amount: budgetAmount)
-                            onSubmit(budget) { error in
-                                presentedError = error
-                            }
-                        }
-                    } catch {
-                        presentedError = error as? DomainError ?? .budget(error: .cannotCreateTheBudget(underlyingError: error))
-                    }
-                }
+                Button("Save", action: save)
+                    .accessibilityIdentifier(AccessibilityIdentifier.NewBudgetView.saveButton)
             }
         }
         .sheet(isPresented: $isInsertNewBudgetSlicePresented) {
@@ -95,6 +82,26 @@ struct NewBudgetView: View {
                     onErrorHandler(error as? DomainError ?? .budget(error: .cannotAddSlice(underlyingError: error)))
                 }
             }
+        }
+    }
+
+    // MARK: Private helper methods
+
+    private func save() {
+        do {
+            if !budgetSlices.isEmpty {
+                let budget = try Budget(id: .init(), name: budgetName, slices: budgetSlices)
+                onSubmit(budget) { error in
+                    presentedError = error
+                }
+            } else {
+                let budget = try Budget(id: .init(), name: budgetName, amount: budgetAmount)
+                onSubmit(budget) { error in
+                    presentedError = error
+                }
+            }
+        } catch {
+            presentedError = error as? DomainError ?? .budget(error: .cannotCreateTheBudget(underlyingError: error))
         }
     }
 }

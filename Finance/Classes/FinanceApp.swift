@@ -12,7 +12,11 @@ struct FinanceApp: App {
 
     var body: some Scene {
         WindowGroup {
-            DashboardView()
+            if CommandLine.arguments.contains("testing") {
+                DashboardView(storageProvider: MockStorageProvider(budgets: []))
+            } else {
+                DashboardView(storageProvider: CoreDataStorageProvider())
+            }
         }
     }
 }

@@ -20,6 +20,7 @@ struct ReportView: View {
                 NavigationLink(destination: BudgetView(budget: budget, storageProvider: controller.storageProvider)) {
                     AmountListItem(label: budget.name, amount: budget.amount)
                 }
+                .accessibilityIdentifier(AccessibilityIdentifier.ReportView.budgetLink)
             }
             .onDelete { offsets in
                 controller.delete(budgetsAt: offsets) { result in
@@ -37,6 +38,7 @@ struct ReportView: View {
 
             Button(action: { isAddNewBudgetPresented = true }) {
                 Label("Add", systemImage: "plus")
+                    .accessibilityIdentifier(AccessibilityIdentifier.ReportView.addBudgetButton)
             }
         }
         .sheet(isPresented: $isAddNewBudgetPresented) {
