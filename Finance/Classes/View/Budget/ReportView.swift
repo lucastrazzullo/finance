@@ -16,29 +16,31 @@ struct ReportView: View {
 
     var body: some View {
         List {
-            ForEach(controller.report.budgets) { budget in
-                NavigationLink(destination: BudgetView(budget: budget, storageProvider: controller.storageProvider)) {
-                    AmountListItem(label: budget.name, amount: budget.amount)
+            Section(header: Text("Budgets")) {
+                ForEach(controller.report.budgets) { budget in
+                    NavigationLink(destination: BudgetView(budget: budget, storageProvider: controller.storageProvider)) {
+                        AmountListItem(label: budget.name, amount: budget.amount)
+                    }
+                    .accessibilityIdentifier(AccessibilityIdentifier.ReportView.budgetLink)
                 }
-                .accessibilityIdentifier(AccessibilityIdentifier.ReportView.budgetLink)
-            }
-            .onDelete { offsets in
-                controller.delete(budgetsAt: offsets) { result in
-                    if case let .failure(error) = result {
-                        updateBudgetsError = error
-                    } else {
-                        updateBudgetsError = nil
+                .onDelete { offsets in
+                    controller.delete(budgetsAt: offsets) { result in
+                        if case let .failure(error) = result {
+                            updateBudgetsError = error
+                        } else {
+                            updateBudgetsError = nil
+                        }
                     }
                 }
-            }
 
-            if let error = updateBudgetsError {
-                InlineErrorView(error: error)
-            }
+                if let error = updateBudgetsError {
+                    InlineErrorView(error: error)
+                }
 
-            Button(action: { isAddNewBudgetPresented = true }) {
-                Label("Add", systemImage: "plus")
-                    .accessibilityIdentifier(AccessibilityIdentifier.ReportView.addBudgetButton)
+                Button(action: { isAddNewBudgetPresented = true }) {
+                    Label("Add", systemImage: "plus")
+                        .accessibilityIdentifier(AccessibilityIdentifier.ReportView.addBudgetButton)
+                }
             }
         }
         .sheet(isPresented: $isAddNewBudgetPresented) {

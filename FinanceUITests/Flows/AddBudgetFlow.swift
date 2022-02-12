@@ -11,23 +11,16 @@ final class AddBudgetFlow: UIFlow {
 
     var commonElements: CommonElements
 
-    private let dashboardElements: DashboardElements
     private let reportElements: ReportElements
     private let newBudgetElements: NewBudgetElements
 
     init(app: XCUIApplication) {
         commonElements = CommonElements(app: app)
-        dashboardElements = DashboardElements(app: app)
         reportElements = ReportElements(app: app)
         newBudgetElements = NewBudgetElements(app: app)
     }
 
     // MARK: Internal methods
-
-    func start() -> Self {
-        dashboardElements.budgetsLink.waitForEsistanceAndTap()
-        return self
-    }
 
     func addBudget(withName: Bool = true, withAmount: Bool = true) -> Self {
         var flow = tapAddNewBudget()

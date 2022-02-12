@@ -26,38 +26,6 @@ enum Mocks {
             try! BudgetSlice(id: .init(), name: "Furnitures", amount: .value(120.23))
         ]
     }()
-
-    // MARK: - Transactions
-
-    static let incomingTransactions: [Transaction] = {
-        budgets
-            .map { budget in
-                budget.slices.map { slice in
-                    [
-                        Transaction(transfer: .income(amount: .value(100.02)), budgetId: budget.id, budgetSliceId: slice.id),
-                        Transaction(transfer: .income(amount: .value(200.02)), budgetId: budget.id, budgetSliceId: slice.id),
-                        Transaction(transfer: .income(amount: .value(300.02)), budgetId: budget.id, budgetSliceId: slice.id)
-                    ]
-                }
-                .flatMap({$0})
-            }
-            .flatMap({$0})
-    }()
-
-    static let outgoingTransactions: [Transaction] = {
-        budgets
-            .map { budget in
-                budget.slices.map { slice in
-                    [
-                        Transaction(transfer: .expense(amount: .value(100.02)), budgetId: budget.id, budgetSliceId: slice.id),
-                        Transaction(transfer: .expense(amount: .value(200.02)), budgetId: budget.id, budgetSliceId: slice.id),
-                        Transaction(transfer: .expense(amount: .value(300.02)), budgetId: budget.id, budgetSliceId: slice.id)
-                    ]
-                }
-                .flatMap({$0})
-            }
-            .flatMap({$0})
-    }()
 }
 
 final class MockStorageProvider: StorageProvider, ObservableObject {

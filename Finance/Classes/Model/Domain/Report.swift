@@ -16,7 +16,7 @@ struct Report: Identifiable {
     // MARK: Object life cycle
 
     init(budgets: [Budget]) {
-        try! self.init(id: .init(), name: "Budgets", budgets: budgets)
+        try! self.init(id: .init(), name: "Amsterdam 2022", budgets: budgets)
     }
 
     init(id: ID, name: String, budgets: [Budget]) throws {

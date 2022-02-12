@@ -32,7 +32,6 @@ final class AddBudgetUITests: XCTestCase {
 
     func testAddBudget() {
         flow = AddBudgetFlow(app: app)
-            .start()
             .assertBudgetLinkDoesntExists()
             .addBudget()
             .assertBudgetLinkExists()
@@ -40,7 +39,6 @@ final class AddBudgetUITests: XCTestCase {
 
     func testAddBudget_withSameName() {
         flow = AddBudgetFlow(app: app)
-            .start()
             .assertBudgetLinkDoesntExists()
             .addBudget()
             .addBudget()
@@ -49,7 +47,6 @@ final class AddBudgetUITests: XCTestCase {
 
     func testAddBudget_withoutName() {
         flow = AddBudgetFlow(app: app)
-            .start()
             .assertBudgetLinkDoesntExists()
             .addBudget(withName: false)
             .assertInvalidNameErrorExists()
@@ -57,7 +54,6 @@ final class AddBudgetUITests: XCTestCase {
 
     func testAddBudget_withoutAmount() {
         flow = AddBudgetFlow(app: app)
-            .start()
             .assertBudgetLinkDoesntExists()
             .addBudget(withAmount: false)
             .assertInvalidAmountErrorExists()

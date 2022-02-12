@@ -17,10 +17,6 @@ enum AccessibilityIdentifier {
         static let invalidAmountError = "InvalidAmountError"
     }
 
-    enum DashboardView {
-        static let budgetsLink = "BudgetsLink"
-    }
-
     enum ReportView {
         static let addBudgetButton = "AddBudgetButton"
         static let budgetLink = "BudgetLink"
