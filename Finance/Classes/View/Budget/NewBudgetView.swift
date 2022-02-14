@@ -61,6 +61,7 @@ struct NewBudgetView: View {
                 Button(action: { isInsertNewBudgetSlicePresented = true }) {
                     Label("Add", systemImage: "plus")
                 }
+                .accessibilityIdentifier(AccessibilityIdentifier.NewBudgetView.addSliceButton)
             }
 
             Section {

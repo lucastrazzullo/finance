@@ -25,6 +25,13 @@ enum AccessibilityIdentifier {
     enum NewBudgetView {
         static let nameInputField = "BudgetNameInputField"
         static let amountInputField = "BudgetAmountInputField"
+        static let addSliceButton = "AddSliceButton"
         static let saveButton = "SaveBudgetButton"
+    }
+
+    enum NewSliceView {
+        static let nameInputField = "SliceNameInputField"
+        static let amountInputField = "SliceAmountInputField"
+        static let saveButton = "SaveSliceButton"
     }
 }

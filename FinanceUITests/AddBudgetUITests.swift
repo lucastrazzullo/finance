@@ -28,34 +28,70 @@ final class AddBudgetUITests: XCTestCase {
         app = nil
     }
 
-    // MARK: Happy flows
+    // MARK: - Happy cases
 
-    func testAddBudget() {
+    func testAddBudgetWithAmount() {
         flow = AddBudgetFlow(app: app)
             .assertBudgetLinkDoesntExists()
-            .addBudget()
+
+            .tapAddNewBudget()
+            .insertNewBudgetName()
+            .insertNewBudgetAmount()
+            .tapSave()
+
             .assertBudgetLinkExists()
     }
+
+    func testAddBudgetWithSlices() {
+        flow = AddBudgetFlow(app: app)
+            .assertBudgetLinkDoesntExists()
+
+            .tapAddNewBudget()
+            .insertNewBudgetName()
+            .insertNewBudgetSlice()
+            .tapSave()
+
+            .assertBudgetLinkExists()
+    }
+
+    // MARK: - Unhappy cases
 
     func testAddBudget_withSameName() {
         flow = AddBudgetFlow(app: app)
             .assertBudgetLinkDoesntExists()
-            .addBudget()
-            .addBudget()
+
+            .tapAddNewBudget()
+            .insertNewBudgetName()
+            .insertNewBudgetAmount()
+            .tapSave()
+
+            .tapAddNewBudget()
+            .insertNewBudgetName()
+            .insertNewBudgetAmount()
+            .tapSave()
+
             .assertSameNameErrorExists()
     }
 
     func testAddBudget_withoutName() {
         flow = AddBudgetFlow(app: app)
             .assertBudgetLinkDoesntExists()
-            .addBudget(withName: false)
+
+            .tapAddNewBudget()
+            .insertNewBudgetAmount()
+            .tapSave()
+
             .assertInvalidNameErrorExists()
     }
 
     func testAddBudget_withoutAmount() {
         flow = AddBudgetFlow(app: app)
             .assertBudgetLinkDoesntExists()
-            .addBudget(withAmount: false)
+
+            .tapAddNewBudget()
+            .insertNewBudgetName()
+            .tapSave()
+
             .assertInvalidAmountErrorExists()
     }
 }

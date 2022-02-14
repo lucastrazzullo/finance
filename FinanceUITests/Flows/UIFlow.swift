@@ -8,6 +8,7 @@
 import XCTest
 
 protocol UIFlow {
+    var app: XCUIApplication { get }
     var commonElements: CommonElements { get }
 }
 

@@ -23,10 +23,12 @@ struct NewBudgetSliceView: View {
 
                 VStack(alignment: .leading) {
                     TextField("Name", text: $newBudgetSliceName)
+                        .accessibilityIdentifier(AccessibilityIdentifier.NewSliceView.nameInputField)
                 }
 
                 VStack(alignment: .leading) {
                     InsertAmountField(amountValue: $newBudgetSliceAmount, title: "Monthly Amount", prompt: nil)
+                        .accessibilityIdentifier(AccessibilityIdentifier.NewSliceView.amountInputField)
                 }
             }
 
@@ -45,6 +47,7 @@ struct NewBudgetSliceView: View {
                         newBudgetSlicePresentedError = error as? DomainError ?? .budgetSlice(error: .cannotCreateTheSlice(underlyingError: error))
                     }
                 }
+                .accessibilityIdentifier(AccessibilityIdentifier.NewSliceView.saveButton)
             }
         }
     }

@@ -9,32 +9,20 @@ import XCTest
 
 final class AddBudgetFlow: UIFlow {
 
-    var commonElements: CommonElements
+    let app: XCUIApplication
+    let commonElements: CommonElements
 
     private let reportElements: ReportElements
     private let newBudgetElements: NewBudgetElements
 
     init(app: XCUIApplication) {
-        commonElements = CommonElements(app: app)
-        reportElements = ReportElements(app: app)
-        newBudgetElements = NewBudgetElements(app: app)
+        self.app = app
+        self.commonElements = CommonElements(app: app)
+        self.reportElements = ReportElements(app: app)
+        self.newBudgetElements = NewBudgetElements(app: app)
     }
 
-    // MARK: Internal methods
-
-    func addBudget(withName: Bool = true, withAmount: Bool = true) -> Self {
-        var flow = tapAddNewBudget()
-
-        if withName {
-            flow = flow.insertNewBudgetName()
-        }
-
-        if withAmount {
-            flow = flow.insertNewBudgetAmount()
-        }
-
-        return flow.tapSave()
-    }
+    // MARK: Asserts
 
     func assertBudgetLinkDoesntExists() -> Self {
         reportElements.budgetLink.assertDoesntExists()
@@ -46,26 +34,36 @@ final class AddBudgetFlow: UIFlow {
         return self
     }
 
-    // MARK: Private methods
+    // MARK: Actions
 
-    private func tapAddNewBudget() -> Self {
+    func tapAddNewBudget() -> Self {
         reportElements.addBudgetButton.waitForEsistanceAndTap()
         return self
     }
 
-    private func insertNewBudgetName() -> Self {
+    func insertNewBudgetName() -> Self {
         newBudgetElements.nameTextField.waitForEsistanceAndTap()
         newBudgetElements.nameTextField.typeText("Test")
         return self
     }
 
-    private func insertNewBudgetAmount() -> Self {
+    func insertNewBudgetAmount() -> Self {
         newBudgetElements.amountTextField.waitForEsistanceAndTap()
         newBudgetElements.amountTextField.typeText("100")
         return self
     }
 
-    private func tapSave() -> Self {
+    func insertNewBudgetSlice() -> Self {
+        _ = AddSliceFlow(app: app)
+            .tapAddNewSlice()
+            .insertNewSliceName()
+            .insertNewSliceAmount()
+            .tapSave()
+
+        return self
+    }
+
+    func tapSave() -> Self {
         newBudgetElements.saveButton.waitForEsistanceAndTap()
         return self
     }

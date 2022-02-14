@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		811F7BD3278C2A3500F1B8C9 /* BudgetSlice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 811F7BD2278C2A3500F1B8C9 /* BudgetSlice.swift */; };
+		8157AB8327BA7E15003FEB28 /* NewSliceElements.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8157AB8227BA7E15003FEB28 /* NewSliceElements.swift */; };
+		8157AB8527BA7E5D003FEB28 /* AddSliceFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8157AB8427BA7E5D003FEB28 /* AddSliceFlow.swift */; };
 		817033E227B1B7BB001686FA /* Report.swift in Sources */ = {isa = PBXBuildFile; fileRef = 817033E127B1B7BB001686FA /* Report.swift */; };
 		817033EC27B25F9F001686FA /* RepositoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 817033EB27B25F9F001686FA /* RepositoryTests.swift */; };
 		817033F927B3D218001686FA /* AddBudgetUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 817033F827B3D218001686FA /* AddBudgetUITests.swift */; };
@@ -69,6 +71,8 @@
 
 /* Begin PBXFileReference section */
 		811F7BD2278C2A3500F1B8C9 /* BudgetSlice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetSlice.swift; sourceTree = "<group>"; };
+		8157AB8227BA7E15003FEB28 /* NewSliceElements.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSliceElements.swift; sourceTree = "<group>"; };
+		8157AB8427BA7E5D003FEB28 /* AddSliceFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddSliceFlow.swift; sourceTree = "<group>"; };
 		817033E127B1B7BB001686FA /* Report.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Report.swift; sourceTree = "<group>"; };
 		817033E927B25F9F001686FA /* FinanceTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FinanceTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		817033EB27B25F9F001686FA /* RepositoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepositoryTests.swift; sourceTree = "<group>"; };
@@ -230,6 +234,7 @@
 			children = (
 				8170340827B7E2F6001686FA /* UIFlow.swift */,
 				8170341227B7E6E4001686FA /* AddBudgetFlow.swift */,
+				8157AB8427BA7E5D003FEB28 /* AddSliceFlow.swift */,
 			);
 			path = Flows;
 			sourceTree = "<group>";
@@ -242,6 +247,7 @@
 				8170341527B7FB07001686FA /* CommonElements.swift */,
 				8170340E27B7E6A5001686FA /* ReportElements.swift */,
 				8170341027B7E6BD001686FA /* NewBudgetElements.swift */,
+				8157AB8227BA7E15003FEB28 /* NewSliceElements.swift */,
 			);
 			path = Elements;
 			sourceTree = "<group>";
@@ -482,9 +488,11 @@
 			files = (
 				8170340527B7E0E6001686FA /* FinanceElements.swift in Sources */,
 				8170340727B7E1DF001686FA /* XCUIElement+Extensions.swift in Sources */,
+				8157AB8527BA7E5D003FEB28 /* AddSliceFlow.swift in Sources */,
 				8170340F27B7E6A5001686FA /* ReportElements.swift in Sources */,
 				817033F927B3D218001686FA /* AddBudgetUITests.swift in Sources */,
 				8170341427B7F5CA001686FA /* AccessibilityIdentifier.swift in Sources */,
+				8157AB8327BA7E15003FEB28 /* NewSliceElements.swift in Sources */,
 				8170341127B7E6BD001686FA /* NewBudgetElements.swift in Sources */,
 				8170341327B7E6E4001686FA /* AddBudgetFlow.swift in Sources */,
 				8170341627B7FB07001686FA /* CommonElements.swift in Sources */,
