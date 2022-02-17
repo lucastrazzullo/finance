@@ -13,7 +13,7 @@ final class AddSliceUITests: FinanceUITestCase {
     // MARK: - Happy cases
 
     func testAddSlice_toNewBudget() {
-        let addBudgetFlow = AddBudgetFlow(app: app)
+        let addBudgetFlow = ReportFlow(app: app)
             .tapAddNewBudget()
             .assertSliceItemDoesntExists()
 
@@ -30,34 +30,34 @@ final class AddSliceUITests: FinanceUITestCase {
     // MARK: - Unhappy cases
 
     func testAddSlice_toNewBudget_withSameName() {
-        _ = AddBudgetFlow(app: app)
+        _ = ReportFlow(app: app)
             .tapAddNewBudget()
             .insertNewBudgetSlice()
 
             .tapAddNewSlice()
             .insertNewSliceName()
             .insertNewSliceAmount()
-            .tapSave()
+            .tapSave()?
 
             .assertSameNameErrorExists()
     }
 
     func testAddSlice_toNewBudget_withoutName() {
-        _ = AddBudgetFlow(app: app)
+        _ = ReportFlow(app: app)
             .tapAddNewBudget()
             .tapAddNewSlice()
             .insertNewSliceAmount()
-            .tapSave()
+            .tapSave()?
 
             .assertInvalidNameErrorExists()
     }
 
     func testAddSlice_toNewBudget_withoutAmount() {
-        _ = AddBudgetFlow(app: app)
+        _ = ReportFlow(app: app)
             .tapAddNewBudget()
             .tapAddNewSlice()
             .insertNewSliceName()
-            .tapSave()
+            .tapSave()?
 
             .assertInvalidAmountErrorExists()
     }

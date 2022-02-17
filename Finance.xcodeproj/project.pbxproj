@@ -9,9 +9,10 @@
 /* Begin PBXBuildFile section */
 		811F7BD3278C2A3500F1B8C9 /* BudgetSlice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 811F7BD2278C2A3500F1B8C9 /* BudgetSlice.swift */; };
 		8157AB8327BA7E15003FEB28 /* NewSliceElements.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8157AB8227BA7E15003FEB28 /* NewSliceElements.swift */; };
-		8157AB8527BA7E5D003FEB28 /* AddSliceFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8157AB8427BA7E5D003FEB28 /* AddSliceFlow.swift */; };
+		8157AB8527BA7E5D003FEB28 /* SliceFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8157AB8427BA7E5D003FEB28 /* SliceFlow.swift */; };
 		8157AB8727BACCE9003FEB28 /* AddSliceUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8157AB8627BACCE9003FEB28 /* AddSliceUITests.swift */; };
 		8157AB8927BACD2B003FEB28 /* FinanceUITestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8157AB8827BACD2B003FEB28 /* FinanceUITestCase.swift */; };
+		8157AB8B27BEC3ED003FEB28 /* ReportFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8157AB8A27BEC3ED003FEB28 /* ReportFlow.swift */; };
 		817033E227B1B7BB001686FA /* Report.swift in Sources */ = {isa = PBXBuildFile; fileRef = 817033E127B1B7BB001686FA /* Report.swift */; };
 		817033EC27B25F9F001686FA /* RepositoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 817033EB27B25F9F001686FA /* RepositoryTests.swift */; };
 		817033F927B3D218001686FA /* AddBudgetUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 817033F827B3D218001686FA /* AddBudgetUITests.swift */; };
@@ -21,7 +22,7 @@
 		8170340927B7E2F6001686FA /* UIFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8170340827B7E2F6001686FA /* UIFlow.swift */; };
 		8170340F27B7E6A5001686FA /* ReportElements.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8170340E27B7E6A5001686FA /* ReportElements.swift */; };
 		8170341127B7E6BD001686FA /* NewBudgetElements.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8170341027B7E6BD001686FA /* NewBudgetElements.swift */; };
-		8170341327B7E6E4001686FA /* AddBudgetFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8170341227B7E6E4001686FA /* AddBudgetFlow.swift */; };
+		8170341327B7E6E4001686FA /* BudgetFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8170341227B7E6E4001686FA /* BudgetFlow.swift */; };
 		8170341427B7F5CA001686FA /* AccessibilityIdentifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8170340127B59945001686FA /* AccessibilityIdentifier.swift */; };
 		8170341627B7FB07001686FA /* CommonElements.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8170341527B7FB07001686FA /* CommonElements.swift */; };
 		81735ACC279A2B8D007C9AA3 /* Array+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81735ACB279A2B8D007C9AA3 /* Array+Extensions.swift */; };
@@ -74,9 +75,10 @@
 /* Begin PBXFileReference section */
 		811F7BD2278C2A3500F1B8C9 /* BudgetSlice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetSlice.swift; sourceTree = "<group>"; };
 		8157AB8227BA7E15003FEB28 /* NewSliceElements.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSliceElements.swift; sourceTree = "<group>"; };
-		8157AB8427BA7E5D003FEB28 /* AddSliceFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddSliceFlow.swift; sourceTree = "<group>"; };
+		8157AB8427BA7E5D003FEB28 /* SliceFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SliceFlow.swift; sourceTree = "<group>"; };
 		8157AB8627BACCE9003FEB28 /* AddSliceUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddSliceUITests.swift; sourceTree = "<group>"; };
 		8157AB8827BACD2B003FEB28 /* FinanceUITestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceUITestCase.swift; sourceTree = "<group>"; };
+		8157AB8A27BEC3ED003FEB28 /* ReportFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportFlow.swift; sourceTree = "<group>"; };
 		817033E127B1B7BB001686FA /* Report.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Report.swift; sourceTree = "<group>"; };
 		817033E927B25F9F001686FA /* FinanceTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FinanceTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		817033EB27B25F9F001686FA /* RepositoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepositoryTests.swift; sourceTree = "<group>"; };
@@ -88,7 +90,7 @@
 		8170340827B7E2F6001686FA /* UIFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIFlow.swift; sourceTree = "<group>"; };
 		8170340E27B7E6A5001686FA /* ReportElements.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportElements.swift; sourceTree = "<group>"; };
 		8170341027B7E6BD001686FA /* NewBudgetElements.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewBudgetElements.swift; sourceTree = "<group>"; };
-		8170341227B7E6E4001686FA /* AddBudgetFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddBudgetFlow.swift; sourceTree = "<group>"; };
+		8170341227B7E6E4001686FA /* BudgetFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetFlow.swift; sourceTree = "<group>"; };
 		8170341527B7FB07001686FA /* CommonElements.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonElements.swift; sourceTree = "<group>"; };
 		81735ACB279A2B8D007C9AA3 /* Array+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+Extensions.swift"; sourceTree = "<group>"; };
 		81735ACE279B2179007C9AA3 /* Months.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Months.swift; sourceTree = "<group>"; };
@@ -239,8 +241,9 @@
 			isa = PBXGroup;
 			children = (
 				8170340827B7E2F6001686FA /* UIFlow.swift */,
-				8170341227B7E6E4001686FA /* AddBudgetFlow.swift */,
-				8157AB8427BA7E5D003FEB28 /* AddSliceFlow.swift */,
+				8157AB8A27BEC3ED003FEB28 /* ReportFlow.swift */,
+				8170341227B7E6E4001686FA /* BudgetFlow.swift */,
+				8157AB8427BA7E5D003FEB28 /* SliceFlow.swift */,
 			);
 			path = Flows;
 			sourceTree = "<group>";
@@ -493,15 +496,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				8170340527B7E0E6001686FA /* FinanceElements.swift in Sources */,
+				8157AB8B27BEC3ED003FEB28 /* ReportFlow.swift in Sources */,
 				8170340727B7E1DF001686FA /* XCUIElement+Extensions.swift in Sources */,
-				8157AB8527BA7E5D003FEB28 /* AddSliceFlow.swift in Sources */,
+				8157AB8527BA7E5D003FEB28 /* SliceFlow.swift in Sources */,
 				8170340F27B7E6A5001686FA /* ReportElements.swift in Sources */,
 				817033F927B3D218001686FA /* AddBudgetUITests.swift in Sources */,
 				8170341427B7F5CA001686FA /* AccessibilityIdentifier.swift in Sources */,
 				8157AB8727BACCE9003FEB28 /* AddSliceUITests.swift in Sources */,
 				8157AB8327BA7E15003FEB28 /* NewSliceElements.swift in Sources */,
 				8170341127B7E6BD001686FA /* NewBudgetElements.swift in Sources */,
-				8170341327B7E6E4001686FA /* AddBudgetFlow.swift in Sources */,
+				8170341327B7E6E4001686FA /* BudgetFlow.swift in Sources */,
 				8170341627B7FB07001686FA /* CommonElements.swift in Sources */,
 				8157AB8927BACD2B003FEB28 /* FinanceUITestCase.swift in Sources */,
 				8170340927B7E2F6001686FA /* UIFlow.swift in Sources */,

@@ -13,25 +13,25 @@ final class AddBudgetUITests: FinanceUITestCase {
     // MARK: - Happy cases
 
     func testAddBudgetWithAmount() {
-        _ = AddBudgetFlow(app: app)
+        _ = ReportFlow(app: app)
             .assertBudgetLinkDoesntExists()
 
             .tapAddNewBudget()
             .insertNewBudgetName()
             .insertNewBudgetAmount()
-            .tapSave()
+            .tapSave()?
 
             .assertBudgetLinkExists()
     }
 
     func testAddBudgetWithSlices() {
-        _ = AddBudgetFlow(app: app)
+        _ = ReportFlow(app: app)
             .assertBudgetLinkDoesntExists()
 
             .tapAddNewBudget()
             .insertNewBudgetName()
             .insertNewBudgetSlice()
-            .tapSave()
+            .tapSave()?
 
             .assertBudgetLinkExists()
     }
@@ -39,24 +39,24 @@ final class AddBudgetUITests: FinanceUITestCase {
     // MARK: - Unhappy cases
 
     func testAddBudget_withSameName() {
-        _ = AddBudgetFlow(app: app)
+        _ = ReportFlow(app: app)
             .assertBudgetLinkDoesntExists()
 
             .tapAddNewBudget()
             .insertNewBudgetName()
             .insertNewBudgetAmount()
-            .tapSave()
+            .tapSave()?
 
             .tapAddNewBudget()
             .insertNewBudgetName()
             .insertNewBudgetAmount()
-            .tapSave()
+            .tapSave()?
 
             .assertSameNameErrorExists()
     }
 
     func testAddBudget_withSameSlice() {
-        _ = AddBudgetFlow(app: app)
+        _ = ReportFlow(app: app)
             .assertBudgetLinkDoesntExists()
 
             .tapAddNewBudget()
@@ -68,23 +68,23 @@ final class AddBudgetUITests: FinanceUITestCase {
     }
 
     func testAddBudget_withoutName() {
-        _ = AddBudgetFlow(app: app)
+        _ = ReportFlow(app: app)
             .assertBudgetLinkDoesntExists()
 
             .tapAddNewBudget()
             .insertNewBudgetAmount()
-            .tapSave()
+            .tapSave()?
 
             .assertInvalidNameErrorExists()
     }
 
     func testAddBudget_withoutAmount() {
-        _ = AddBudgetFlow(app: app)
+        _ = ReportFlow(app: app)
             .assertBudgetLinkDoesntExists()
 
             .tapAddNewBudget()
             .insertNewBudgetName()
-            .tapSave()
+            .tapSave()?
 
             .assertInvalidAmountErrorExists()
     }

@@ -1,5 +1,5 @@
 //
-//  AddSliceFlow.swift
+//  SliceFlow.swift
 //  FinanceUITests
 //
 //  Created by Luca Strazzullo on 14/02/2022.
@@ -7,19 +7,15 @@
 
 import XCTest
 
-final class AddSliceFlow: UIFlow {
-
-    let app: XCUIApplication
-    let commonElements: CommonElements
+final class SliceFlow<ParentFlow: UIFlow>: UIFlow {
 
     private let newBudgetElements: NewBudgetElements
     private let newSliceElements: NewSliceElements
 
-    init(app: XCUIApplication) {
-        self.app = app
-        self.commonElements = CommonElements(app: app)
+    init(app: XCUIApplication, parentFlow: ParentFlow? = nil) {
         self.newBudgetElements = NewBudgetElements(app: app)
         self.newSliceElements = NewSliceElements(app: app)
+        super.init(app: app, parentFlow: parentFlow)
     }
 
     // MARK: Actions
@@ -41,8 +37,8 @@ final class AddSliceFlow: UIFlow {
         return self
     }
 
-    func tapSave() -> Self {
+    func tapSave() -> ParentFlow? {
         newSliceElements.saveButton.waitForEsistanceAndTap()
-        return self
+        return parentFlow as? ParentFlow
     }
 }

@@ -7,12 +7,19 @@
 
 import XCTest
 
-protocol UIFlow {
-    var app: XCUIApplication { get }
-    var commonElements: CommonElements { get }
-}
+class UIFlow {
 
-extension UIFlow {
+    let app: XCUIApplication
+    let commonElements: CommonElements
+    let parentFlow: UIFlow?
+
+    init(app: XCUIApplication, parentFlow: UIFlow? = nil) {
+        self.app = app
+        self.commonElements = CommonElements(app: app)
+        self.parentFlow = parentFlow
+    }
+
+    // MARK: Asserts
 
     func assertSomeErrorExists() -> Self {
         commonElements.someError.assertExists()

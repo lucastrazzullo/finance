@@ -1,5 +1,5 @@
 //
-//  AddBudgetFlow.swift
+//  BudgetFlow.swift
 //  FinanceUITests
 //
 //  Created by Luca Strazzullo on 12/02/2022.
@@ -7,32 +7,18 @@
 
 import XCTest
 
-final class AddBudgetFlow: UIFlow {
-
-    let app: XCUIApplication
-    let commonElements: CommonElements
+final class BudgetFlow<ParentFlow: UIFlow>: UIFlow {
 
     private let reportElements: ReportElements
     private let newBudgetElements: NewBudgetElements
 
-    init(app: XCUIApplication) {
-        self.app = app
-        self.commonElements = CommonElements(app: app)
+    init(app: XCUIApplication, parentFlow: ParentFlow? = nil) {
         self.reportElements = ReportElements(app: app)
         self.newBudgetElements = NewBudgetElements(app: app)
+        super.init(app: app, parentFlow: parentFlow)
     }
 
     // MARK: Asserts
-
-    func assertBudgetLinkDoesntExists() -> Self {
-        reportElements.budgetLink.assertDoesntExists()
-        return self
-    }
-
-    func assertBudgetLinkExists() -> Self {
-        reportElements.budgetLink.assertExists()
-        return self
-    }
 
     func assertSliceItemDoesntExists() -> Self {
         newBudgetElements.sliceItem.assertDoesntExists()
@@ -46,13 +32,8 @@ final class AddBudgetFlow: UIFlow {
 
     // MARK: Actions
 
-    func tapAddNewBudget() -> Self {
-        reportElements.addBudgetButton.waitForEsistanceAndTap()
-        return self
-    }
-
-    func tapAddNewSlice() -> AddSliceFlow {
-        return AddSliceFlow(app: app)
+    func tapAddNewSlice() -> SliceFlow<BudgetFlow> {
+        return SliceFlow(app: app, parentFlow: self)
             .tapAddNewSlice()
     }
 
@@ -69,7 +50,7 @@ final class AddBudgetFlow: UIFlow {
     }
 
     func insertNewBudgetSlice() -> Self {
-        _ = AddSliceFlow(app: app)
+        _ = SliceFlow(app: app, parentFlow: self)
             .tapAddNewSlice()
             .insertNewSliceName()
             .insertNewSliceAmount()
@@ -78,8 +59,8 @@ final class AddBudgetFlow: UIFlow {
         return self
     }
 
-    func tapSave() -> Self {
+    func tapSave() -> ParentFlow? {
         newBudgetElements.saveButton.waitForEsistanceAndTap()
-        return self
+        return parentFlow as? ParentFlow
     }
 }
