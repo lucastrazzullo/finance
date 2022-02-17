@@ -17,6 +17,10 @@ final class NewBudgetElements: FinanceElements {
         tablesQuery.textFields[AccessibilityIdentifier.NewBudgetView.amountInputField]
     }
 
+    var sliceItem: XCUIElement {
+        tablesQuery.staticTexts[AccessibilityIdentifier.NewBudgetView.sliceItem]
+    }
+
     var addSliceButton: XCUIElement {
         tablesQuery.buttons[AccessibilityIdentifier.NewBudgetView.addSliceButton]
     }

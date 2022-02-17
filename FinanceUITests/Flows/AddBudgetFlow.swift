@@ -34,11 +34,26 @@ final class AddBudgetFlow: UIFlow {
         return self
     }
 
+    func assertSliceItemDoesntExists() -> Self {
+        newBudgetElements.sliceItem.assertDoesntExists()
+        return self
+    }
+
+    func assertSliceItemExists() -> Self {
+        newBudgetElements.sliceItem.assertExists()
+        return self
+    }
+
     // MARK: Actions
 
     func tapAddNewBudget() -> Self {
         reportElements.addBudgetButton.waitForEsistanceAndTap()
         return self
+    }
+
+    func tapAddNewSlice() -> AddSliceFlow {
+        return AddSliceFlow(app: app)
+            .tapAddNewSlice()
     }
 
     func insertNewBudgetName() -> Self {

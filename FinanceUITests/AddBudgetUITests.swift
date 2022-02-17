@@ -8,30 +8,12 @@
 import XCTest
 @testable import Finance
 
-final class AddBudgetUITests: XCTestCase {
-
-    private var app: XCUIApplication!
-    private var flow: UIFlow!
-
-    // MARK: Test life cycle
-
-    override func setUpWithError() throws {
-        continueAfterFailure = false
-
-        app = XCUIApplication()
-        app.launchArguments = ["testing"]
-        app.launch()
-    }
-
-    override func tearDownWithError() throws {
-        flow = nil
-        app = nil
-    }
+final class AddBudgetUITests: FinanceUITestCase {
 
     // MARK: - Happy cases
 
     func testAddBudgetWithAmount() {
-        flow = AddBudgetFlow(app: app)
+        _ = AddBudgetFlow(app: app)
             .assertBudgetLinkDoesntExists()
 
             .tapAddNewBudget()
@@ -43,7 +25,7 @@ final class AddBudgetUITests: XCTestCase {
     }
 
     func testAddBudgetWithSlices() {
-        flow = AddBudgetFlow(app: app)
+        _ = AddBudgetFlow(app: app)
             .assertBudgetLinkDoesntExists()
 
             .tapAddNewBudget()
@@ -57,7 +39,7 @@ final class AddBudgetUITests: XCTestCase {
     // MARK: - Unhappy cases
 
     func testAddBudget_withSameName() {
-        flow = AddBudgetFlow(app: app)
+        _ = AddBudgetFlow(app: app)
             .assertBudgetLinkDoesntExists()
 
             .tapAddNewBudget()
@@ -73,8 +55,20 @@ final class AddBudgetUITests: XCTestCase {
             .assertSameNameErrorExists()
     }
 
+    func testAddBudget_withSameSlice() {
+        _ = AddBudgetFlow(app: app)
+            .assertBudgetLinkDoesntExists()
+
+            .tapAddNewBudget()
+            .insertNewBudgetName()
+            .insertNewBudgetSlice()
+            .insertNewBudgetSlice()
+
+            .assertSameNameErrorExists()
+    }
+
     func testAddBudget_withoutName() {
-        flow = AddBudgetFlow(app: app)
+        _ = AddBudgetFlow(app: app)
             .assertBudgetLinkDoesntExists()
 
             .tapAddNewBudget()
@@ -85,7 +79,7 @@ final class AddBudgetUITests: XCTestCase {
     }
 
     func testAddBudget_withoutAmount() {
-        flow = AddBudgetFlow(app: app)
+        _ = AddBudgetFlow(app: app)
             .assertBudgetLinkDoesntExists()
 
             .tapAddNewBudget()

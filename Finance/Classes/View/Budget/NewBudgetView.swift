@@ -43,6 +43,7 @@ struct NewBudgetView: View {
                     List {
                         ForEach(budgetSlices) { slice in
                             AmountListItem(label: slice.name, amount: slice.amount)
+                                .accessibilityIdentifier(AccessibilityIdentifier.NewBudgetView.sliceItem)
                                 .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                                     Button(role: .destructive) {
                                         do {
