@@ -46,12 +46,7 @@ struct NewBudgetView: View {
                                 .accessibilityIdentifier(AccessibilityIdentifier.NewBudgetView.sliceItem)
                                 .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                                     Button(role: .destructive) {
-                                        do {
-                                            try Budget.canRemove(slice: slice, from: budgetSlices)
-                                            budgetSlices.removeAll(where: { $0.id == slice.id })
-                                        } catch {
-                                            presentedError = error as? DomainError ?? .budget(error: .cannotDeleteSlice(underlyingError: error))
-                                        }
+                                        budgetSlices.removeAll(where: { $0.id == slice.id })
                                     } label: {
                                         Label("Delete", systemImage: "trash")
                                     }
