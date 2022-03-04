@@ -158,6 +158,11 @@ enum BudgetSliceError: DomainUnderlyingError {
 
     case nameNotValid
     case amountNotValid
+    case scheduleMonthNotValid
+    case scheduleAlreadyExistsFor(month: String)
+    case scheduleDoesntExistFor(month: String)
+    case thereMustBeAtLeastOneSchedule
+    case cannotAddSchedule(underlyingError: Error?)
     case cannotCreateTheSlice(underlyingError: Error?)
 
     var id: String {
@@ -170,6 +175,16 @@ enum BudgetSliceError: DomainUnderlyingError {
             return "Please use a valid name"
         case .amountNotValid:
             return "Please use a valid amount"
+        case .scheduleMonthNotValid:
+            return "Month not valid"
+        case .scheduleAlreadyExistsFor(let month):
+            return "Schedule already exists for \(month)"
+        case .scheduleDoesntExistFor(let month):
+            return "Schedule not found for \(month)"
+        case .thereMustBeAtLeastOneSchedule:
+            return "There must be at least one schedule"
+        case .cannotAddSchedule:
+            return "Cannot add schedule"
         case .cannotCreateTheSlice:
             return "This slice cannot be created!"
         }

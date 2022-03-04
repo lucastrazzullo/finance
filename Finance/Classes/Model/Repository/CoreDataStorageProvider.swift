@@ -6,6 +6,7 @@
 //
 
 import CoreData
+import CoreText
 
 final class CoreDataStorageProvider: ObservableObject, StorageProvider {
 
@@ -68,16 +69,7 @@ final class CoreDataStorageProvider: ObservableObject, StorageProvider {
 
     func add(budget: Budget) async throws -> Report {
         let budgetEntity = BudgetEntity(context: persistentContainer.viewContext)
-        budgetEntity.identifier = budget.id
-        budgetEntity.name = budget.name
-        budgetEntity.slices = NSSet(array: budget.slices.map { slice in
-            let sliceEntity = BudgetSliceEntity(context: persistentContainer.viewContext)
-            sliceEntity.identifier = slice.id
-            sliceEntity.name = slice.name
-            sliceEntity.amount = NSDecimalNumber(decimal: slice.amount.value)
-            sliceEntity.budget = budgetEntity
-            return sliceEntity
-        })
+        setupBudgetEntity(budgetEntity, with: budget)
 
         try saveOrRollback()
         return try await fetchReport()
@@ -96,10 +88,8 @@ final class CoreDataStorageProvider: ObservableObject, StorageProvider {
         budget.slices.forEach { slice in
             if !entitySlices.contains(where: { $0.identifier == slice.id }) {
                 let sliceEntity = BudgetSliceEntity(context: self.persistentContainer.viewContext)
-                sliceEntity.identifier = slice.id
-                sliceEntity.name = slice.name
-                sliceEntity.amount = NSDecimalNumber(decimal: slice.amount.value)
                 sliceEntity.budget = budgetEntity
+                setupSliceEntity(sliceEntity, with: slice)
             }
         }
 
@@ -150,6 +140,45 @@ final class CoreDataStorageProvider: ObservableObject, StorageProvider {
         }
     }
 
+    // MARK: Private setup methods
+
+    private func setupBudgetEntity(_ budgetEntity: BudgetEntity, with budget: Budget) {
+        budgetEntity.identifier = budget.id
+        budgetEntity.name = budget.name
+        budgetEntity.slices = NSSet(array: budget.slices.map { slice in
+            let sliceEntity = BudgetSliceEntity(context: persistentContainer.viewContext)
+            sliceEntity.budget = budgetEntity
+
+            setupSliceEntity(sliceEntity, with: slice)
+
+            return sliceEntity
+        })
+    }
+
+    private func setupSliceEntity(_ sliceEntity: BudgetSliceEntity, with slice: BudgetSlice) {
+        sliceEntity.identifier = slice.id
+        sliceEntity.name = slice.name
+        sliceEntity.configurationType = slice.configuration.configurationType
+
+        switch slice.configuration {
+        case .montly(let amount):
+            sliceEntity.amount = NSDecimalNumber(decimal: amount.value)
+        case .scheduled(let schedules):
+            sliceEntity.schedules = NSSet(array: schedules.map { schedule in
+                let scheduledAmountEntry = BudgetSliceScheduledAmountEntity(context: persistentContainer.viewContext)
+                scheduledAmountEntry.slice = sliceEntity
+
+                setupSliceScheduledAmountEntity(scheduledAmountEntry, with: schedule)
+                return scheduledAmountEntry
+            })
+        }
+    }
+
+    private func setupSliceScheduledAmountEntity(_ scheduledAmountEntry: BudgetSliceScheduledAmountEntity, with schedule: BudgetSlice.ScheduledAmount) {
+        scheduledAmountEntry.amount = NSDecimalNumber(decimal: schedule.amount.value)
+        scheduledAmountEntry.monthIdentifier = schedule.month.id
+    }
+
     // MARK: Private saving methods
 
     private func saveOrRollback() throws {
@@ -185,11 +214,54 @@ private extension BudgetSlice {
 
     static func with(budgetSliceEntity: BudgetSliceEntity) -> Self? {
         guard let identifier = budgetSliceEntity.identifier,
-              let name = budgetSliceEntity.name,
-              let amountDecimal = budgetSliceEntity.amount else {
+              let name = budgetSliceEntity.name else {
             return nil
         }
 
-        return try? BudgetSlice(id: identifier, name: name, amount: .value(amountDecimal.decimalValue))
+        if let configuration = BudgetSlice.Configuration.with(budgetSliceEntity: budgetSliceEntity) {
+            return try? BudgetSlice(id: identifier, name: name, configuration: configuration)
+        } else {
+            return nil
+        }
+    }
+}
+
+private extension BudgetSlice.Configuration {
+
+    static func with(budgetSliceEntity: BudgetSliceEntity) -> Self? {
+        let configurationType = budgetSliceEntity.configurationType
+        let monthlyAmount = budgetSliceEntity.amount
+        let schedules = budgetSliceEntity.schedules?.compactMap(BudgetSlice.ScheduledAmount.with(budgetSliceScheduledAmountEntity:))
+
+        switch (configurationType, monthlyAmount, schedules) {
+        case let (0, monthlyAmount?, _):
+            return .montly(amount: .value(monthlyAmount.decimalValue))
+        case let (1, _, schedules?) where schedules.count > 0:
+            return .scheduled(schedules: schedules)
+        default:
+            return nil
+        }
+    }
+
+    var configurationType: Int16 {
+        switch self {
+        case .montly:
+            return 0
+        case .scheduled:
+            return 1
+        }
+    }
+}
+
+private extension BudgetSlice.ScheduledAmount {
+
+    static func with(budgetSliceScheduledAmountEntity: NSSet.Element) -> Self? {
+        guard let schedule = budgetSliceScheduledAmountEntity as? BudgetSliceScheduledAmountEntity,
+              let monthIdentifier = schedule.monthIdentifier, let month = Months.default[monthIdentifier],
+              let amount = schedule.amount else {
+            return nil
+        }
+
+        return .init(amount: .value(amount.decimalValue), month: month)
     }
 }

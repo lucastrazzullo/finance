@@ -19,22 +19,18 @@ struct Budget: Identifiable, Hashable, AmountHolder {
         return slices.totalAmount
     }
 
-    var yearlyAmount: MoneyValue {
-        return Self.yearlyAmount(for: amount)
-    }
-
     // MARK: Object life cycle
 
-    init(id: ID, name: String, amount: String) throws {
-        guard let amount = MoneyValue.string(amount) else {
+    init(id: ID, name: String, monthlyAmount: String) throws {
+        guard let monthlyAmount = MoneyValue.string(monthlyAmount) else {
             throw DomainError.budget(error: .amountNotValid)
         }
-        try self.init(id: id, name: name, amount: amount)
+        try self.init(id: id, name: name, monthlyAmount: monthlyAmount)
     }
 
-    init(id: ID, name: String, amount: MoneyValue = .zero) throws {
+    init(id: ID, name: String, monthlyAmount: MoneyValue = .zero) throws {
         let slices = [
-            try BudgetSlice(id: .init(), name: Self.defaultSliceName, amount: amount)
+            try BudgetSlice(id: .init(), name: Self.defaultSliceName, configuration: .montly(amount: monthlyAmount))
         ]
         try self.init(id: id, name: name, slices: slices)
     }
@@ -56,10 +52,6 @@ struct Budget: Identifiable, Hashable, AmountHolder {
     }
 
     // MARK: Helpers
-
-    static func yearlyAmount(for montlyAmount: MoneyValue) -> MoneyValue {
-        montlyAmount * .value(12)
-    }
 
     static func canAdd(slice: BudgetSlice, to list: [BudgetSlice]) throws {
         guard !list.contains(where: { $0.name == slice.name }) else {

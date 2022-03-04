@@ -14,7 +14,7 @@ struct NewBudgetView: View {
     let onSubmit: (Budget, @escaping OnSubmitErrorHandler) -> Void
 
     @State private var budgetName: String = ""
-    @State private var budgetAmount: String = ""
+    @State private var budgetMonthlyAmount: String = ""
     @State private var budgetSlices: [BudgetSlice] = []
 
     @State private var presentedError: DomainError?
@@ -28,11 +28,11 @@ struct NewBudgetView: View {
                     .accessibilityIdentifier(AccessibilityIdentifier.NewBudgetView.nameInputField)
 
                 if budgetSlices.isEmpty {
-                    InsertAmountField(amountValue: $budgetAmount, title: "Monthly Amount", prompt: nil)
+                    AmountTextField(amountValue: $budgetMonthlyAmount, title: "Monthly Amount", prompt: nil)
                         .accessibilityIdentifier(AccessibilityIdentifier.NewBudgetView.amountInputField)
                 } else {
-                    AmountCollectionItem(title: "Monthly total",
-                                         caption: "\(Budget.yearlyAmount(for: budgetSlices.totalAmount).localizedDescription) per year",
+                    AmountCollectionItem(title: "Total",
+                                         caption: nil,
                                          amount: budgetSlices.totalAmount,
                                          color: .green)
                 }
@@ -42,7 +42,7 @@ struct NewBudgetView: View {
                 if !budgetSlices.isEmpty {
                     List {
                         ForEach(budgetSlices) { slice in
-                            AmountListItem(label: slice.name, amount: slice.amount)
+                            BudgetSlicesListItem(slice: slice, totalAmount: budgetSlices.totalAmount)
                                 .accessibilityIdentifier(AccessibilityIdentifier.NewBudgetView.sliceItem)
                                 .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                                     Button(role: .destructive) {
@@ -92,7 +92,7 @@ struct NewBudgetView: View {
                     presentedError = error
                 }
             } else {
-                let budget = try Budget(id: .init(), name: budgetName, amount: budgetAmount)
+                let budget = try Budget(id: .init(), name: budgetName, monthlyAmount: budgetMonthlyAmount)
                 onSubmit(budget) { error in
                     presentedError = error
                 }

@@ -17,8 +17,8 @@ struct BudgetView: View {
         VStack(alignment: .leading, spacing: 12) {
             VStack(alignment: .leading, spacing: 12) {
                 AmountCollectionItem(
-                    title: "Monthly",
-                    caption: "\(controller.budget.yearlyAmount.localizedDescription) per year",
+                    title: "Total Amount",
+                    caption: nil,
                     amount: controller.budget.amount,
                     color: .gray.opacity(0.3)
                 )
@@ -30,10 +30,7 @@ struct BudgetView: View {
                 Section(header: Text("Slices")) {
                     if controller.budget.slices.count > 0 {
                         ForEach(controller.budget.slices) { slice in
-                            HStack {
-                                AmountListItem(label: slice.name, amount: slice.amount)
-                                Text(makePercentageStringFor(amount: slice.amount)).font(.caption)
-                            }
+                            BudgetSlicesListItem(slice: slice, totalAmount: controller.budget.amount)
                         }
                     } else {
                         Text("No slices defined for this budget")
@@ -61,13 +58,6 @@ struct BudgetView: View {
         }
         .navigationTitle(controller.budget.name)
         .onAppear(perform: controller.fetch)
-    }
-
-    // MARK: - Private factory methods
-
-    private func makePercentageStringFor(amount: MoneyValue) -> String {
-        let percentage = NSDecimalNumber(decimal: amount.value * 100 / controller.budget.amount.value).floatValue
-        return "\(percentage)%"
     }
 
     // MARK: - Object life cycle

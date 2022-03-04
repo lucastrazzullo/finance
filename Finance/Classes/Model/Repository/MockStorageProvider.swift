@@ -14,16 +14,25 @@ enum Mocks {
 
     static let budgets: [Budget] = {
         [
-            try! Budget(id: UUID(), name: "House", slices: Mocks.slices),
-            try! Budget(id: UUID(), name: "Groceries", amount: .value(200.01)),
-            try! Budget(id: UUID(), name: "Health", amount: .value(200.01))
+            try! .init(id: UUID(), name: "House", slices: Mocks.slices),
+            try! .init(id: UUID(), name: "Groceries", monthlyAmount: .value(200.01)),
+            try! .init(id: UUID(), name: "Health", monthlyAmount: .value(200.01))
         ]
     }()
 
     static let slices: [BudgetSlice] = {
         [
-            try! BudgetSlice(id: .init(), name: "Mortgage", amount: .value(120.23)),
-            try! BudgetSlice(id: .init(), name: "Furnitures", amount: .value(120.23))
+            try! .init(id: .init(), name: "Mortgage", configuration: .montly(amount: .value(120.23))),
+            try! .init(id: .init(), name: "Furnitures", configuration: .montly(amount: .value(120.23))),
+            try! .init(id: .init(), name: "Works", configuration: .scheduled(schedules: sliceScheduledAmounts))
+        ]
+    }()
+
+    static let sliceScheduledAmounts: [BudgetSlice.ScheduledAmount] = {
+        [
+            .init(amount: .value(100), month: Months.default[0]!),
+            .init(amount: .value(200), month: Months.default[2]!),
+            .init(amount: .value(300), month: Months.default[7]!)
         ]
     }()
 }

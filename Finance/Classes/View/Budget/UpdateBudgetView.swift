@@ -37,7 +37,7 @@ struct UpdateBudgetView: View {
                 Section(header: Text("Slices")) {
                     List {
                         ForEach(budgetSlices) { slice in
-                            AmountListItem(label: slice.name, amount: slice.amount)
+                            BudgetSlicesListItem(slice: slice, totalAmount: budgetSlices.totalAmount)
                                 .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                                     Button(role: .destructive) {
                                         do {

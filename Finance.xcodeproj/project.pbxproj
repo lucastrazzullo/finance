@@ -34,7 +34,7 @@
 		8195E8BA27A4129000D58297 /* UpdateBudgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8195E8B927A4129000D58297 /* UpdateBudgetView.swift */; };
 		8195E8BC27A41BD200D58297 /* InlineErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8195E8BB27A41BD200D58297 /* InlineErrorView.swift */; };
 		819993D52752F80C00FA3E03 /* Locale+Defaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 819993D42752F80C00FA3E03 /* Locale+Defaults.swift */; };
-		819993D72752FAA300FA3E03 /* InsertAmountField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 819993D62752FAA300FA3E03 /* InsertAmountField.swift */; };
+		819993D72752FAA300FA3E03 /* AmountTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 819993D62752FAA300FA3E03 /* AmountTextField.swift */; };
 		819993DC2757692300FA3E03 /* AmountCollectionItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 819993DB2757692300FA3E03 /* AmountCollectionItem.swift */; };
 		81B284E327A0008D00EE51EB /* NewBudgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81B284E227A0008D00EE51EB /* NewBudgetView.swift */; };
 		81B284E627A0011800EE51EB /* ReportController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81B284E527A0011800EE51EB /* ReportController.swift */; };
@@ -51,6 +51,8 @@
 		81CB8BFE2746DA8F00A64785 /* AmountHolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81CB8BFD2746DA8F00A64785 /* AmountHolder.swift */; };
 		81EC7CAD279A17AD006194C9 /* Repository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81EC7CAC279A17AD006194C9 /* Repository.swift */; };
 		81F24A792743D6DC00C37ADE /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81F24A782743D6DC00C37ADE /* DashboardView.swift */; };
+		81F7E16A27D16F3F00D67EB8 /* BudgetSlicesListItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81F7E16927D16F3F00D67EB8 /* BudgetSlicesListItem.swift */; };
+		81F7E16C27D178B800D67EB8 /* NewBudgetSliceScheduleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81F7E16B27D178B800D67EB8 /* NewBudgetSliceScheduleView.swift */; };
 		81FC8750279B65460031D3AC /* Finance.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 81FC874E279B65460031D3AC /* Finance.xcdatamodeld */; };
 		81FC8752279B77240031D3AC /* CoreDataStorageProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81FC8751279B77240031D3AC /* CoreDataStorageProvider.swift */; };
 /* End PBXBuildFile section */
@@ -102,7 +104,7 @@
 		8195E8B927A4129000D58297 /* UpdateBudgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateBudgetView.swift; sourceTree = "<group>"; };
 		8195E8BB27A41BD200D58297 /* InlineErrorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InlineErrorView.swift; sourceTree = "<group>"; };
 		819993D42752F80C00FA3E03 /* Locale+Defaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Locale+Defaults.swift"; sourceTree = "<group>"; };
-		819993D62752FAA300FA3E03 /* InsertAmountField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsertAmountField.swift; sourceTree = "<group>"; };
+		819993D62752FAA300FA3E03 /* AmountTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmountTextField.swift; sourceTree = "<group>"; };
 		819993DB2757692300FA3E03 /* AmountCollectionItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmountCollectionItem.swift; sourceTree = "<group>"; };
 		81B284E227A0008D00EE51EB /* NewBudgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewBudgetView.swift; sourceTree = "<group>"; };
 		81B284E527A0011800EE51EB /* ReportController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportController.swift; sourceTree = "<group>"; };
@@ -119,8 +121,11 @@
 		81CB8BF52746BFDC00A64785 /* BudgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetView.swift; sourceTree = "<group>"; };
 		81CB8BF72746CA6500A64785 /* AmountListItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmountListItem.swift; sourceTree = "<group>"; };
 		81CB8BFD2746DA8F00A64785 /* AmountHolder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmountHolder.swift; sourceTree = "<group>"; };
+		81EB260E27D162C6006F53DA /* Finance 0. 4.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Finance 0. 4.xcdatamodel"; sourceTree = "<group>"; };
 		81EC7CAC279A17AD006194C9 /* Repository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Repository.swift; sourceTree = "<group>"; };
 		81F24A782743D6DC00C37ADE /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
+		81F7E16927D16F3F00D67EB8 /* BudgetSlicesListItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetSlicesListItem.swift; sourceTree = "<group>"; };
+		81F7E16B27D178B800D67EB8 /* NewBudgetSliceScheduleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewBudgetSliceScheduleView.swift; sourceTree = "<group>"; };
 		81FC874F279B65460031D3AC /* Finance.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Finance.xcdatamodel; sourceTree = "<group>"; };
 		81FC8751279B77240031D3AC /* CoreDataStorageProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataStorageProvider.swift; sourceTree = "<group>"; };
 		81FCE397279C59F200A407A7 /* Finance 0.1.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Finance 0.1.xcdatamodel"; sourceTree = "<group>"; };
@@ -178,9 +183,11 @@
 			children = (
 				81947EB827329707001C2AC9 /* ReportView.swift */,
 				81CB8BF52746BFDC00A64785 /* BudgetView.swift */,
+				81F7E16927D16F3F00D67EB8 /* BudgetSlicesListItem.swift */,
 				81B284E227A0008D00EE51EB /* NewBudgetView.swift */,
 				8195E8B927A4129000D58297 /* UpdateBudgetView.swift */,
 				81B284E727A0035700EE51EB /* NewBudgetSliceView.swift */,
+				81F7E16B27D178B800D67EB8 /* NewBudgetSliceScheduleView.swift */,
 			);
 			path = Budget;
 			sourceTree = "<group>";
@@ -189,7 +196,7 @@
 			isa = PBXGroup;
 			children = (
 				81BB5377274E1509002B46D6 /* AmountView.swift */,
-				819993D62752FAA300FA3E03 /* InsertAmountField.swift */,
+				819993D62752FAA300FA3E03 /* AmountTextField.swift */,
 				81CB8BF72746CA6500A64785 /* AmountListItem.swift */,
 				819993DB2757692300FA3E03 /* AmountCollectionItem.swift */,
 			);
@@ -518,13 +525,15 @@
 			files = (
 				81BB5378274E1509002B46D6 /* AmountView.swift in Sources */,
 				81F24A792743D6DC00C37ADE /* DashboardView.swift in Sources */,
+				81F7E16C27D178B800D67EB8 /* NewBudgetSliceScheduleView.swift in Sources */,
 				81FC8750279B65460031D3AC /* Finance.xcdatamodeld in Sources */,
 				81FC8752279B77240031D3AC /* CoreDataStorageProvider.swift in Sources */,
 				81CB8BF62746BFDC00A64785 /* BudgetView.swift in Sources */,
 				81C222DC279CD11F00759CCB /* MockStorageProvider.swift in Sources */,
+				81F7E16A27D16F3F00D67EB8 /* BudgetSlicesListItem.swift in Sources */,
 				81EC7CAD279A17AD006194C9 /* Repository.swift in Sources */,
 				81735ACC279A2B8D007C9AA3 /* Array+Extensions.swift in Sources */,
-				819993D72752FAA300FA3E03 /* InsertAmountField.swift in Sources */,
+				819993D72752FAA300FA3E03 /* AmountTextField.swift in Sources */,
 				811F7BD3278C2A3500F1B8C9 /* BudgetSlice.swift in Sources */,
 				81B284E827A0035700EE51EB /* NewBudgetSliceView.swift in Sources */,
 				8195E8BA27A4129000D58297 /* UpdateBudgetView.swift in Sources */,
@@ -855,12 +864,13 @@
 		81FC874E279B65460031D3AC /* Finance.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				81EB260E27D162C6006F53DA /* Finance 0. 4.xcdatamodel */,
 				81C222D8279CC4F600759CCB /* Finance 0. 3.xcdatamodel */,
 				81C222D7279CB5C700759CCB /* Finance 0. 2.xcdatamodel */,
 				81FCE397279C59F200A407A7 /* Finance 0.1.xcdatamodel */,
 				81FC874F279B65460031D3AC /* Finance.xcdatamodel */,
 			);
-			currentVersion = 81C222D8279CC4F600759CCB /* Finance 0. 3.xcdatamodel */;
+			currentVersion = 81EB260E27D162C6006F53DA /* Finance 0. 4.xcdatamodel */;
 			path = Finance.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
