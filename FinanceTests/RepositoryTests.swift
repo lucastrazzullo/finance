@@ -130,8 +130,8 @@ class RepositoryTests: XCTestCase {
     // MARK: - Update
 
     func testUpdateBudget() async throws {
-        let budgetSlicesBeforeUpdate = [try BudgetSlice(id: UUID(), name: "Slice 1", amount: .value(100))]
-        let budgetSlicesAfterUpdate = [try BudgetSlice(id: UUID(), name: "Slice 2", amount: .value(200))]
+        let budgetSlicesBeforeUpdate = [try BudgetSlice(id: UUID(), name: "Slice 1", configuration: .montly(amount: .value(100)))]
+        let budgetSlicesAfterUpdate = [try BudgetSlice(id: UUID(), name: "Slice 2", configuration: .montly(amount: .value(200)))]
 
         let budgetBeforeUpdate = try Budget(id: UUID(), name: "Test", slices: budgetSlicesBeforeUpdate)
 
@@ -147,8 +147,8 @@ class RepositoryTests: XCTestCase {
     }
 
     func testUpdateBudgetWithSameName() async throws {
-        let budget1 = try Budget(id: UUID(), name: "Test 1", amount: .value(100))
-        let budget2 = try Budget(id: UUID(), name: "Test 2", amount: .value(100))
+        let budget1 = try Budget(id: UUID(), name: "Test 1", monthlyAmount: .value(100))
+        let budget2 = try Budget(id: UUID(), name: "Test 2", monthlyAmount: .value(100))
 
         storageProvider = MockStorageProvider(budgets: [budget1, budget2])
         repository = Repository(storageProvider: storageProvider)
