@@ -9,7 +9,7 @@ import Foundation
 
 final class ReportController: ObservableObject {
 
-    @Published var report: Report
+    @Published var report: Report?
 
     let storageProvider: StorageProvider
     private let repository: Repository
@@ -17,7 +17,6 @@ final class ReportController: ObservableObject {
     init(storageProvider: StorageProvider) {
         self.storageProvider = storageProvider
         self.repository = Repository(storageProvider: storageProvider)
-        self.report = Report(budgets: [])
     }
 
     // MARK: Internal methods
@@ -55,6 +54,11 @@ final class ReportController: ObservableObject {
 
     func delete(budgetsAt offsets: IndexSet, completion: @escaping (Result<Void, DomainError>) -> Void) {
         Task { [weak self] in
+            guard let report = report else {
+                completion(.failure(.report(error: .reportIsNotLoaded)))
+                return
+            }
+
             let budgetsIdentifiersToDelete = Set(report.budgets(at: offsets).map(\.id))
             guard !budgetsIdentifiersToDelete.isEmpty else {
                 completion(.failure(.report(error: .budgetDoesntExist)))

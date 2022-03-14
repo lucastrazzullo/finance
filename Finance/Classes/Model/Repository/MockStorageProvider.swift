@@ -43,22 +43,22 @@ final class MockStorageProvider: StorageProvider, ObservableObject {
         case mock
     }
 
-    private var budgets: [Budget]
+    private var report: Report
 
     init(budgets: [Budget] = Mocks.budgets) {
-        self.budgets = budgets
+        self.report = try! Report(id: .init(), name: "Mock Report", budgets: budgets)
     }
 
     // MARK: Budget list
 
     func fetchReport() async throws -> Report {
-        return Report(budgets: budgets)
+        return report
     }
 
     // MARK: Budget
 
     func fetch(budgetWith identifier: Budget.ID) async throws -> Budget {
-        if let budget = budgets.first(where: { $0.id == identifier }) {
+        if let budget = report.budgets.first(where: { $0.id == identifier }) {
             return budget
         } else {
             throw DomainError.storageProvider(error: .budgetEntityNotFound)
@@ -66,27 +66,27 @@ final class MockStorageProvider: StorageProvider, ObservableObject {
     }
 
     func delete(budgetWith identifier: Budget.ID) async throws -> Report {
-        budgets.removeAll(where: { $0.id == identifier })
-        return Report(budgets: budgets)
+        report.budgets.removeAll(where: { $0.id == identifier })
+        return report
     }
 
     func delete(budgetsWith identifiers: Set<Budget.ID>) async throws -> Report {
-        self.budgets.removeAll(where: { identifiers.contains($0.id) })
-        return Report(budgets: budgets)
+        report.budgets.removeAll(where: { identifiers.contains($0.id) })
+        return report
     }
 
     func add(budget: Budget) async throws -> Report {
-        budgets.append(budget)
-        return Report(budgets: budgets)
+        report.budgets.append(budget)
+        return report
     }
 
     func update(budget: Budget) async throws -> Budget {
-        guard let budgetIndex = budgets.firstIndex(where: { $0.id == budget.id }) else {
+        guard let budgetIndex = report.budgets.firstIndex(where: { $0.id == budget.id }) else {
             throw DomainError.storageProvider(error: .underlying(error: Error.mock))
         }
 
-        budgets.remove(at: budgetIndex)
-        budgets.insert(budget, at: budgetIndex)
+        report.budgets.remove(at: budgetIndex)
+        report.budgets.insert(budget, at: budgetIndex)
 
         return budget
     }

@@ -28,7 +28,7 @@ final class CoreDataStorageProvider: ObservableObject, StorageProvider {
     func fetchReport() async throws -> Report {
         let budgetEntities = try fetchBudgetEntities()
         let budgets = try budgetEntities.compactMap(Budget.with(budgetEntity:))
-        let report = Report(budgets: budgets)
+        let report = Report.default(with: budgets)
         return report
     }
 

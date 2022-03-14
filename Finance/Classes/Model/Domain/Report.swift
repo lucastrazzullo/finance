@@ -9,15 +9,15 @@ import Foundation
 
 struct Report: Identifiable {
 
+    static func `default`(with budgets: [Budget]) -> Report {
+        try! Report(id: .init(), name: "Default", budgets: budgets)
+    }
+
     let id: UUID
     let name: String
-    let budgets: [Budget]
+    var budgets: [Budget]
 
     // MARK: Object life cycle
-
-    init(budgets: [Budget]) {
-        try! self.init(id: .init(), name: "Amsterdam 2022", budgets: budgets)
-    }
 
     init(id: ID, name: String, budgets: [Budget]) throws {
         guard !name.isEmpty else {

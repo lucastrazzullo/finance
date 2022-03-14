@@ -59,6 +59,7 @@ enum DomainError: Error, Identifiable {
 
 enum ReportError: DomainUnderlyingError {
 
+    case reportIsNotLoaded
     case nameNotValid
     case budgetAlreadyExistsWith(name: String)
     case budgetDoesntExist
@@ -70,6 +71,8 @@ enum ReportError: DomainUnderlyingError {
 
     var description: String {
         switch self {
+        case .reportIsNotLoaded:
+            return "Report is not loaded"
         case .nameNotValid:
             return "Name not valid!"
         case .budgetAlreadyExistsWith(let name):
