@@ -28,7 +28,7 @@ enum Mocks {
         ]
     }()
 
-    static let sliceScheduledAmounts: [BudgetSlice.ScheduledAmount] = {
+    static let sliceScheduledAmounts: [BudgetSlice.Schedule] = {
         [
             .init(amount: .value(100), month: Months.default[0]!),
             .init(amount: .value(200), month: Months.default[2]!),
@@ -45,17 +45,17 @@ final class MockStorageProvider: StorageProvider, ObservableObject {
 
     private var report: Report
 
+    // MARK: Object life cycle
+
     init(budgets: [Budget] = Mocks.budgets) {
         self.report = try! Report(id: .init(), name: "Mock Report", budgets: budgets)
     }
 
-    // MARK: Budget list
+    // MARK: Fetch
 
     func fetchReport() async throws -> Report {
         return report
     }
-
-    // MARK: Budget
 
     func fetch(budgetWith identifier: Budget.ID) async throws -> Budget {
         if let budget = report.budgets.first(where: { $0.id == identifier }) {
@@ -65,30 +65,43 @@ final class MockStorageProvider: StorageProvider, ObservableObject {
         }
     }
 
-    func delete(budgetWith identifier: Budget.ID) async throws -> Report {
-        report.budgets.removeAll(where: { $0.id == identifier })
-        return report
+    // MARK: Add
+
+    func add(budget: Budget) async throws {
+        try report.append(budget: budget)
     }
 
-    func delete(budgetsWith identifiers: Set<Budget.ID>) async throws -> Report {
-        report.budgets.removeAll(where: { identifiers.contains($0.id) })
-        return report
-    }
+    func add(slice: BudgetSlice, toBudgetWith id: Budget.ID) async throws {
+        if let budgetIndex = report.budgets.firstIndex(where: { $0.id == id }),
+            var budget = report.budget(at: budgetIndex) {
+            try budget.append(slice: slice)
 
-    func add(budget: Budget) async throws -> Report {
-        report.budgets.append(budget)
-        return report
-    }
+            report.delete(budgetWith: budget.id)
+            try report.append(budget: budget)
 
-    func update(budget: Budget) async throws -> Budget {
-        guard let budgetIndex = report.budgets.firstIndex(where: { $0.id == budget.id }) else {
-            throw DomainError.storageProvider(error: .underlying(error: Error.mock))
+        } else {
+            throw DomainError.storageProvider(error: .budgetEntityNotFound)
         }
+    }
 
-        report.budgets.remove(at: budgetIndex)
-        report.budgets.insert(budget, at: budgetIndex)
+    // MARK: Delete
 
-        return budget
+    func delete(budgetsWith identifiers: Set<Budget.ID>) async throws -> Set<Budget.ID> {
+        let budgets = report.budgets(with: identifiers)
+        report.delete(budgetsWith: identifiers)
+        return Set(budgets.map(\.id))
+    }
+
+    func delete(slicesWith identifiers: Set<BudgetSlice.ID>, inBudgetWith id: Budget.ID) async throws {
+        if var budget = report.budgets.first(where: { $0.id == id }) {
+            let indices = IndexSet(budget.slices.compactMap({ budget.slices.firstIndex(of: $0) }))
+            try budget.delete(slicesAt: indices)
+
+            report.delete(budgetWith: budget.id)
+            try report.append(budget: budget)
+        } else {
+            throw DomainError.storageProvider(error: .budgetEntityNotFound)
+        }
     }
 }
 #endif

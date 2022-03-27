@@ -9,100 +9,110 @@ import SwiftUI
 
 struct NewBudgetSliceView: View {
 
-    typealias OnSubmitErrorHandler = (DomainError) -> Void
-
-    enum ConfigurationType: String, CaseIterable {
+    enum Schedule: String, CaseIterable {
         case monthly = "Monthly"
         case scheduled = "Scheduled"
     }
 
-    let onSubmit: (BudgetSlice, OnSubmitErrorHandler) -> Void
+    // MARK: Properties
 
-    @State private var newBudgetSliceName: String = ""
-    @State private var newBudgetSliceConfigurationType: ConfigurationType = .monthly
-    @State private var newBudgetSliceMonthlyAmount: String = ""
-    @State private var newBudgetSliceSchedules: [BudgetSlice.ScheduledAmount] = []
-    @State private var newBudgetSlicePresentedError: DomainError?
-    @State private var isInsertNewBudgetSliceSchedulePresented: Bool = false
+    @State private var sliceName: String = ""
+    @State private var sliceConfigurationType: Schedule = .monthly
+    @State private var sliceMonthlyAmount: String = ""
+
+    @State private var sliceSchedules: [BudgetSlice.Schedule] = []
+    @State private var isInsertNewSchedulePresented: Bool = false
+
+    @State private var submitError: DomainError?
+
+    let onSubmit: (BudgetSlice) async throws -> Void
 
     var body: some View {
         Form {
             Section(header: Text("New Budget Slice")) {
-                TextField("Name", text: $newBudgetSliceName)
+                TextField("Name", text: $sliceName)
                     .accessibilityIdentifier(AccessibilityIdentifier.NewSliceView.nameInputField)
             }
 
             Section(header: Text("Amount")) {
-                Picker("Repeats", selection: $newBudgetSliceConfigurationType) {
-                    ForEach(ConfigurationType.allCases, id: \.self) { type in
+                Picker("Schedule", selection: $sliceConfigurationType) {
+                    ForEach(Schedule.allCases, id: \.self) { type in
                         Text(type.rawValue)
                     }
                 }
                 .pickerStyle(SegmentedPickerStyle())
                 .padding(.vertical)
 
-                switch newBudgetSliceConfigurationType {
+                switch sliceConfigurationType {
                 case .monthly:
-                    AmountTextField(amountValue: $newBudgetSliceMonthlyAmount, title: "Monthly Amount", prompt: nil)
-                        .padding(.horizontal)
+                    AmountTextField(amountValue: $sliceMonthlyAmount, title: "Monthly Amount", prompt: nil)
                         .accessibilityIdentifier(AccessibilityIdentifier.NewSliceView.amountInputField)
                 case .scheduled:
-                    List {
-                        ForEach(newBudgetSliceSchedules, id: \.month.id) { schedule in
-                            AmountListItem(label: schedule.month.name, amount: schedule.amount)
-                                .padding(4)
-                                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                                    Button(role: .destructive) {
-                                        newBudgetSliceSchedules.removeAll(where: { $0.month.id == schedule.month.id })
-                                    } label: {
-                                        Label("Delete", systemImage: "trash")
-                                    }
-                                }
-                        }
-                    }
-                    Button(action: { isInsertNewBudgetSliceSchedulePresented = true }) {
+                    SchedulesList(schedules: $sliceSchedules)
+                    Button(action: { isInsertNewSchedulePresented = true }) {
                         Label("Add", systemImage: "plus")
                     }
                 }
             }
 
             Section {
-                if let error = newBudgetSlicePresentedError {
+                if let error = submitError {
                     InlineErrorView(error: error)
                 }
 
-                Button("Save") {
-                    do {
-                        switch newBudgetSliceConfigurationType {
-                        case .monthly:
-                            let slice = try BudgetSlice(id: .init(), name: newBudgetSliceName, monthlyAmount: newBudgetSliceMonthlyAmount)
-                            onSubmit(slice) { error in
-                                newBudgetSlicePresentedError = error
-                            }
-                        case .scheduled:
-                            let slice = try BudgetSlice(id: .init(), name: newBudgetSliceName, configuration: .scheduled(schedules: newBudgetSliceSchedules))
-                            onSubmit(slice) { error in
-                                newBudgetSlicePresentedError = error
-                            }
-                        }
-                    } catch {
-                        newBudgetSlicePresentedError = error as? DomainError ?? .budgetSlice(error: .cannotCreateTheSlice(underlyingError: error))
-                    }
-                }
-                .accessibilityIdentifier(AccessibilityIdentifier.NewSliceView.saveButton)
+                Button("Save", action: submit)
+                    .accessibilityIdentifier(AccessibilityIdentifier.NewSliceView.saveButton)
             }
         }
-        .sheet(isPresented: $isInsertNewBudgetSliceSchedulePresented) {
-            NewBudgetSliceScheduleView { newSchedule, onErrorHandler in
-                do {
-                    try BudgetSlice.canAdd(schedule: newSchedule, to: newBudgetSliceSchedules)
-                    newBudgetSliceSchedules.append(newSchedule)
-                    isInsertNewBudgetSliceSchedulePresented = false
-                } catch {
-                    onErrorHandler(error as? DomainError ?? .budgetSlice(error: .cannotAddSchedule(underlyingError: error)))
-                }
+        .sheet(isPresented: $isInsertNewSchedulePresented) {
+            NewBudgetSliceScheduleView { newSchedule in
+                try BudgetSlice.willAdd(schedule: newSchedule, to: sliceSchedules)
+                sliceSchedules.append(newSchedule)
+                isInsertNewSchedulePresented = false
             }
         }
+    }
+
+    // MARK: Private helper methods
+
+    private func submit() {
+        Task {
+            do {
+                let slice = try makeSlice()
+                try await onSubmit(slice)
+                submitError = nil
+            } catch {
+                submitError = error as? DomainError
+            }
+        }
+    }
+
+    private func makeSlice() throws -> BudgetSlice {
+        switch sliceConfigurationType {
+        case .monthly:
+            return try BudgetSlice(name: sliceName, monthlyAmount: sliceMonthlyAmount)
+        case .scheduled:
+            return try BudgetSlice(name: sliceName, configuration: .scheduled(schedules: sliceSchedules))
+        }
+    }
+}
+
+private struct SchedulesList: View {
+
+    @Binding var schedules: [BudgetSlice.Schedule]
+
+    var body: some View {
+        List {
+            ForEach(schedules, id: \.month.id) { schedule in
+                AmountListItem(label: schedule.month.name, amount: schedule.amount)
+                    .padding(4)
+            }
+            .onDelete(perform: delete(at:))
+        }
+    }
+
+    private func delete(at indices: IndexSet) {
+        indices.forEach({ schedules.remove(at: $0) })
     }
 }
 
@@ -110,6 +120,6 @@ struct NewBudgetSliceView: View {
 
 struct NewBudgetSliceView_Previews: PreviewProvider {
     static var previews: some View {
-        NewBudgetSliceView { _, _ in }
+        NewBudgetSliceView { _ in }
     }
 }

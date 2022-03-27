@@ -10,12 +10,12 @@ import Foundation
 struct Report: Identifiable {
 
     static func `default`(with budgets: [Budget]) -> Report {
-        try! Report(id: .init(), name: "Default", budgets: budgets)
+        try! Report(id: .init(), name: "Default Report", budgets: budgets)
     }
 
     let id: UUID
     let name: String
-    var budgets: [Budget]
+    private(set) var budgets: [Budget]
 
     // MARK: Object life cycle
 
@@ -28,31 +28,49 @@ struct Report: Identifiable {
         self.budgets = budgets
     }
 
-    func budgets(at offsets: IndexSet) -> [Budget] {
-        return offsets.compactMap { index -> Budget? in
-            guard budgets.indices.contains(index) else {
-                return nil
-            }
-            return budgets[index]
+    // MARK: Getter methods
+
+    func budget(at index: Int) -> Budget? {
+        guard budgets.indices.contains(index) else {
+            return nil
         }
+        return budgets[index]
     }
 
-    func canAdd(budget: Budget) throws {
-        try Self.canAdd(budget: budget, to: budgets)
+    func budgets(at indices: IndexSet) -> [Budget] {
+        return budgets
+            .enumerated()
+            .filter { index, budget -> Bool in indices.contains(index) }
+            .map(\.element)
     }
 
-    func canUpdate(budget: Budget) throws {
-        try Self.canUpdate(budget: budget, in: budgets)
+    func budgets(with identifiers: Set<Budget.ID>) -> [Budget] {
+        return budgets.filter({ identifiers.contains($0.id) })
     }
 
-    static func canAdd(budget: Budget, to list: [Budget]) throws {
-        guard !list.contains(where: { $0.name == budget.name }) else {
-            throw DomainError.report(error: .budgetAlreadyExistsWith(name: budget.name))
-        }
+    func budgetIdentifiers(at indices: IndexSet) -> Set<Budget.ID> {
+        return Set(budgets(at: indices).map(\.id))
     }
 
-    static func canUpdate(budget: Budget, in list: [Budget]) throws {
-        guard !list.contains(where: { $0.id != budget.id && $0.name == budget.name }) else {
+    // MARK: Mutating methods
+
+    mutating func delete(budgetWith id: Budget.ID) {
+        budgets.removeAll(where: { $0.id == id })
+    }
+
+    mutating func delete(budgetsWith identifiers: Set<Budget.ID>) {
+        budgets.removeAll(where: { identifiers.contains($0.id) })
+    }
+
+    mutating func append(budget: Budget) throws {
+        try willAdd(budget: budget)
+        budgets.append(budget)
+    }
+
+    // MARK: Helper methods
+
+    func willAdd(budget: Budget) throws {
+        guard !budgets.contains(where: { $0.name == budget.name }) else {
             throw DomainError.report(error: .budgetAlreadyExistsWith(name: budget.name))
         }
     }

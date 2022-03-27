@@ -62,8 +62,9 @@ enum ReportError: DomainUnderlyingError {
     case reportIsNotLoaded
     case nameNotValid
     case budgetAlreadyExistsWith(name: String)
-    case budgetDoesntExist
     case cannotFetchTheBudgets
+    case cannotAddBudget
+    case cannotDeleteBudgets
 
     var id: String {
         return "Report"
@@ -77,10 +78,12 @@ enum ReportError: DomainUnderlyingError {
             return "Name not valid!"
         case .budgetAlreadyExistsWith(let name):
             return "A budget named: \(name) already exists"
-        case .budgetDoesntExist:
-            return "The budget you are looking for doesn't exist"
         case .cannotFetchTheBudgets:
             return "Budgets cannot be fetched right now"
+        case .cannotAddBudget:
+            return "Cannot add budget"
+        case .cannotDeleteBudgets:
+            return "Cannot delete budgets"
         }
     }
 
@@ -151,6 +154,8 @@ enum BudgetError: DomainUnderlyingError {
             return AccessibilityIdentifier.Error.sameNameError
         case .sliceAlreadyExistsWith:
             return AccessibilityIdentifier.Error.sameNameError
+        case .thereMustBeAtLeastOneSlice:
+            return AccessibilityIdentifier.Error.invalidSlicesError
         default:
             return AccessibilityIdentifier.Error.someError
         }
@@ -163,7 +168,7 @@ enum BudgetSliceError: DomainUnderlyingError {
     case amountNotValid
     case scheduleMonthNotValid
     case scheduleAlreadyExistsFor(month: String)
-    case scheduleDoesntExistFor(month: String)
+    case schedulesNotFound
     case thereMustBeAtLeastOneSchedule
     case cannotAddSchedule(underlyingError: Error?)
     case cannotCreateTheSlice(underlyingError: Error?)
@@ -182,8 +187,8 @@ enum BudgetSliceError: DomainUnderlyingError {
             return "Month not valid"
         case .scheduleAlreadyExistsFor(let month):
             return "Schedule already exists for \(month)"
-        case .scheduleDoesntExistFor(let month):
-            return "Schedule not found for \(month)"
+        case .schedulesNotFound:
+            return "Schedule not found"
         case .thereMustBeAtLeastOneSchedule:
             return "There must be at least one schedule"
         case .cannotAddSchedule:

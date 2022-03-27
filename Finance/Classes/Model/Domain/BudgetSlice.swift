@@ -9,14 +9,16 @@ import Foundation
 
 struct BudgetSlice: Identifiable, Hashable, AmountHolder {
 
-    struct ScheduledAmount: AmountHolder, Equatable {
+    typealias ID = UUID
+
+    struct Schedule: AmountHolder, Equatable {
         let amount: MoneyValue
         let month: Month
     }
 
     enum Configuration: AmountHolder, Equatable {
         case montly(amount: MoneyValue)
-        case scheduled(schedules: [ScheduledAmount])
+        case scheduled(schedules: [Schedule])
 
         var amount: MoneyValue {
             switch self {
@@ -28,7 +30,7 @@ struct BudgetSlice: Identifiable, Hashable, AmountHolder {
         }
     }
 
-    let id: UUID
+    let id: Self.ID
     let name: String
     let configuration: Configuration
 
@@ -38,15 +40,15 @@ struct BudgetSlice: Identifiable, Hashable, AmountHolder {
 
     // MARK: Object life cycle
 
-    init(id: UUID, name: String, monthlyAmount: String) throws {
+    init(name: String, monthlyAmount: String) throws {
         guard let monthlyAmount = MoneyValue.string(monthlyAmount) else {
             throw DomainError.budgetSlice(error: .amountNotValid)
         }
 
-        try self.init(id: id, name: name, configuration: .montly(amount: monthlyAmount))
+        try self.init(name: name, configuration: .montly(amount: monthlyAmount))
     }
 
-    init(id: UUID, name: String, configuration: Configuration) throws {
+    init(id: UUID = .init(), name: String, configuration: Configuration) throws {
         guard !name.isEmpty else {
             throw DomainError.budgetSlice(error: .nameNotValid)
         }
@@ -69,18 +71,9 @@ struct BudgetSlice: Identifiable, Hashable, AmountHolder {
 
     // MARK: Helpers
 
-    static func canAdd(schedule: ScheduledAmount, to list: [ScheduledAmount]) throws {
+    static func willAdd(schedule: Schedule, to list: [Schedule]) throws {
         guard !list.contains(where: { $0.month == schedule.month }) else {
             throw DomainError.budgetSlice(error: .scheduleAlreadyExistsFor(month: schedule.month.name))
-        }
-    }
-
-    static func canRemove(schedule: ScheduledAmount, from list: [ScheduledAmount]) throws {
-        guard list.contains(where: { $0.month == schedule.month }) else {
-            throw DomainError.budgetSlice(error: .scheduleDoesntExistFor(month: schedule.month.name))
-        }
-        guard list.count > 1 else {
-            throw DomainError.budgetSlice(error: .thereMustBeAtLeastOneSchedule)
         }
     }
 }

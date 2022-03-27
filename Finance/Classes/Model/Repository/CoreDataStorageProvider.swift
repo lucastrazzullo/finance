@@ -23,78 +23,64 @@ final class CoreDataStorageProvider: ObservableObject, StorageProvider {
         })
     }
 
-    // MARK: Report
+    // MARK: Fetch
 
     func fetchReport() async throws -> Report {
         let budgetEntities = try fetchBudgetEntities()
-        let budgets = try budgetEntities.compactMap(Budget.with(budgetEntity:))
+        let budgets = budgetEntities.compactMap { return try? Budget.with(budgetEntity: $0) }
         let report = Report.default(with: budgets)
         return report
     }
 
-    // MARK: Budget
-
     func fetch(budgetWith identifier: Budget.ID) async throws -> Budget {
         let budgetEntity = try fetchBudgetEntity(with: identifier)
-
-        do {
-            return try Budget.with(budgetEntity: budgetEntity)
-        } catch let error as DomainError {
-            throw error
-        } catch {
-            throw DomainError.storageProvider(error: .underlying(error: error))
-        }
+        return try Budget.with(budgetEntity: budgetEntity)
     }
 
-    func delete(budgetWith identifier: Budget.ID) async throws -> Report {
-        if let budgetEntity = try? fetchBudgetEntity(with: identifier) {
-            persistentContainer.viewContext.delete(budgetEntity)
-        }
+    // MARK: Add
 
-        try saveOrRollback()
-        return try await fetchReport()
-    }
-
-    func delete(budgetsWith identifiers: Set<Budget.ID>) async throws -> Report {
-        let budgetsEntities = try fetchBudgetEntities()
-        budgetsEntities.forEach { budgetEntity in
-            if let identifier = budgetEntity.identifier, identifiers.contains(identifier) {
-                self.persistentContainer.viewContext.delete(budgetEntity)
-            }
-        }
-
-        try saveOrRollback()
-        return try await fetchReport()
-    }
-
-    func add(budget: Budget) async throws -> Report {
+    func add(budget: Budget) async throws {
         let budgetEntity = BudgetEntity(context: persistentContainer.viewContext)
         setupBudgetEntity(budgetEntity, with: budget)
 
         try saveOrRollback()
-        return try await fetchReport()
     }
 
-    func update(budget: Budget) async throws -> Budget {
-        let budgetEntity = try fetchBudgetEntity(with: budget.id)
-        budgetEntity.name = budget.name
+    func add(slice: BudgetSlice, toBudgetWith id: Budget.ID) async throws {
+        let budgetEntity = try fetchBudgetEntity(with: id)
 
-        let entitySlices = budgetEntity.slices?.compactMap { $0 as? BudgetSliceEntity } ?? []
-        entitySlices.forEach { sliceEntity in
-            if !budget.slices.contains(where: { $0.id == sliceEntity.identifier }) {
-                self.persistentContainer.viewContext.delete(sliceEntity)
-            }
-        }
-        budget.slices.forEach { slice in
-            if !entitySlices.contains(where: { $0.identifier == slice.id }) {
-                let sliceEntity = BudgetSliceEntity(context: self.persistentContainer.viewContext)
-                sliceEntity.budget = budgetEntity
-                setupSliceEntity(sliceEntity, with: slice)
+        let sliceEntity = BudgetSliceEntity(context: self.persistentContainer.viewContext)
+        sliceEntity.budget = budgetEntity
+        setupSliceEntity(sliceEntity, with: slice)
+
+        try saveOrRollback()
+    }
+
+    // MARK: Delete
+
+    func delete(budgetsWith identifiers: Set<Budget.ID>) async throws -> Set<Budget.ID> {
+        var deletedBudgetIdentifiers: Set<Budget.ID> = []
+        let budgetsEntities = try fetchBudgetEntities()
+        budgetsEntities.forEach { budgetEntity in
+            if let identifier = budgetEntity.identifier, identifiers.contains(identifier) {
+                self.persistentContainer.viewContext.delete(budgetEntity)
+                deletedBudgetIdentifiers.insert(identifier)
             }
         }
 
         try saveOrRollback()
-        return try await fetch(budgetWith: budget.id)
+        return deletedBudgetIdentifiers
+    }
+
+    func delete(slicesWith identifiers: Set<BudgetSlice.ID>, inBudgetWith id: Budget.ID) async throws {
+        let slicesEntities = try fetchBudgetSlicesEntities(forBudgetWith: id)
+        slicesEntities.forEach { sliceEntity in
+            if let identifier = sliceEntity.identifier, identifiers.contains(identifier) {
+                self.persistentContainer.viewContext.delete(sliceEntity)
+            }
+        }
+
+        try saveOrRollback()
     }
 
     // MARK: Private fetching methods
@@ -120,6 +106,19 @@ final class CoreDataStorageProvider: ObservableObject, StorageProvider {
                 throw DomainError.storageProvider(error: .budgetEntityNotFound)
             }
             return budgetEntity
+        } catch {
+            throw DomainError.storageProvider(error: .underlying(error: error))
+        }
+    }
+
+    private func fetchBudgetSlicesEntities(forBudgetWith identifier: Budget.ID) throws -> [BudgetSliceEntity] {
+        let predicate = NSPredicate(format: "%K == %@", #keyPath(BudgetSliceEntity.budget.identifier), identifier as CVarArg)
+        let fetchBudgetSlicesRequest: NSFetchRequest<BudgetSliceEntity> = BudgetSliceEntity.fetchRequest()
+        fetchBudgetSlicesRequest.predicate = predicate
+
+        do {
+            let entities = try persistentContainer.viewContext.fetch(fetchBudgetSlicesRequest)
+            return entities
         } catch {
             throw DomainError.storageProvider(error: .underlying(error: error))
         }
@@ -168,13 +167,13 @@ final class CoreDataStorageProvider: ObservableObject, StorageProvider {
                 let scheduledAmountEntry = BudgetSliceScheduledAmountEntity(context: persistentContainer.viewContext)
                 scheduledAmountEntry.slice = sliceEntity
 
-                setupSliceScheduledAmountEntity(scheduledAmountEntry, with: schedule)
+                setupSliceScheduleEntity(scheduledAmountEntry, with: schedule)
                 return scheduledAmountEntry
             })
         }
     }
 
-    private func setupSliceScheduledAmountEntity(_ scheduledAmountEntry: BudgetSliceScheduledAmountEntity, with schedule: BudgetSlice.ScheduledAmount) {
+    private func setupSliceScheduleEntity(_ scheduledAmountEntry: BudgetSliceScheduledAmountEntity, with schedule: BudgetSlice.Schedule) {
         scheduledAmountEntry.amount = NSDecimalNumber(decimal: schedule.amount.value)
         scheduledAmountEntry.monthIdentifier = schedule.month.id
     }
@@ -231,7 +230,7 @@ private extension BudgetSlice.Configuration {
     static func with(budgetSliceEntity: BudgetSliceEntity) -> Self? {
         let configurationType = budgetSliceEntity.configurationType
         let monthlyAmount = budgetSliceEntity.amount
-        let schedules = budgetSliceEntity.schedules?.compactMap(BudgetSlice.ScheduledAmount.with(budgetSliceScheduledAmountEntity:))
+        let schedules = budgetSliceEntity.schedules?.compactMap(BudgetSlice.Schedule.with(budgetSliceScheduleEntity:))
 
         switch (configurationType, monthlyAmount, schedules) {
         case let (0, monthlyAmount?, _):
@@ -253,10 +252,10 @@ private extension BudgetSlice.Configuration {
     }
 }
 
-private extension BudgetSlice.ScheduledAmount {
+private extension BudgetSlice.Schedule {
 
-    static func with(budgetSliceScheduledAmountEntity: NSSet.Element) -> Self? {
-        guard let schedule = budgetSliceScheduledAmountEntity as? BudgetSliceScheduledAmountEntity,
+    static func with(budgetSliceScheduleEntity: NSSet.Element) -> Self? {
+        guard let schedule = budgetSliceScheduleEntity as? BudgetSliceScheduledAmountEntity,
               let monthIdentifier = schedule.monthIdentifier, let month = Months.default[monthIdentifier],
               let amount = schedule.amount else {
             return nil

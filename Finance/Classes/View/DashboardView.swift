@@ -13,7 +13,7 @@ struct DashboardView<StorageProviderType: StorageProvider & ObservableObject>: V
 
     var body: some View {
         NavigationView {
-            ReportView(storageProvider: storageProvider)
+            ReportView(report: Report.default(with: []), storageProvider: storageProvider)
                 .navigationTitle("Finance")
         }
     }

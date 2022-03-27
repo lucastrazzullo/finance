@@ -15,6 +15,7 @@ enum AccessibilityIdentifier {
         static let sameNameError = "SameNameError"
         static let invalidNameError = "InvalidNameError"
         static let invalidAmountError = "InvalidAmountError"
+        static let invalidSlicesError = "InvalidSlicesError"
     }
 
     enum ReportView {
@@ -24,7 +25,6 @@ enum AccessibilityIdentifier {
 
     enum NewBudgetView {
         static let nameInputField = "BudgetNameInputField"
-        static let amountInputField = "BudgetAmountInputField"
         static let addSliceButton = "AddSliceButton"
         static let sliceItem = "SliceItem"
         static let saveButton = "SaveBudgetButton"

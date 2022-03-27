@@ -24,4 +24,8 @@ final class CommonElements: FinanceElements {
     var invalidAmountError: XCUIElement {
         tablesQuery.staticTexts[AccessibilityIdentifier.Error.invalidAmountError]
     }
+
+    var invalidSlicesError: XCUIElement {
+        tablesQuery.staticTexts[AccessibilityIdentifier.Error.invalidSlicesError]
+    }
 }

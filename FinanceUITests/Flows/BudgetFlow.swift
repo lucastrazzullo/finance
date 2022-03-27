@@ -43,12 +43,6 @@ final class BudgetFlow<ParentFlow: UIFlow>: UIFlow {
         return self
     }
 
-    func insertNewBudgetAmount() -> Self {
-        newBudgetElements.amountTextField.waitForEsistanceAndTap()
-        newBudgetElements.amountTextField.typeText("100")
-        return self
-    }
-
     func insertNewBudgetSlice() -> Self {
         _ = SliceFlow(app: app, parentFlow: self)
             .tapAddNewSlice()

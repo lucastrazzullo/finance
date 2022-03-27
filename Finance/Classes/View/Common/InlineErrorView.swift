@@ -14,7 +14,7 @@ struct InlineErrorView: View {
     var body: some View {
         Text(error.description)
             .font(.caption2)
-            .foregroundColor(.teal)
+            .foregroundColor(.orange)
             .accessibilityIdentifier(error.accessibilityIdentifier)
     }
 }

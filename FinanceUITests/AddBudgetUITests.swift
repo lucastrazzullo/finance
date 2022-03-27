@@ -12,18 +12,6 @@ final class AddBudgetUITests: FinanceUITestCase {
 
     // MARK: - Happy cases
 
-    func testAddBudgetWithAmount() {
-        _ = ReportFlow(app: app)
-            .assertBudgetLinkDoesntExists()
-
-            .tapAddNewBudget()
-            .insertNewBudgetName()
-            .insertNewBudgetAmount()
-            .tapSave()?
-
-            .assertBudgetLinkExists()
-    }
-
     func testAddBudgetWithSlices() {
         _ = ReportFlow(app: app)
             .assertBudgetLinkDoesntExists()
@@ -44,12 +32,12 @@ final class AddBudgetUITests: FinanceUITestCase {
 
             .tapAddNewBudget()
             .insertNewBudgetName()
-            .insertNewBudgetAmount()
+            .insertNewBudgetSlice()
             .tapSave()?
 
             .tapAddNewBudget()
             .insertNewBudgetName()
-            .insertNewBudgetAmount()
+            .insertNewBudgetSlice()
             .tapSave()?
 
             .assertSameNameErrorExists()
@@ -72,13 +60,13 @@ final class AddBudgetUITests: FinanceUITestCase {
             .assertBudgetLinkDoesntExists()
 
             .tapAddNewBudget()
-            .insertNewBudgetAmount()
+            .insertNewBudgetSlice()
             .tapSave()?
 
             .assertInvalidNameErrorExists()
     }
 
-    func testAddBudget_withoutAmount() {
+    func testAddBudget_withoutSlices() {
         _ = ReportFlow(app: app)
             .assertBudgetLinkDoesntExists()
 
@@ -86,6 +74,6 @@ final class AddBudgetUITests: FinanceUITestCase {
             .insertNewBudgetName()
             .tapSave()?
 
-            .assertInvalidAmountErrorExists()
+            .assertInvalidSlicesErrorExists()
     }
 }

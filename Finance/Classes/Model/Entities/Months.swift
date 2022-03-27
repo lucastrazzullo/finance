@@ -9,9 +9,28 @@ import Foundation
 
 struct Months {
 
-    static let `default` = Months(all: Calendar.current.standaloneMonthSymbols.map { Month(id: $0, name: $0) })
+    static let `default` = Months(calendar: Calendar.current)
 
-    let all: [Month]
+    private let calendar: Calendar
+
+    // MARK: Object life cycle
+
+    init(calendar: Calendar) {
+        self.calendar = calendar
+    }
+
+    // MARK: Computed properties
+
+    var all: [Month] {
+        return calendar.standaloneMonthSymbols.map { Month(id: $0, name: $0) }
+    }
+
+    var current: Month {
+        let identifier = calendar.component(.month, from: Date())
+        return all[monthIndex(for: identifier)]
+    }
+
+    // MARK: Subscripts
 
     subscript(atIndex: Int) -> Month? {
         guard all.indices.contains(atIndex) else {
@@ -23,6 +42,8 @@ struct Months {
     subscript(withIdentifier: Month.ID) -> Month? {
         return all.first(where: { $0.id == withIdentifier })
     }
+
+    // MARK: Private helper methods
 
     private func monthIdentifier(by index: Int) -> Int {
         return index + 1

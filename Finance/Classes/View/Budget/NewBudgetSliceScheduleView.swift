@@ -9,50 +9,48 @@ import SwiftUI
 
 struct NewBudgetSliceScheduleView: View {
 
-    typealias OnSubmitErrorHandler = (DomainError) -> Void
-
-    let onSubmit: (BudgetSlice.ScheduledAmount, @escaping OnSubmitErrorHandler) -> Void
-
     @State private var newScheduleAmount: String = ""
-    @State private var newScheduleMonth: Month.ID = Months.default.all[0].id
-    @State private var newSchedulePresentedError: DomainError?
+    @State private var newScheduleMonth: Month.ID = Months.default.current.id
+    @State private var submitError: DomainError?
+
+    let onSubmit: (BudgetSlice.Schedule) throws -> Void
 
     var body: some View {
         Form {
             Section(header: Text("New Slice Schedule")) {
                 AmountTextField(amountValue: $newScheduleAmount, title: "Amount", prompt: nil)
-                    .padding(.horizontal)
-
-                Picker("Month", selection: $newScheduleMonth) {
-                    ForEach(Months.default.all, id: \.id) { month in
-                        Text(month.name)
-                    }
-                }
-                .pickerStyle(WheelPickerStyle())
+                MonthPickerView(month: $newScheduleMonth)
             }
 
             Section {
-                if let error = newSchedulePresentedError {
+                if let error = submitError {
                     InlineErrorView(error: error)
                 }
 
-                Button("Save") {
-                    guard let amount = MoneyValue.string(newScheduleAmount) else {
-                        newSchedulePresentedError = .budgetSlice(error: .amountNotValid)
-                        return
-                    }
-
-                    guard let month = Months.default[newScheduleMonth] else {
-                        newSchedulePresentedError = .budgetSlice(error: .scheduleMonthNotValid)
-                        return
-                    }
-
-                    onSubmit(.init(amount: amount, month: month)) { error in
-                        newSchedulePresentedError = error
-                    }
-                }
-                .accessibilityIdentifier(AccessibilityIdentifier.NewSliceView.saveButton)
+                Button("Save", action: submit)
+                    .accessibilityIdentifier(AccessibilityIdentifier.NewSliceView.saveButton)
             }
+        }
+    }
+
+    // MARK: Private helper methods
+
+    private func submit() {
+        guard let amount = MoneyValue.string(newScheduleAmount) else {
+            submitError = .budgetSlice(error: .amountNotValid)
+            return
+        }
+
+        guard let month = Months.default[newScheduleMonth] else {
+            submitError = .budgetSlice(error: .scheduleMonthNotValid)
+            return
+        }
+
+        do {
+            try onSubmit(BudgetSlice.Schedule(amount: amount, month: month))
+            submitError = nil
+        } catch {
+            submitError = error as? DomainError
         }
     }
 }
@@ -61,6 +59,6 @@ struct NewBudgetSliceScheduleView: View {
 
 struct NewBudgetSliceScheduleView_Previews: PreviewProvider {
     static var previews: some View {
-        NewBudgetSliceScheduleView() { _, _ in }
+        NewBudgetSliceScheduleView() { _ in }
     }
 }

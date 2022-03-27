@@ -13,10 +13,6 @@ final class NewBudgetElements: FinanceElements {
         tablesQuery.textFields[AccessibilityIdentifier.NewBudgetView.nameInputField]
     }
 
-    var amountTextField: XCUIElement {
-        tablesQuery.textFields[AccessibilityIdentifier.NewBudgetView.amountInputField]
-    }
-
     var sliceItem: XCUIElement {
         tablesQuery.staticTexts[AccessibilityIdentifier.NewBudgetView.sliceItem]
     }

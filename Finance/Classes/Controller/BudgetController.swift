@@ -9,47 +9,41 @@ import SwiftUI
 
 final class BudgetController: ObservableObject {
 
-    @Published var budget: Budget
+    @Published private(set) var budget: Budget
 
-    private var repository: Repository
+    private let repository: Repository
 
     init(budget: Budget, storageProvider: StorageProvider) {
         self.budget = budget
         self.repository = Repository(storageProvider: storageProvider)
     }
 
-    // MARK: Budget
+    // MARK: Public methods
 
-    func fetch() {
-        let budgetId = budget.id
-        Task { [weak self] in
-            do {
-                guard let budget = try await self?.repository.fetch(budgetWith: budgetId) else {
-                    throw DomainError.budget(error: .cannotFetchTheBudget(id: budgetId))
-                }
-                DispatchQueue.main.async { [weak self] in
-                    self?.budget = budget
-                }
-            } catch {
-                fatalError(error.localizedDescription)
-            }
+    func fetch() async throws {
+        let budget = try await repository.fetch(budgetWith: budget.id)
+
+        DispatchQueue.main.async { [weak self] in
+            self?.budget = budget
         }
     }
 
-    func update(budget: Budget, completion: @escaping (Result<Void, DomainError>) -> Void) {
-        let budget = budget
-        Task { [weak self] in
-            do {
-                guard let budget = try await self?.repository.update(budget: budget) else {
-                    throw DomainError.budget(error: .cannotUpdateTheBudget(underlyingError: nil))
-                }
-                DispatchQueue.main.async { [weak self] in
-                    self?.budget = budget
-                    completion(.success(()))
-                }
-            } catch {
-                completion(.failure(error as? DomainError ?? .underlying(error: .swiftError(error: error))))
-            }
+    func add(slice: BudgetSlice) async throws {
+        try budget.willAdd(slice: slice)
+        try await repository.add(slice: slice, toBudgetWith: budget.id)
+
+        DispatchQueue.main.async { [weak self] in
+            try? self?.budget.append(slice: slice)
+        }
+    }
+
+    func delete(slicesAt indices: IndexSet) async throws {
+        let identifiers = budget.sliceIdentifiers(at: indices)
+        try budget.willDelete(slicesWith: identifiers)
+        try await repository.delete(slicesWith: identifiers, inBudgetWith: budget.id)
+
+        DispatchQueue.main.async { [weak self] in
+            try? self?.budget.delete(slicesAt: indices)
         }
     }
 }

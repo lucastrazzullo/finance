@@ -40,4 +40,9 @@ class UIFlow {
         commonElements.invalidAmountError.assertExists()
         return self
     }
+
+    func assertInvalidSlicesErrorExists() -> Self {
+        commonElements.invalidSlicesError.assertExists()
+        return self
+    }
 }
