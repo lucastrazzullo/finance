@@ -30,6 +30,10 @@ struct Report: Identifiable {
 
     // MARK: Getter methods
 
+    func budget(with identifier: Budget.ID) -> Budget? {
+        return budgets.first(where: { $0.id == id })
+    }
+
     func budget(at index: Int) -> Budget? {
         guard budgets.indices.contains(index) else {
             return nil
@@ -70,8 +74,16 @@ struct Report: Identifiable {
     // MARK: Helper methods
 
     func willAdd(budget: Budget) throws {
-        guard !budgets.contains(where: { $0.name == budget.name }) else {
-            throw DomainError.report(error: .budgetAlreadyExistsWith(name: budget.name))
+        try willIntroduce(newBudgetName: budget.name)
+    }
+
+    func willUpdate(budgetName: String) throws {
+        try willIntroduce(newBudgetName: budgetName)
+    }
+
+    private func willIntroduce(newBudgetName: String) throws {
+        guard !budgets.contains(where: { $0.name == newBudgetName }) else {
+            throw DomainError.report(error: .budgetAlreadyExistsWith(name: newBudgetName))
         }
     }
 }

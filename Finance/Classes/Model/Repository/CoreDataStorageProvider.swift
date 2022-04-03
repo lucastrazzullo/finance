@@ -83,7 +83,16 @@ final class CoreDataStorageProvider: ObservableObject, StorageProvider {
         try saveOrRollback()
     }
 
-    // MARK: Private fetching methods
+    // MARK: Update
+
+    func update(name: String, inBudgetWith id: Budget.ID) async throws {
+        let budgetEntity = try fetchBudgetEntity(with: id)
+        budgetEntity.name = name
+
+        try saveOrRollback()
+    }
+
+    // MARK: - Private fetching methods
 
     private func fetchBudgetEntities() throws -> [BudgetEntity] {
         let fetchBudgetsRequest: NSFetchRequest<BudgetEntity> = BudgetEntity.fetchRequest()
@@ -139,7 +148,7 @@ final class CoreDataStorageProvider: ObservableObject, StorageProvider {
         }
     }
 
-    // MARK: Private setup methods
+    // MARK: - Private setup methods
 
     private func setupBudgetEntity(_ budgetEntity: BudgetEntity, with budget: Budget) {
         budgetEntity.identifier = budget.id

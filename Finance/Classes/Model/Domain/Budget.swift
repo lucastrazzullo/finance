@@ -63,6 +63,15 @@ struct Budget: Identifiable, Hashable, AmountHolder {
         slices = updatedSlices
     }
 
+    /// Updates name in budget
+    /// Parameters:
+    ///     - name: New name of the budget
+    ///
+    mutating func update(name: String) throws {
+        try willUpdate(name: name)
+        self.name = name
+    }
+
     // MARK: Getters
 
     func sliceIdentifiers(at indices: IndexSet) -> Set<BudgetSlice.ID> {
@@ -86,6 +95,10 @@ struct Budget: Identifiable, Hashable, AmountHolder {
         var updatedSlices = slices
         updatedSlices.removeAll(where: { identifiers.contains($0.id) })
         try Self.canUse(slices: updatedSlices)
+    }
+
+    func willUpdate(name: String) throws {
+        try Self.canUse(name: name)
     }
 
     static func willAdd(slice: BudgetSlice, to list: [BudgetSlice]) throws {

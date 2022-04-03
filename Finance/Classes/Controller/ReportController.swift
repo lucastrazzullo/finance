@@ -24,13 +24,13 @@ final class ReportController: ObservableObject {
 
     func fetch() async throws {
         let report = try await repository.fetchReport()
+
         DispatchQueue.main.async { [weak self] in
             self?.report = report
         }
     }
 
     func add(budget: Budget) async throws {
-        try report.willAdd(budget: budget)
         try await repository.add(budget: budget)
 
         DispatchQueue.main.async { [weak self] in

@@ -28,8 +28,19 @@ final class BudgetController: ObservableObject {
         }
     }
 
+    func update(budgetName name: String) async throws {
+        guard name != budget.name else {
+            return
+        }
+
+        try await repository.update(name: name, inBudgetWith: budget.id)
+
+        DispatchQueue.main.async { [weak self] in
+            try? self?.budget.update(name: name)
+        }
+    }
+
     func add(slice: BudgetSlice) async throws {
-        try budget.willAdd(slice: slice)
         try await repository.add(slice: slice, toBudgetWith: budget.id)
 
         DispatchQueue.main.async { [weak self] in
@@ -39,7 +50,6 @@ final class BudgetController: ObservableObject {
 
     func delete(slicesAt indices: IndexSet) async throws {
         let identifiers = budget.sliceIdentifiers(at: indices)
-        try budget.willDelete(slicesWith: identifiers)
         try await repository.delete(slicesWith: identifiers, inBudgetWith: budget.id)
 
         DispatchQueue.main.async { [weak self] in

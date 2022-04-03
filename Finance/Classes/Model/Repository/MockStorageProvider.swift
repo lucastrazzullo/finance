@@ -58,11 +58,10 @@ final class MockStorageProvider: StorageProvider, ObservableObject {
     }
 
     func fetch(budgetWith identifier: Budget.ID) async throws -> Budget {
-        if let budget = report.budgets.first(where: { $0.id == identifier }) {
-            return budget
-        } else {
+        guard let budget = report.budget(with: identifier) else {
             throw DomainError.storageProvider(error: .budgetEntityNotFound)
         }
+        return budget
     }
 
     // MARK: Add
@@ -72,16 +71,14 @@ final class MockStorageProvider: StorageProvider, ObservableObject {
     }
 
     func add(slice: BudgetSlice, toBudgetWith id: Budget.ID) async throws {
-        if let budgetIndex = report.budgets.firstIndex(where: { $0.id == id }),
-            var budget = report.budget(at: budgetIndex) {
-            try budget.append(slice: slice)
-
-            report.delete(budgetWith: budget.id)
-            try report.append(budget: budget)
-
-        } else {
+        guard var budget = report.budget(with: id) else {
             throw DomainError.storageProvider(error: .budgetEntityNotFound)
         }
+
+        try budget.append(slice: slice)
+
+        report.delete(budgetWith: budget.id)
+        try report.append(budget: budget)
     }
 
     // MARK: Delete
@@ -93,15 +90,28 @@ final class MockStorageProvider: StorageProvider, ObservableObject {
     }
 
     func delete(slicesWith identifiers: Set<BudgetSlice.ID>, inBudgetWith id: Budget.ID) async throws {
-        if var budget = report.budgets.first(where: { $0.id == id }) {
-            let indices = IndexSet(budget.slices.compactMap({ budget.slices.firstIndex(of: $0) }))
-            try budget.delete(slicesAt: indices)
-
-            report.delete(budgetWith: budget.id)
-            try report.append(budget: budget)
-        } else {
+        guard var budget = report.budget(with: id) else {
             throw DomainError.storageProvider(error: .budgetEntityNotFound)
         }
+
+        let indices = IndexSet(budget.slices.compactMap({ budget.slices.firstIndex(of: $0) }))
+        try budget.delete(slicesAt: indices)
+
+        report.delete(budgetWith: budget.id)
+        try report.append(budget: budget)
+    }
+
+    // MARK: Update
+
+    func update(name: String, inBudgetWith id: Budget.ID) async throws {
+        guard var budget = report.budget(with: id) else {
+            throw DomainError.storageProvider(error: .budgetEntityNotFound)
+        }
+
+        try budget.update(name: name)
+
+        report.delete(budgetWith: id)
+        try report.append(budget: budget)
     }
 }
 #endif
