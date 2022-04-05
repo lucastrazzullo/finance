@@ -56,7 +56,9 @@ struct BudgetView: View {
         .toolbar { EditButton() }
         .onAppear { fetch() }
         .onChange(of: isEditing) { newVaue in
-            if !isEditing {
+            if !newVaue {
+                updateBudgetNameError = nil
+                deleteSlicesError = nil
                 saveUpdatedValues()
             }
         }
@@ -108,12 +110,14 @@ private struct NameSection: View {
     let error: DomainError?
 
     var body: some View {
-        Section(header: Text("Name")) {
-            TextField("Budget Name", text: $name)
-                .disabled(!isEditing)
+        if isEditing {
+            Section(header: Text("Name")) {
+                TextField("Budget Name", text: $name)
+                    .disabled(!isEditing)
 
-            if let error = error {
-                InlineErrorView(error: error)
+                if let error = error {
+                    InlineErrorView(error: error)
+                }
             }
         }
     }
@@ -130,10 +134,16 @@ private struct SlicesListSection: View {
 
     var body: some View {
         Section(header: Text("Slices")) {
-            ForEach(slices, id: \.id) { slice in
-                BudgetSlicesListItem(slice: slice, totalAmount: slices.totalAmount)
+            if isEditing {
+                ForEach(slices, id: \.id) { slice in
+                    BudgetSlicesListItem(slice: slice, totalAmount: slices.totalAmount)
+                }
+                .onDelete(perform: onDelete)
+            } else {
+                ForEach(slices, id: \.id) { slice in
+                    BudgetSlicesListItem(slice: slice, totalAmount: slices.totalAmount)
+                }
             }
-            .onDelete(perform: onDelete)
 
             if isEditing {
                 Label("Add", systemImage: "plus")
