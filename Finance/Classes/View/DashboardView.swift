@@ -47,12 +47,18 @@ struct DashboardView<StorageProviderType: StorageProvider & ObservableObject>: V
                     onAdd: { isAddNewBudgetPresented = true },
                     onDelete: deleteBudgets(at:)
                 )
-                .navigationBarTitleDisplayMode(.inline)
                 .onAppear {
                     Task {
                         try? await reportController.fetch()
                     }
                 }
+                .sheet(isPresented: $isAddNewBudgetPresented) {
+                    NewBudgetView { budget in
+                        try await reportController.add(budget: budget)
+                        isAddNewBudgetPresented = false
+                    }
+                }
+                .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
                     ToolbarItem(placement: .navigationBarLeading) {
                         VStack(alignment: .leading) {
@@ -63,12 +69,6 @@ struct DashboardView<StorageProviderType: StorageProvider & ObservableObject>: V
 
                     ToolbarItem(placement: .navigationBarTrailing) {
                         EditButton()
-                    }
-                }
-                .sheet(isPresented: $isAddNewBudgetPresented) {
-                    NewBudgetView { budget in
-                        try await reportController.add(budget: budget)
-                        isAddNewBudgetPresented = false
                     }
                 }
             }
