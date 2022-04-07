@@ -57,3 +57,9 @@ extension MoneyValue: Comparable {
         lhs.value < rhs.value
     }
 }
+
+extension MoneyValue: Hashable {
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(value)
+    }
+}

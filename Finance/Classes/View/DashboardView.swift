@@ -9,34 +9,71 @@ import SwiftUI
 
 struct DashboardView<StorageProviderType: StorageProvider & ObservableObject>: View {
 
-    private let storageProvider: StorageProviderType
-
     @ObservedObject private var reportController: ReportController
 
     @State private var isAddNewBudgetPresented: Bool = false
     @State private var deleteBudgetsError: DomainError?
 
+    private let storageProvider: StorageProviderType
+
     var body: some View {
-        NavigationView {
-            BudgetList(
-                destination: { budget in BudgetView(budget: budget, storageProvider: storageProvider) },
-                budgets: reportController.report.budgets,
-                error: deleteBudgetsError,
-                onAdd: { isAddNewBudgetPresented = true },
-                onDelete: deleteBudgets(at:)
-            )
-            .sheet(isPresented: $isAddNewBudgetPresented) {
-                NewBudgetView { budget in
-                    try await reportController.add(budget: budget)
-                    isAddNewBudgetPresented = false
+        TabView {
+            NavigationView {
+                OverviewView()
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarLeading) {
+                            VStack(alignment: .leading) {
+                                Text(reportController.report.name).font(.title2.bold())
+                                Text("Overview").font(.caption)
+                            }
+                        }
+                    }
+            }
+            .tabItem {
+                Label("Overview", systemImage: "list.bullet.below.rectangle")
+            }
+
+            NavigationView {
+                BudgetsListView(
+                    listItem: { budget in
+                        let destination = BudgetView(budget: budget, storageProvider: storageProvider)
+                        NavigationLink(destination: destination) {
+                            AmountListItem(label: budget.name, amount: budget.amount)
+                        }
+                    },
+                    budgets: reportController.report.budgets,
+                    error: deleteBudgetsError,
+                    onAdd: { isAddNewBudgetPresented = true },
+                    onDelete: deleteBudgets(at:)
+                )
+                .navigationBarTitleDisplayMode(.inline)
+                .onAppear {
+                    Task {
+                        try? await reportController.fetch()
+                    }
+                }
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        VStack(alignment: .leading) {
+                            Text(reportController.report.name).font(.title2.bold())
+                            Text("Budgets").font(.caption)
+                        }
+                    }
+
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        EditButton()
+                    }
+                }
+                .sheet(isPresented: $isAddNewBudgetPresented) {
+                    NewBudgetView { budget in
+                        try await reportController.add(budget: budget)
+                        isAddNewBudgetPresented = false
+                    }
                 }
             }
-            .toolbar { EditButton() }
-            .navigationTitle(reportController.report.name)
-            .onAppear {
-                Task {
-                    try? await reportController.fetch()
-                }
+            .tabItem {
+                Label("Budgets", systemImage: "list.dash")
             }
         }
     }

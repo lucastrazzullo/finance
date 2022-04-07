@@ -1,5 +1,5 @@
 //
-//  BudgetList.swift
+//  BudgetsListView.swift
 //  Finance
 //
 //  Created by Luca Strazzullo on 07/04/2022.
@@ -7,9 +7,9 @@
 
 import SwiftUI
 
-struct BudgetList<Destination: View>: View {
+struct BudgetsListView<ListItem: View>: View {
 
-    @ViewBuilder let destination: (Budget) -> Destination
+    @ViewBuilder let listItem: (Budget) -> ListItem
 
     let budgets: [Budget]
     let error: DomainError?
@@ -21,10 +21,8 @@ struct BudgetList<Destination: View>: View {
         List {
             Section(header: Text("Budgets")) {
                 ForEach(budgets) { budget in
-                    NavigationLink(destination: destination(budget)) {
-                        AmountListItem(label: budget.name, amount: budget.amount)
-                    }
-                    .accessibilityIdentifier(AccessibilityIdentifier.ReportView.budgetLink)
+                    listItem(budget)
+                        .accessibilityIdentifier(AccessibilityIdentifier.ReportView.budgetLink)
                 }
                 .onDelete(perform: onDelete)
 
@@ -44,13 +42,13 @@ struct BudgetList<Destination: View>: View {
 
 // MARK: - Previews
 
-struct BudgetList_Previews: PreviewProvider {
+struct BudgetsListView_Previews: PreviewProvider {
     static let storageProvider = MockStorageProvider()
     static var previews: some View {
-        BudgetList(destination: { budget in BudgetView(budget: budget, storageProvider: storageProvider)},
-                   budgets: Mocks.budgets,
-                   error: nil,
-                   onAdd: {},
-                   onDelete: { _ in })
+        BudgetsListView(listItem: { budget in AmountListItem(label: budget.name, amount: budget.amount) },
+                        budgets: Mocks.budgets,
+                        error: nil,
+                        onAdd: {},
+                        onDelete: { _ in })
     }
 }

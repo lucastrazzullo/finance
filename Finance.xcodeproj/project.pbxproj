@@ -7,7 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		810F869F27FF4E1C00A1CDD4 /* BudgetList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 810F869E27FF4E1C00A1CDD4 /* BudgetList.swift */; };
+		810F869F27FF4E1C00A1CDD4 /* BudgetsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 810F869E27FF4E1C00A1CDD4 /* BudgetsListView.swift */; };
+		810F86A227FF833600A1CDD4 /* OverviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 810F86A127FF833600A1CDD4 /* OverviewView.swift */; };
+		810F86A427FF91CB00A1CDD4 /* MonthlyBudgetOverview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 810F86A327FF91CA00A1CDD4 /* MonthlyBudgetOverview.swift */; };
 		811F7BD3278C2A3500F1B8C9 /* BudgetSlice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 811F7BD2278C2A3500F1B8C9 /* BudgetSlice.swift */; };
 		8157AB8327BA7E15003FEB28 /* NewSliceElements.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8157AB8227BA7E15003FEB28 /* NewSliceElements.swift */; };
 		8157AB8527BA7E5D003FEB28 /* SliceFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8157AB8427BA7E5D003FEB28 /* SliceFlow.swift */; };
@@ -74,7 +76,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		810F869E27FF4E1C00A1CDD4 /* BudgetList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetList.swift; sourceTree = "<group>"; };
+		810F869E27FF4E1C00A1CDD4 /* BudgetsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetsListView.swift; sourceTree = "<group>"; };
+		810F86A127FF833600A1CDD4 /* OverviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverviewView.swift; sourceTree = "<group>"; };
+		810F86A327FF91CA00A1CDD4 /* MonthlyBudgetOverview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthlyBudgetOverview.swift; sourceTree = "<group>"; };
 		811F7BD2278C2A3500F1B8C9 /* BudgetSlice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetSlice.swift; sourceTree = "<group>"; };
 		8157AB8227BA7E15003FEB28 /* NewSliceElements.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSliceElements.swift; sourceTree = "<group>"; };
 		8157AB8427BA7E5D003FEB28 /* SliceFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SliceFlow.swift; sourceTree = "<group>"; };
@@ -154,6 +158,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		810F86A027FF832000A1CDD4 /* Overview */ = {
+			isa = PBXGroup;
+			children = (
+				810F86A127FF833600A1CDD4 /* OverviewView.swift */,
+				810F86A327FF91CA00A1CDD4 /* MonthlyBudgetOverview.swift */,
+			);
+			path = Overview;
+			sourceTree = "<group>";
+		};
 		811F7BCE278C250700F1B8C9 /* Entities */ = {
 			isa = PBXGroup;
 			children = (
@@ -179,7 +192,7 @@
 		811F7BD4278C46C100F1B8C9 /* Budget */ = {
 			isa = PBXGroup;
 			children = (
-				810F869E27FF4E1C00A1CDD4 /* BudgetList.swift */,
+				810F869E27FF4E1C00A1CDD4 /* BudgetsListView.swift */,
 				81CB8BF52746BFDC00A64785 /* BudgetView.swift */,
 				81F7E16927D16F3F00D67EB8 /* BudgetSlicesListItem.swift */,
 				81B284E227A0008D00EE51EB /* NewBudgetView.swift */,
@@ -333,6 +346,7 @@
 			isa = PBXGroup;
 			children = (
 				81F24A782743D6DC00C37ADE /* DashboardView.swift */,
+				810F86A027FF832000A1CDD4 /* Overview */,
 				81542BD6279580F300A05B77 /* Amount */,
 				811F7BD4278C46C100F1B8C9 /* Budget */,
 				819993D82756CFA300FA3E03 /* Common */,
@@ -525,11 +539,12 @@
 				81F7E16C27D178B800D67EB8 /* NewBudgetSliceScheduleView.swift in Sources */,
 				81FC8750279B65460031D3AC /* Finance.xcdatamodeld in Sources */,
 				81FC8752279B77240031D3AC /* CoreDataStorageProvider.swift in Sources */,
-				810F869F27FF4E1C00A1CDD4 /* BudgetList.swift in Sources */,
+				810F869F27FF4E1C00A1CDD4 /* BudgetsListView.swift in Sources */,
 				81CB8BF62746BFDC00A64785 /* BudgetView.swift in Sources */,
 				81C222DC279CD11F00759CCB /* MockStorageProvider.swift in Sources */,
 				81F7E16A27D16F3F00D67EB8 /* BudgetSlicesListItem.swift in Sources */,
 				81EC7CAD279A17AD006194C9 /* Repository.swift in Sources */,
+				810F86A227FF833600A1CDD4 /* OverviewView.swift in Sources */,
 				81735ACC279A2B8D007C9AA3 /* Array+Extensions.swift in Sources */,
 				819993D72752FAA300FA3E03 /* AmountTextField.swift in Sources */,
 				811F7BD3278C2A3500F1B8C9 /* BudgetSlice.swift in Sources */,
@@ -538,6 +553,7 @@
 				81CB8BFE2746DA8F00A64785 /* AmountHolder.swift in Sources */,
 				81CB8BF42746BC4A00A64785 /* MoneyValue.swift in Sources */,
 				8170340227B59945001686FA /* AccessibilityIdentifier.swift in Sources */,
+				810F86A427FF91CB00A1CDD4 /* MonthlyBudgetOverview.swift in Sources */,
 				819993D52752F80C00FA3E03 /* Locale+Defaults.swift in Sources */,
 				817033E227B1B7BB001686FA /* Report.swift in Sources */,
 				81CB8BF02746B92400A64785 /* Budget.swift in Sources */,
