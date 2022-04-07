@@ -9,70 +9,73 @@ import SwiftUI
 
 struct BudgetSlicesListItem: View {
 
-    private static let formatter: NumberFormatter = {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .percent
-        return formatter
-    }()
-
     let slice: BudgetSlice
-    let totalAmount: MoneyValue
+    let totalBudgetAmount: MoneyValue
 
     var body: some View {
-        HStack(alignment: .firstTextBaseline) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(slice.name).font(.headline)
-
-                HStack {
-                    Text("Total")
-                    AmountView(amount: slice.amount)
-
-                    if let percentage = makePercentageStringFor(amount: slice.amount) {
-                        Text(percentage)
-                            .padding(2)
-                            .background(.green)
-                            .cornerRadius(4)
-                    }
-                }
-                .font(.footnote)
-            }
-
+        HStack(alignment: .lastTextBaseline) {
+            LeadingView(label: slice.name, sliceAmount: slice.amount)
             Spacer()
-
-            switch slice.configuration {
-            case .montly(let amount):
-                makeItemTrailingView(amount: amount,
-                                     label: "Monthly",
-                                     iconSystemName: "arrow.counterclockwise.circle.fill")
-
-            case .scheduled(let schedules):
-                VStack(alignment: .trailing, spacing: 8) {
-                    ForEach(schedules, id: \.month.id) { schedule in
-                        makeItemTrailingView(amount: schedule.amount,
-                                             label: schedule.month.name,
-                                             iconSystemName: "calendar.circle.fill")
-                    }
-                }
-            }
+            TrailingView(configuration: slice.configuration)
         }
         .padding(.vertical, 8)
     }
+}
 
-    // MARK: - Private factory methods
+struct LeadingView: View {
 
-    private func makePercentageStringFor(amount: MoneyValue) -> String? {
-        let percentage = NSDecimalNumber(decimal: amount.value / totalAmount.value)
-        return Self.formatter.string(from: percentage)
-    }
+    let label: String
+    let sliceAmount: MoneyValue
 
-    @ViewBuilder
-    private func makeItemTrailingView(amount: MoneyValue, label: String, iconSystemName: String) -> some View {
-        HStack {
-            VStack(alignment: .trailing, spacing: 4) {
-                AmountView(amount: amount)
-                Text(label).font(.caption)
+    var body: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(label).font(.headline)
+
+            HStack {
+                Text("Total")
+                AmountView(amount: sliceAmount)
             }
-            Image(systemName: iconSystemName).font(.title)
+            .font(.footnote)
+        }
+    }
+}
+
+struct TrailingView: View {
+
+    let configuration: BudgetSlice.Configuration
+
+    var body: some View {
+        switch configuration {
+        case .montly(let amount):
+            TrailingViewItem(label: "Every month",
+                             iconSystemName: "arrow.counterclockwise",
+                             amount: amount)
+
+        case .scheduled(let schedules):
+            VStack(alignment: .trailing, spacing: 12) {
+                ForEach(schedules, id: \.month.id) { schedule in
+                    TrailingViewItem(label: schedule.month.name,
+                                     iconSystemName: "calendar",
+                                     amount: schedule.amount)
+                }
+            }
+        }
+    }
+}
+
+struct TrailingViewItem: View {
+
+    let label: String
+    let iconSystemName: String
+    let amount: MoneyValue
+
+    var body: some View {
+        VStack(alignment: .trailing, spacing: 2) {
+            AmountView(amount: amount).font(.headline)
+            HStack(alignment: .lastTextBaseline, spacing: 2) {
+                Text(label).font(.caption)
+                Image(systemName: iconSystemName).font(.caption2)
+            }
         }
     }
 }
@@ -84,7 +87,7 @@ struct BudgetSlicesListItem_Previews: PreviewProvider {
         List {
             Section(header: Text("Slices")) {
                 ForEach(Mocks.slices, id: \.id) { slice in
-                    BudgetSlicesListItem(slice: slice, totalAmount: Mocks.slices.totalAmount)
+                    BudgetSlicesListItem(slice: slice, totalBudgetAmount: Mocks.slices.totalAmount)
                 }
             }
         }

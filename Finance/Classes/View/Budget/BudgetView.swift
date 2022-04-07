@@ -44,7 +44,7 @@ struct BudgetView: View {
                     onDelete: deleteSlices(at:)
                 )
             }
-            .listStyle(InsetGroupedListStyle())
+            .listStyle(InsetListStyle())
         }
         .sheet(isPresented: $isInsertNewSlicePresented) {
             NewBudgetSliceView { newSlice in
@@ -136,12 +136,12 @@ private struct SlicesListSection: View {
         Section(header: Text("Slices")) {
             if isEditing {
                 ForEach(slices, id: \.id) { slice in
-                    BudgetSlicesListItem(slice: slice, totalAmount: slices.totalAmount)
+                    BudgetSlicesListItem(slice: slice, totalBudgetAmount: slices.totalAmount)
                 }
                 .onDelete(perform: onDelete)
             } else {
                 ForEach(slices, id: \.id) { slice in
-                    BudgetSlicesListItem(slice: slice, totalAmount: slices.totalAmount)
+                    BudgetSlicesListItem(slice: slice, totalBudgetAmount: slices.totalAmount)
                 }
             }
 

@@ -79,7 +79,7 @@ private struct SlicesList: View {
     var body: some View {
         List {
             ForEach(slices) { slice in
-                BudgetSlicesListItem(slice: slice, totalAmount: slices.totalAmount)
+                BudgetSlicesListItem(slice: slice, totalBudgetAmount: slices.totalAmount)
                     .accessibilityIdentifier(AccessibilityIdentifier.NewBudgetView.sliceItem)
             }
             .onDelete(perform: deleteSlices(at:))

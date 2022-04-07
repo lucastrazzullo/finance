@@ -38,6 +38,7 @@ struct BudgetList<Destination: View>: View {
                 }
             }
         }
+        .listStyle(InsetListStyle())
     }
 }
 
