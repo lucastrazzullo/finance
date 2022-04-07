@@ -31,7 +31,7 @@ struct Report: Identifiable {
     // MARK: Getter methods
 
     func budget(with identifier: Budget.ID) -> Budget? {
-        return budgets.first(where: { $0.id == id })
+        return budgets.first(where: { $0.id == identifier })
     }
 
     func budget(at index: Int) -> Budget? {

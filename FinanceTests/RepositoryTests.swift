@@ -144,23 +144,21 @@ class RepositoryTests: XCTestCase {
         XCTAssertEqual(updatedBudget.slices, [slice1, slice2])
     }
 
-//    func testUpdateBudgetWithSameName() async throws {
-//        let budget1 = try Budget(id: UUID(), name: "Test 1", monthlyAmount: .value(100))
-//        let budget2 = try Budget(id: UUID(), name: "Test 2", monthlyAmount: .value(100))
-//
-//        storageProvider = MockStorageProvider(budgets: [budget1, budget2])
-//        repository = Repository(storageProvider: storageProvider)
-//
-//        let budgetAfterUpdate = try Budget(id: budget2.id, name: budget1.name, slices: budget2.slices)
-//
-//        do {
-//            let _ = try await repository.update(budget: budgetAfterUpdate)
-//            XCTFail("Error expected")
-//        } catch {
-//            guard case DomainError.report(error: .budgetAlreadyExistsWith(name: budget1.name)) = error else {
-//                XCTFail("Expected different error than \(error)")
-//                return
-//            }
-//        }
-//    }
+    func testUpdateBudgetWithSameName() async throws {
+        let budget1 = try Budget(id: UUID(), name: "Test 1", monthlyAmount: .value(100))
+        let budget2 = try Budget(id: UUID(), name: "Test 2", monthlyAmount: .value(100))
+
+        storageProvider = MockStorageProvider(budgets: [budget1, budget2])
+        repository = Repository(storageProvider: storageProvider)
+
+        do {
+            let _ = try await repository.update(name: budget2.name, inBudgetWith: budget1.id)
+            XCTFail("Error expected")
+        } catch {
+            guard case DomainError.report(error: .budgetAlreadyExistsWith(name: budget2.name)) = error else {
+                XCTFail("Expected different error than \(error)")
+                return
+            }
+        }
+    }
 }

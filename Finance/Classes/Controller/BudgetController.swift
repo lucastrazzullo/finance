@@ -13,6 +13,8 @@ final class BudgetController: ObservableObject {
 
     private let repository: Repository
 
+    // MARK: Object life cycle
+
     init(budget: Budget, storageProvider: StorageProvider) {
         self.budget = budget
         self.repository = Repository(storageProvider: storageProvider)
