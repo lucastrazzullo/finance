@@ -3,6 +3,7 @@
     <entity name="BudgetEntity" representedClassName="BudgetEntity" syncable="YES" codeGenerationType="class">
         <attribute name="identifier" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="name" attributeType="String"/>
+        <attribute name="systemIconName" optional="YES" attributeType="String"/>
         <attribute name="year" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="slices" toMany="YES" deletionRule="Cascade" destinationEntity="BudgetSliceEntity" inverseName="budget" inverseEntity="BudgetSliceEntity"/>
     </entity>
@@ -20,7 +21,7 @@
         <relationship name="slice" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="BudgetSliceEntity" inverseName="schedules" inverseEntity="BudgetSliceEntity"/>
     </entity>
     <elements>
-        <element name="BudgetEntity" positionX="-209.69921875" positionY="-150.32421875" width="128" height="89"/>
+        <element name="BudgetEntity" positionX="-209.69921875" positionY="-150.32421875" width="128" height="104"/>
         <element name="BudgetSliceEntity" positionX="-63" positionY="-18" width="128" height="119"/>
         <element name="BudgetSliceScheduledAmountEntity" positionX="-135" positionY="-45" width="128" height="74"/>
     </elements>

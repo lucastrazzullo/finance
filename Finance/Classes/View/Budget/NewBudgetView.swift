@@ -10,6 +10,7 @@ import SwiftUI
 struct NewBudgetView: View {
 
     @State private var budgetName: String = ""
+    @State private var budgetIcon: String = BudgetViewModel.SystemIcon.default.rawValue
     @State private var budgetSlices: [BudgetSlice] = []
 
     @State private var submitError: DomainError?
@@ -21,8 +22,17 @@ struct NewBudgetView: View {
     var body: some View {
         Form {
             Section {
-                TextField("Name", text: $budgetName)
+                HStack {
+                    TextField("Name", text: $budgetName)
                     .accessibilityIdentifier(AccessibilityIdentifier.NewBudgetView.nameInputField)
+
+                    Picker("Icon", selection: $budgetIcon) {
+                        ForEach(BudgetViewModel.SystemIcon.allCases, id: \.rawValue) { name in
+                            Image(systemName: name.rawValue)
+                        }
+                    }
+                    .pickerStyle(MenuPickerStyle())
+                }
             }
 
             Section(header: Text("Slices")) {
@@ -61,7 +71,13 @@ struct NewBudgetView: View {
     private func submit() {
         Task {
             do {
-                let budget = try Budget(year: year, name: budgetName, icon: nil, slices: budgetSlices)
+                let budget = try Budget(
+                    year: year,
+                    name: budgetName,
+                    icon: .system(name: budgetIcon),
+                    slices: budgetSlices
+                )
+
                 try await onSubmit(budget)
                 submitError = nil
             } catch {

@@ -162,6 +162,14 @@ final class CoreDataStorageProvider: ObservableObject, StorageProvider {
         budgetEntity.identifier = budget.id
         budgetEntity.year = Int64(budget.year)
         budgetEntity.name = budget.name
+
+        switch budget.icon {
+        case .system(let name):
+            budgetEntity.systemIconName = name
+        case .none:
+            break
+        }
+
         budgetEntity.slices = NSSet(array: budget.slices.map { slice in
             let sliceEntity = BudgetSliceEntity(context: persistentContainer.viewContext)
             sliceEntity.budget = budgetEntity
@@ -220,11 +228,19 @@ private extension Budget {
         }
 
         let year = Int(budgetEntity.year)
+        let icon: Budget.Icon = {
+            if let systemIconName = budgetEntity.systemIconName {
+                return .system(name: systemIconName)
+            } else {
+                return .none
+            }
+        }()
+
         let budgetSlices = slices
             .compactMap { $0 as? BudgetSliceEntity }
             .compactMap { BudgetSlice.with(budgetSliceEntity: $0) }
 
-        return try Budget(id: identifier, year: year, name: name, icon: nil, slices: budgetSlices)
+        return try Budget(id: identifier, year: year, name: name, icon: icon, slices: budgetSlices)
     }
 }
 

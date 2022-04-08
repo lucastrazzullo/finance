@@ -62,6 +62,7 @@ struct BudgetView: View {
                     let viewModel = BudgetViewModel(budget: controller.budget)
                     Text(isEditing ? updatingBudgetName : viewModel.name)
                     Image(systemName: viewModel.iconSystemName)
+                        .symbolRenderingMode(.hierarchical)
                 }
             }
             ToolbarItem(placement: .navigationBarTrailing) {
