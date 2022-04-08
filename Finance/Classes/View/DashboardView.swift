@@ -35,6 +35,7 @@ struct DashboardView<StorageProviderType: StorageProvider & ObservableObject>: V
                         destination: { budget in BudgetView(budget: budget, storageProvider: storageProvider) },
                         overview: overview,
                         error: deleteBudgetsError,
+                        onAppear: { try? await overviewController.fetch() },
                         onAdd: { addNewBudgetForOverview = overviewController.overview },
                         onDelete: deleteBudgets(at:)
                     )

@@ -177,7 +177,7 @@ final class MockStorageProvider: StorageProvider, ObservableObject {
 
     // MARK: Update
 
-    func update(name: String, inBudgetWith id: Budget.ID) async throws {
+    func update(name: String, iconSystemName: String?, inBudgetWith id: Budget.ID) async throws {
         guard let overviewIndex = budgetOverviews.firstIndex(where: { $0.budgetIdentifiers().contains(id) }) else {
             throw DomainError.storageProvider(error: .overviewEntityNotFound)
         }
@@ -186,6 +186,10 @@ final class MockStorageProvider: StorageProvider, ObservableObject {
         }
 
         try budget.update(name: name)
+
+        if let iconSystemName = iconSystemName {
+            try budget.update(iconSystemName: iconSystemName)
+        }
 
         budgetOverviews[overviewIndex].delete(budgetWith: id)
         try budgetOverviews[overviewIndex].append(budget: budget)

@@ -15,6 +15,7 @@ struct BudgetViewModel {
         case food = "fork.knife"
         case car = "bolt.car"
         case health = "leaf"
+        case house = "house"
         case travel = "airplane"
         case `default` = "creditcard.and.123"
     }

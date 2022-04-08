@@ -83,7 +83,10 @@ struct YearlyBudgetOverview: Identifiable {
         try willIntroduce(newBudgetName: budget.name)
     }
 
-    func willUpdate(budgetName: String) throws {
+    func willUpdate(budgetName: String, forBudgetWith id: Budget.ID) throws {
+        guard budgets.contains(where: { $0.id == id && $0.name != budgetName }) else {
+            return
+        }
         try willIntroduce(newBudgetName: budgetName)
     }
 

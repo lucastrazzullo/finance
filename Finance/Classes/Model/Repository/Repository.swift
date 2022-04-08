@@ -26,8 +26,7 @@ protocol StorageProvider: AnyObject {
 
     // MARK: Update
 
-    func update(name: String, inBudgetWith id: Budget.ID) async throws
-
+    func update(name: String, iconSystemName: String?, inBudgetWith id: Budget.ID) async throws
 }
 
 final actor Repository {
@@ -82,13 +81,17 @@ final actor Repository {
 
     // MARK: Update
 
-    func update(name: String, inBudgetWith id: Budget.ID) async throws {
+    func update(name: String, iconSystemName: String?, inBudgetWith id: Budget.ID) async throws {
         let budget = try await fetch(budgetWith: id)
         try budget.willUpdate(name: name)
 
-        let overview = try await fetchYearlyOverview(year: budget.year)
-        try overview.willUpdate(budgetName: name)
+        if let iconSystemName = iconSystemName {
+            try budget.willUpdate(iconSystemName: iconSystemName)
+        }
 
-        try await storageProvider.update(name: name, inBudgetWith: id)
+        let overview = try await fetchYearlyOverview(year: budget.year)
+        try overview.willUpdate(budgetName: name, forBudgetWith: id)
+
+        try await storageProvider.update(name: name, iconSystemName: iconSystemName, inBudgetWith: id)
     }
 }

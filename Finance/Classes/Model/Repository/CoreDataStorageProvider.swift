@@ -85,9 +85,10 @@ final class CoreDataStorageProvider: ObservableObject, StorageProvider {
 
     // MARK: Update
 
-    func update(name: String, inBudgetWith id: Budget.ID) async throws {
+    func update(name: String, iconSystemName: String?, inBudgetWith id: Budget.ID) async throws {
         let budgetEntity = try fetchBudgetEntity(with: id)
         budgetEntity.name = name
+        budgetEntity.systemIconName = iconSystemName
 
         try saveOrRollback()
     }

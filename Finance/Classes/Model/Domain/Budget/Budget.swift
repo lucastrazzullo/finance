@@ -20,7 +20,7 @@ struct Budget: Identifiable, Hashable, AmountHolder {
 
     let id: ID
     let year: Int
-    let icon: Icon
+    private(set) var icon: Icon
     private(set) var name: String
     private(set) var slices: [BudgetSlice]
 
@@ -41,6 +41,13 @@ struct Budget: Identifiable, Hashable, AmountHolder {
         try Self.canUse(name: name)
         try Self.canUse(slices: slices)
 
+        switch icon {
+        case .system(let name):
+            try Self.canUse(iconSystemName: name)
+        case .none:
+            break
+        }
+
         self.id = id
         self.year = year
         self.icon = icon
@@ -49,6 +56,24 @@ struct Budget: Identifiable, Hashable, AmountHolder {
     }
 
     // MARK: Mutating methods
+
+    /// Updates name in budget
+    /// Parameters:
+    ///     - name: New name of the budget
+    ///
+    mutating func update(name: String) throws {
+        try willUpdate(name: name)
+        self.name = name
+    }
+
+    /// Updates the icon for the budget
+    /// Parameters:
+    ///     - iconSystemName: The system name of an SFSymbol
+    ///
+    mutating func update(iconSystemName: String) throws {
+        try willUpdate(iconSystemName: iconSystemName)
+        self.icon = .system(name: iconSystemName)
+    }
 
     /// Appends a slice to the list
     /// Parameters:
@@ -70,15 +95,6 @@ struct Budget: Identifiable, Hashable, AmountHolder {
         updatedSlices.remove(atOffsets: indices)
         try Self.canUse(slices: updatedSlices)
         slices = updatedSlices
-    }
-
-    /// Updates name in budget
-    /// Parameters:
-    ///     - name: New name of the budget
-    ///
-    mutating func update(name: String) throws {
-        try willUpdate(name: name)
-        self.name = name
     }
 
     // MARK: Getters
@@ -110,6 +126,10 @@ struct Budget: Identifiable, Hashable, AmountHolder {
         try Self.canUse(name: name)
     }
 
+    func willUpdate(iconSystemName: String) throws {
+        try Self.canUse(iconSystemName: iconSystemName)
+    }
+
     static func willAdd(slice: BudgetSlice, to list: [BudgetSlice]) throws {
         guard !list.contains(where: { $0.name == slice.name }) else {
             throw DomainError.budget(error: .sliceAlreadyExistsWith(name: slice.name))
@@ -119,6 +139,12 @@ struct Budget: Identifiable, Hashable, AmountHolder {
     private static func canUse(name: String) throws {
         guard !name.isEmpty else {
             throw DomainError.budget(error: .nameNotValid)
+        }
+    }
+
+    private static func canUse(iconSystemName: String) throws {
+        guard !iconSystemName.isEmpty else {
+            throw DomainError.budget(error: .iconSystemNameNotValid)
         }
     }
 

@@ -30,14 +30,15 @@ final class BudgetController: ObservableObject {
         }
     }
 
-    func update(budgetName name: String) async throws {
-        guard name != budget.name else {
+    func update(budgetName name: String, iconSystemName: String) async throws {
+        guard name != budget.name || Budget.Icon.system(name: iconSystemName) != budget.icon else {
             return
         }
 
-        try await repository.update(name: name, inBudgetWith: budget.id)
+        try await repository.update(name: name, iconSystemName: iconSystemName, inBudgetWith: budget.id)
 
         DispatchQueue.main.async { [weak self] in
+            try? self?.budget.update(iconSystemName: iconSystemName)
             try? self?.budget.update(name: name)
         }
     }

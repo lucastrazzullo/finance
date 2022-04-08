@@ -14,7 +14,8 @@ struct BudgetView: View {
     @ObservedObject private var controller: BudgetController
 
     @State private var updatingBudgetName: String
-    @State private var updateBudgetNameError: DomainError?
+    @State private var updatingBudgetIcon: String
+    @State private var updateBudgetInfoError: DomainError?
 
     @State private var isInsertNewSlicePresented: Bool = false
     @State private var deleteSlicesError: DomainError?
@@ -33,10 +34,11 @@ struct BudgetView: View {
             .padding(.horizontal)
 
             List {
-                NameSection(
+                InfoSection(
                     name: $updatingBudgetName,
+                    icon: $updatingBudgetIcon,
                     isEditing: isEditing,
-                    error: updateBudgetNameError
+                    error: updateBudgetInfoError
                 )
 
                 SlicesListSection(
@@ -61,7 +63,7 @@ struct BudgetView: View {
                 HStack {
                     let viewModel = BudgetViewModel(budget: controller.budget)
                     Text(isEditing ? updatingBudgetName : viewModel.name)
-                    Image(systemName: viewModel.iconSystemName)
+                    Image(systemName: isEditing ? updatingBudgetIcon : viewModel.iconSystemName)
                         .symbolRenderingMode(.hierarchical)
                 }
             }
@@ -72,7 +74,7 @@ struct BudgetView: View {
         .onAppear { fetch() }
         .onChange(of: isEditing) { newVaue in
             if !newVaue {
-                updateBudgetNameError = nil
+                updateBudgetInfoError = nil
                 deleteSlicesError = nil
                 saveUpdatedValues()
             }
@@ -84,6 +86,9 @@ struct BudgetView: View {
     init(budget: Budget, storageProvider: StorageProvider) {
         self.controller = BudgetController(budget: budget, storageProvider: storageProvider)
         self._updatingBudgetName = State<String>(wrappedValue: budget.name)
+
+        let viewModel = BudgetViewModel(budget: budget)
+        self._updatingBudgetIcon = State<String>(wrappedValue: viewModel.iconSystemName)
     }
 
     // MARK: Private helper methods
@@ -97,10 +102,10 @@ struct BudgetView: View {
     private func saveUpdatedValues() {
         Task {
             do {
-                try await controller.update(budgetName: updatingBudgetName)
-                updateBudgetNameError = nil
+                try await controller.update(budgetName: updatingBudgetName, iconSystemName: updatingBudgetIcon)
+                updateBudgetInfoError = nil
             } catch {
-                updateBudgetNameError = error as? DomainError
+                updateBudgetInfoError = error as? DomainError
             }
         }
     }
@@ -117,18 +122,24 @@ struct BudgetView: View {
     }
 }
 
-private struct NameSection: View {
+private struct InfoSection: View {
 
     @Binding var name: String
+    @Binding var icon: String
 
     let isEditing: Bool
     let error: DomainError?
 
     var body: some View {
-        if isEditing {
-            Section(header: Text("Name")) {
-                TextField("Budget Name", text: $name)
-                    .disabled(!isEditing)
+        if isEditing || error != nil {
+            Section(header: Text("Info")) {
+                HStack {
+                    TextField("Budget Name", text: $name)
+                        .disabled(!isEditing)
+
+                    BudgetIconPicker(selection: $icon, label: "Icon")
+                        .disabled(!isEditing)
+                }
 
                 if let error = error {
                     InlineErrorView(error: error)

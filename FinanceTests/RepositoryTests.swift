@@ -166,7 +166,28 @@ class RepositoryTests: XCTestCase {
         XCTAssertEqual(updatedBudget.slices, [slice1, slice2])
     }
 
-    func testUpdateBudgetWithSameName() async throws {
+    func testUpdateBudget_name() async throws {
+        let year = 2022
+        let budget1 = try Budget(year: year, name: "Test 1", icon: .none, monthlyAmount: .value(100))
+        let budget2 = try Budget(year: year, name: "Test 2", icon: .none, monthlyAmount: .value(100))
+
+        storageProvider = MockStorageProvider(budgets: [budget1, budget2])
+        repository = Repository(storageProvider: storageProvider)
+
+        let _ = try await repository.update(name: "Test 3", iconSystemName: nil, inBudgetWith: budget1.id)
+    }
+
+    func testUpdateBudget_icon() async throws {
+        let year = 2022
+        let budget1 = try Budget(year: year, name: "Test 1", icon: .none, monthlyAmount: .value(100))
+
+        storageProvider = MockStorageProvider(budgets: [budget1])
+        repository = Repository(storageProvider: storageProvider)
+
+        let _ = try await repository.update(name: budget1.name, iconSystemName: "leaf", inBudgetWith: budget1.id)
+    }
+
+    func testUpdateBudget_withSameName() async throws {
         let year = 2022
         let budget1 = try Budget(year: year, name: "Test 1", icon: .none, monthlyAmount: .value(100))
         let budget2 = try Budget(year: year, name: "Test 2", icon: .none, monthlyAmount: .value(100))
@@ -175,7 +196,7 @@ class RepositoryTests: XCTestCase {
         repository = Repository(storageProvider: storageProvider)
 
         do {
-            let _ = try await repository.update(name: budget2.name, inBudgetWith: budget1.id)
+            let _ = try await repository.update(name: budget2.name, iconSystemName: "leaf", inBudgetWith: budget1.id)
             XCTFail("Error expected")
         } catch {
             guard case DomainError.budgetOverview(error: .budgetAlreadyExistsWith(name: budget2.name)) = error else {

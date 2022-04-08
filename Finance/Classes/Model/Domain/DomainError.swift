@@ -102,6 +102,7 @@ enum BudgetOverviewError: DomainUnderlyingError {
 enum BudgetError: DomainUnderlyingError {
 
     case nameNotValid
+    case iconSystemNameNotValid
     case amountNotValid
     case multipleSlicesWithSameName
     case sliceAlreadyExistsWith(name: String)
@@ -121,6 +122,8 @@ enum BudgetError: DomainUnderlyingError {
         switch self {
         case .nameNotValid:
             return "Please use a valid name"
+        case .iconSystemNameNotValid:
+            return "Please use a valid icon system name"
         case .amountNotValid:
             return "Please use a valid amount"
         case .multipleSlicesWithSameName:

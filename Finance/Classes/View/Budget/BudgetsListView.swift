@@ -14,6 +14,7 @@ struct BudgetsListView<Destination: View>: View {
     let overview: YearlyBudgetOverview
     let error: DomainError?
 
+    let onAppear: () async -> Void
     let onAdd: () -> Void
     let onDelete: (IndexSet) -> Void
 
@@ -26,7 +27,6 @@ struct BudgetsListView<Destination: View>: View {
                             HStack {
                                 let viewModel = BudgetViewModel(budget: budget)
                                 Label(viewModel.name, systemImage: viewModel.iconSystemName)
-                                    .symbolVariant(.fill)
                                     .symbolRenderingMode(.hierarchical)
                                     .font(.body.bold())
                                     .accentColor(.secondary)
@@ -58,6 +58,7 @@ struct BudgetsListView<Destination: View>: View {
                     subtitle: "Budgets \(String(overview.year))"
                 )
             })
+            .onAppear(perform: { Task { await onAppear() }})
         }
     }
 }
@@ -72,6 +73,7 @@ struct BudgetsListView_Previews: PreviewProvider {
             destination: { budget in BudgetView(budget: budget, storageProvider: storageProvider) },
             overview: try! YearlyBudgetOverview(name: "Amsterdam", year: year, budgets: Mocks.budgets(withYear: year)),
             error: nil,
+            onAppear: {},
             onAdd: {},
             onDelete: { _ in }
         )

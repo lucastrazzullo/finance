@@ -24,14 +24,9 @@ struct NewBudgetView: View {
             Section {
                 HStack {
                     TextField("Name", text: $budgetName)
-                    .accessibilityIdentifier(AccessibilityIdentifier.NewBudgetView.nameInputField)
+                        .accessibilityIdentifier(AccessibilityIdentifier.NewBudgetView.nameInputField)
 
-                    Picker("Icon", selection: $budgetIcon) {
-                        ForEach(BudgetViewModel.SystemIcon.allCases, id: \.rawValue) { name in
-                            Image(systemName: name.rawValue)
-                        }
-                    }
-                    .pickerStyle(MenuPickerStyle())
+                    BudgetIconPicker(selection: $budgetIcon, label: "Icon")
                 }
             }
 
