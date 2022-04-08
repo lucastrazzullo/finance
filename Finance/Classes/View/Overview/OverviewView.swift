@@ -22,10 +22,6 @@ struct OverviewView: View {
                         MonthlyBudgetOverviewItem(overview: overview)
                             .listRowSeparator(.hidden)
                     }
-
-                    NavigationLink(destination: EmptyView()) {
-                        Text("View all")
-                    }
                 }
 
                 Section(header: Text("Lowest budgets this month")) {
