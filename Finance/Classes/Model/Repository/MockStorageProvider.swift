@@ -60,13 +60,13 @@ enum Mocks {
 
     // MARK: - Budgets
 
-    static let budgets: [Budget] = {
+    static func budgets(withYear year: Int) -> [Budget] {
         [
-            try! .init(id: UUID(), name: "House", slices: Mocks.slices),
-            try! .init(id: UUID(), name: "Groceries", monthlyAmount: .value(200.01)),
-            try! .init(id: UUID(), name: "Health", monthlyAmount: .value(200.01))
+            try! .init(id: UUID(), year: 2022, name: "House", slices: Mocks.slices),
+            try! .init(id: UUID(), year: 2022, name: "Groceries", monthlyAmount: .value(200.01)),
+            try! .init(id: UUID(), year: 2022, name: "Health", monthlyAmount: .value(200.01))
         ]
-    }()
+    }
 
     static let slices: [BudgetSlice] = {
         [
@@ -91,22 +91,36 @@ final class MockStorageProvider: StorageProvider, ObservableObject {
         case mock
     }
 
-    private var report: Report
+    private var budgetOverviews: [YearlyBudgetOverview]
 
     // MARK: Object life cycle
 
-    init(budgets: [Budget] = Mocks.budgets) {
-        self.report = try! Report(id: .init(), name: "Mock Report", year: 2022, budgets: budgets)
+    init(budgets: [Budget]) {
+        let years = Set(budgets.map(\.year))
+        let sortedYears = years.sorted(by: { $0 < $1 })
+        self.budgetOverviews = sortedYears.map { year in
+            try! YearlyBudgetOverview(id: .init(), name: "Mock Overview", year: year, budgets: budgets)
+        }
+    }
+
+    init(overviewYear: Int) {
+        self.budgetOverviews = [
+            try! YearlyBudgetOverview(id: .init(), name: "Mock Overview", year: overviewYear, budgets: [])
+        ]
     }
 
     // MARK: Fetch
 
-    func fetchReport() async throws -> Report {
-        return report
+    func fetchYearlyOverview(year: Int) async throws -> YearlyBudgetOverview {
+        guard let overview = budgetOverviews.first(where: { $0.year == year }) else {
+            throw DomainError.storageProvider(error: .overviewEntityNotFound)
+        }
+        return overview
     }
 
     func fetch(budgetWith identifier: Budget.ID) async throws -> Budget {
-        guard let budget = report.budget(with: identifier) else {
+        guard let overview = budgetOverviews.first(where: { $0.budgetIdentifiers().contains(identifier) }),
+              let budget = overview.budget(with: identifier) else {
             throw DomainError.storageProvider(error: .budgetEntityNotFound)
         }
         return budget
@@ -115,51 +129,67 @@ final class MockStorageProvider: StorageProvider, ObservableObject {
     // MARK: Add
 
     func add(budget: Budget) async throws {
-        try report.append(budget: budget)
+        guard let overviewIndex = budgetOverviews.firstIndex(where: { $0.year == budget.year }) else {
+            throw DomainError.storageProvider(error: .overviewEntityNotFound)
+        }
+
+        try budgetOverviews[overviewIndex].append(budget: budget)
     }
 
     func add(slice: BudgetSlice, toBudgetWith id: Budget.ID) async throws {
-        guard var budget = report.budget(with: id) else {
+        guard let overviewIndex = budgetOverviews.firstIndex(where: { $0.budgetIdentifiers().contains(id) }) else {
+            throw DomainError.storageProvider(error: .overviewEntityNotFound)
+        }
+        guard var budget = budgetOverviews[overviewIndex].budget(with: id) else {
             throw DomainError.storageProvider(error: .budgetEntityNotFound)
         }
 
         try budget.append(slice: slice)
 
-        report.delete(budgetWith: budget.id)
-        try report.append(budget: budget)
+        budgetOverviews[overviewIndex].delete(budgetWith: budget.id)
+        try budgetOverviews[overviewIndex].append(budget: budget)
     }
 
     // MARK: Delete
 
     func delete(budgetsWith identifiers: Set<Budget.ID>) async throws -> Set<Budget.ID> {
-        let budgets = report.budgets(with: identifiers)
-        report.delete(budgetsWith: identifiers)
+        guard let overviewIndex = budgetOverviews.firstIndex(where: { identifiers.isSubset(of: $0.budgetIdentifiers()) }) else {
+            throw DomainError.storageProvider(error: .overviewEntityNotFound)
+        }
+        let budgets = budgetOverviews[overviewIndex].budgets(with: identifiers)
+        budgetOverviews[overviewIndex].delete(budgetsWith: identifiers)
         return Set(budgets.map(\.id))
     }
 
     func delete(slicesWith identifiers: Set<BudgetSlice.ID>, inBudgetWith id: Budget.ID) async throws {
-        guard var budget = report.budget(with: id) else {
+        guard let overviewIndex = budgetOverviews.firstIndex(where: { $0.budgetIdentifiers().contains(id) }) else {
+            throw DomainError.storageProvider(error: .overviewEntityNotFound)
+        }
+        guard var budget = budgetOverviews[overviewIndex].budget(with: id) else {
             throw DomainError.storageProvider(error: .budgetEntityNotFound)
         }
 
         let indices = IndexSet(budget.slices.compactMap({ budget.slices.firstIndex(of: $0) }))
         try budget.delete(slicesAt: indices)
 
-        report.delete(budgetWith: budget.id)
-        try report.append(budget: budget)
+        budgetOverviews[overviewIndex].delete(budgetWith: budget.id)
+        try budgetOverviews[overviewIndex].append(budget: budget)
     }
 
     // MARK: Update
 
     func update(name: String, inBudgetWith id: Budget.ID) async throws {
-        guard var budget = report.budget(with: id) else {
+        guard let overviewIndex = budgetOverviews.firstIndex(where: { $0.budgetIdentifiers().contains(id) }) else {
+            throw DomainError.storageProvider(error: .overviewEntityNotFound)
+        }
+        guard var budget = budgetOverviews[overviewIndex].budget(with: id) else {
             throw DomainError.storageProvider(error: .budgetEntityNotFound)
         }
 
         try budget.update(name: name)
 
-        report.delete(budgetWith: id)
-        try report.append(budget: budget)
+        budgetOverviews[overviewIndex].delete(budgetWith: id)
+        try budgetOverviews[overviewIndex].append(budget: budget)
     }
 }
 #endif

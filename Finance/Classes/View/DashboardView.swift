@@ -9,7 +9,7 @@ import SwiftUI
 
 struct DashboardView<StorageProviderType: StorageProvider & ObservableObject>: View {
 
-    @ObservedObject private var reportController: ReportController
+    @ObservedObject private var overviewController: OverviewController
 
     @State private var isAddNewBudgetPresented: Bool = false
     @State private var deleteBudgetsError: DomainError?
@@ -18,50 +18,39 @@ struct DashboardView<StorageProviderType: StorageProvider & ObservableObject>: V
 
     var body: some View {
         TabView {
-            NavigationView {
-                OverviewView(
-                    listItem: { overview in MonthlyBudgetOverviewItem(overview: overview) },
-                    viewAllDestination: { EmptyView() },
-                    mostViewedOverviews: Mocks.monthlyOverviews,
-                    lowestBudgetOverviews: Mocks.montlyExpiringOverviews
-                )
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar(content: makeToolbarPrimaryItem)
-            }
+            OverviewView(
+                title: overviewController.overview.name,
+                subtitle: "Overview \(String(overviewController.overview.year))",
+                favouriteBudgetOverviews: Mocks.monthlyOverviews,
+                lowestBudgetOverviews: Mocks.montlyExpiringOverviews
+            )
             .tabItem {
                 Label("Overview", systemImage: "list.bullet.below.rectangle")
             }
 
-            NavigationView {
-                BudgetsListView(
-                    listItem: { budget in
-                        let destination = BudgetView(budget: budget, storageProvider: storageProvider)
-                        NavigationLink(destination: destination) {
-                            AmountListItem(label: budget.name, amount: budget.amount)
-                        }
-                    },
-                    budgets: reportController.report.budgets,
-                    error: deleteBudgetsError,
-                    onAdd: { isAddNewBudgetPresented = true },
-                    onDelete: deleteBudgets(at:)
-                )
-                .onAppear {
-                    Task {
-                        try? await reportController.fetch()
-                    }
+            BudgetsListView(
+                destination: { budget in BudgetView(budget: budget, storageProvider: storageProvider) },
+                title: overviewController.overview.name,
+                subtitle: "Budgets \(String(overviewController.overview.year))",
+                budgets: overviewController.overview.budgets,
+                error: deleteBudgetsError,
+                onAdd: { isAddNewBudgetPresented = true },
+                onDelete: deleteBudgets(at:)
+            )
+            .onAppear {
+                Task {
+                    try? await overviewController.fetch()
                 }
-                .sheet(isPresented: $isAddNewBudgetPresented) {
-                    NewBudgetView { budget in
-                        try await reportController.add(budget: budget)
-                        isAddNewBudgetPresented = false
-                    }
+            }
+            .sheet(isPresented: $isAddNewBudgetPresented) {
+                NewBudgetView(year: overviewController.overview.year) { budget in
+                    try await overviewController.add(budget: budget)
+                    isAddNewBudgetPresented = false
                 }
-                .navigationBarTitleDisplayMode(.inline)
-                .navigationBarItems(trailing: EditButton())
-                .toolbar(content: makeToolbarPrimaryItem)
             }
             .tabItem {
                 Label("Budgets", systemImage: "list.dash")
+                    .accessibilityIdentifier(AccessibilityIdentifier.DashboardView.budgetsTab)
             }
         }
     }
@@ -71,7 +60,7 @@ struct DashboardView<StorageProviderType: StorageProvider & ObservableObject>: V
     private func deleteBudgets(at indices: IndexSet) {
         Task {
             do {
-                try await reportController.delete(budgetsAt: indices)
+                try await overviewController.delete(budgetsAt: indices)
                 deleteBudgetsError = nil
             } catch {
                 deleteBudgetsError = error as? DomainError
@@ -83,21 +72,12 @@ struct DashboardView<StorageProviderType: StorageProvider & ObservableObject>: V
 
     init(storageProvider: StorageProviderType) {
         self.storageProvider = storageProvider
-        self.reportController = ReportController(report: Report.current(with: []), storageProvider: storageProvider)
-    }
-
-    func makeToolbarPrimaryItem() -> some ToolbarContent {
-        ToolbarItem(placement: .navigationBarLeading) {
-            VStack(alignment: .leading) {
-                Text(reportController.report.name).font(.title2.bold())
-                Text("Overview \(String(reportController.report.year))").font(.caption)
-            }
-        }
+        self.overviewController = OverviewController(overview: YearlyBudgetOverview.current(with: []), storageProvider: storageProvider)
     }
 }
 
 struct DashboardView_Previews: PreviewProvider {
     static var previews: some View {
-        DashboardView(storageProvider: MockStorageProvider())
+        DashboardView(storageProvider: MockStorageProvider(overviewYear: 2022))
     }
 }

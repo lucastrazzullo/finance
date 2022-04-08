@@ -11,6 +11,7 @@ class FinanceElements {
 
     private let app: XCUIApplication
 
+    lazy var tabBarQuery: XCUIElementQuery = app.tabBars
     lazy var tablesQuery: XCUIElementQuery = app.tables
 
     init(app: XCUIApplication) {

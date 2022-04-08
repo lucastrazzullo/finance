@@ -16,15 +16,15 @@
 		8157AB8527BA7E5D003FEB28 /* SliceFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8157AB8427BA7E5D003FEB28 /* SliceFlow.swift */; };
 		8157AB8727BACCE9003FEB28 /* AddSliceUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8157AB8627BACCE9003FEB28 /* AddSliceUITests.swift */; };
 		8157AB8927BACD2B003FEB28 /* FinanceUITestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8157AB8827BACD2B003FEB28 /* FinanceUITestCase.swift */; };
-		8157AB8B27BEC3ED003FEB28 /* ReportFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8157AB8A27BEC3ED003FEB28 /* ReportFlow.swift */; };
-		817033E227B1B7BB001686FA /* Report.swift in Sources */ = {isa = PBXBuildFile; fileRef = 817033E127B1B7BB001686FA /* Report.swift */; };
+		8157AB8B27BEC3ED003FEB28 /* BudgetsListFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8157AB8A27BEC3ED003FEB28 /* BudgetsListFlow.swift */; };
+		817033E227B1B7BB001686FA /* YearlyBudgetOverview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 817033E127B1B7BB001686FA /* YearlyBudgetOverview.swift */; };
 		817033EC27B25F9F001686FA /* RepositoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 817033EB27B25F9F001686FA /* RepositoryTests.swift */; };
 		817033F927B3D218001686FA /* AddBudgetUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 817033F827B3D218001686FA /* AddBudgetUITests.swift */; };
 		8170340227B59945001686FA /* AccessibilityIdentifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8170340127B59945001686FA /* AccessibilityIdentifier.swift */; };
 		8170340527B7E0E6001686FA /* FinanceElements.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8170340427B7E0E6001686FA /* FinanceElements.swift */; };
 		8170340727B7E1DF001686FA /* XCUIElement+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8170340627B7E1DF001686FA /* XCUIElement+Extensions.swift */; };
 		8170340927B7E2F6001686FA /* UIFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8170340827B7E2F6001686FA /* UIFlow.swift */; };
-		8170340F27B7E6A5001686FA /* ReportElements.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8170340E27B7E6A5001686FA /* ReportElements.swift */; };
+		8170340F27B7E6A5001686FA /* BudgetListViewElements.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8170340E27B7E6A5001686FA /* BudgetListViewElements.swift */; };
 		8170341127B7E6BD001686FA /* NewBudgetElements.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8170341027B7E6BD001686FA /* NewBudgetElements.swift */; };
 		8170341327B7E6E4001686FA /* BudgetFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8170341227B7E6E4001686FA /* BudgetFlow.swift */; };
 		8170341427B7F5CA001686FA /* AccessibilityIdentifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8170340127B59945001686FA /* AccessibilityIdentifier.swift */; };
@@ -38,8 +38,11 @@
 		8195E8BC27A41BD200D58297 /* InlineErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8195E8BB27A41BD200D58297 /* InlineErrorView.swift */; };
 		819993D52752F80C00FA3E03 /* Locale+Defaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 819993D42752F80C00FA3E03 /* Locale+Defaults.swift */; };
 		819993D72752FAA300FA3E03 /* AmountTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 819993D62752FAA300FA3E03 /* AmountTextField.swift */; };
+		81A6FB6A280037CD00D71BE6 /* DefaultToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81A6FB69280037CD00D71BE6 /* DefaultToolbar.swift */; };
+		81A6FB6D2800493E00D71BE6 /* DashboardFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81A6FB6C2800493E00D71BE6 /* DashboardFlow.swift */; };
+		81A6FB6F2800495A00D71BE6 /* DashboardViewElements.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81A6FB6E2800495A00D71BE6 /* DashboardViewElements.swift */; };
 		81B284E327A0008D00EE51EB /* NewBudgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81B284E227A0008D00EE51EB /* NewBudgetView.swift */; };
-		81B284E627A0011800EE51EB /* ReportController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81B284E527A0011800EE51EB /* ReportController.swift */; };
+		81B284E627A0011800EE51EB /* OverviewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81B284E527A0011800EE51EB /* OverviewController.swift */; };
 		81B284E827A0035700EE51EB /* NewBudgetSliceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81B284E727A0035700EE51EB /* NewBudgetSliceView.swift */; };
 		81B284EA27A003FB00EE51EB /* BudgetController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81B284E927A003FB00EE51EB /* BudgetController.swift */; };
 		81B284F027A02FB800EE51EB /* DomainError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81B284EF27A02FB800EE51EB /* DomainError.swift */; };
@@ -86,8 +89,8 @@
 		8157AB8427BA7E5D003FEB28 /* SliceFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SliceFlow.swift; sourceTree = "<group>"; };
 		8157AB8627BACCE9003FEB28 /* AddSliceUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddSliceUITests.swift; sourceTree = "<group>"; };
 		8157AB8827BACD2B003FEB28 /* FinanceUITestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceUITestCase.swift; sourceTree = "<group>"; };
-		8157AB8A27BEC3ED003FEB28 /* ReportFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportFlow.swift; sourceTree = "<group>"; };
-		817033E127B1B7BB001686FA /* Report.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Report.swift; sourceTree = "<group>"; };
+		8157AB8A27BEC3ED003FEB28 /* BudgetsListFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetsListFlow.swift; sourceTree = "<group>"; };
+		817033E127B1B7BB001686FA /* YearlyBudgetOverview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YearlyBudgetOverview.swift; sourceTree = "<group>"; };
 		817033E927B25F9F001686FA /* FinanceTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FinanceTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		817033EB27B25F9F001686FA /* RepositoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepositoryTests.swift; sourceTree = "<group>"; };
 		817033F627B3D218001686FA /* FinanceUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FinanceUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -96,7 +99,7 @@
 		8170340427B7E0E6001686FA /* FinanceElements.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceElements.swift; sourceTree = "<group>"; };
 		8170340627B7E1DF001686FA /* XCUIElement+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "XCUIElement+Extensions.swift"; sourceTree = "<group>"; };
 		8170340827B7E2F6001686FA /* UIFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIFlow.swift; sourceTree = "<group>"; };
-		8170340E27B7E6A5001686FA /* ReportElements.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportElements.swift; sourceTree = "<group>"; };
+		8170340E27B7E6A5001686FA /* BudgetListViewElements.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetListViewElements.swift; sourceTree = "<group>"; };
 		8170341027B7E6BD001686FA /* NewBudgetElements.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewBudgetElements.swift; sourceTree = "<group>"; };
 		8170341227B7E6E4001686FA /* BudgetFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetFlow.swift; sourceTree = "<group>"; };
 		8170341527B7FB07001686FA /* CommonElements.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonElements.swift; sourceTree = "<group>"; };
@@ -110,8 +113,12 @@
 		8195E8BB27A41BD200D58297 /* InlineErrorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InlineErrorView.swift; sourceTree = "<group>"; };
 		819993D42752F80C00FA3E03 /* Locale+Defaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Locale+Defaults.swift"; sourceTree = "<group>"; };
 		819993D62752FAA300FA3E03 /* AmountTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmountTextField.swift; sourceTree = "<group>"; };
+		81A6FB69280037CD00D71BE6 /* DefaultToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultToolbar.swift; sourceTree = "<group>"; };
+		81A6FB6B28003D5400D71BE6 /* Finance 0. 5.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Finance 0. 5.xcdatamodel"; sourceTree = "<group>"; };
+		81A6FB6C2800493E00D71BE6 /* DashboardFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardFlow.swift; sourceTree = "<group>"; };
+		81A6FB6E2800495A00D71BE6 /* DashboardViewElements.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardViewElements.swift; sourceTree = "<group>"; };
 		81B284E227A0008D00EE51EB /* NewBudgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewBudgetView.swift; sourceTree = "<group>"; };
-		81B284E527A0011800EE51EB /* ReportController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportController.swift; sourceTree = "<group>"; };
+		81B284E527A0011800EE51EB /* OverviewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverviewController.swift; sourceTree = "<group>"; };
 		81B284E727A0035700EE51EB /* NewBudgetSliceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewBudgetSliceView.swift; sourceTree = "<group>"; };
 		81B284E927A003FB00EE51EB /* BudgetController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetController.swift; sourceTree = "<group>"; };
 		81B284EF27A02FB800EE51EB /* DomainError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DomainError.swift; sourceTree = "<group>"; };
@@ -184,9 +191,9 @@
 			children = (
 				8170340127B59945001686FA /* AccessibilityIdentifier.swift */,
 				81B284EF27A02FB800EE51EB /* DomainError.swift */,
-				817033E127B1B7BB001686FA /* Report.swift */,
 				81CB8BEF2746B92400A64785 /* Budget.swift */,
 				811F7BD2278C2A3500F1B8C9 /* BudgetSlice.swift */,
+				817033E127B1B7BB001686FA /* YearlyBudgetOverview.swift */,
 				810F86A327FF91CA00A1CDD4 /* MonthlyBudgetOverview.swift */,
 			);
 			path = Domain;
@@ -260,7 +267,8 @@
 			isa = PBXGroup;
 			children = (
 				8170340827B7E2F6001686FA /* UIFlow.swift */,
-				8157AB8A27BEC3ED003FEB28 /* ReportFlow.swift */,
+				81A6FB6C2800493E00D71BE6 /* DashboardFlow.swift */,
+				8157AB8A27BEC3ED003FEB28 /* BudgetsListFlow.swift */,
 				8170341227B7E6E4001686FA /* BudgetFlow.swift */,
 				8157AB8427BA7E5D003FEB28 /* SliceFlow.swift */,
 			);
@@ -273,7 +281,8 @@
 				8170340627B7E1DF001686FA /* XCUIElement+Extensions.swift */,
 				8170340427B7E0E6001686FA /* FinanceElements.swift */,
 				8170341527B7FB07001686FA /* CommonElements.swift */,
-				8170340E27B7E6A5001686FA /* ReportElements.swift */,
+				81A6FB6E2800495A00D71BE6 /* DashboardViewElements.swift */,
+				8170340E27B7E6A5001686FA /* BudgetListViewElements.swift */,
 				8170341027B7E6BD001686FA /* NewBudgetElements.swift */,
 				8157AB8227BA7E15003FEB28 /* NewSliceElements.swift */,
 			);
@@ -330,8 +339,9 @@
 		819993D82756CFA300FA3E03 /* Common */ = {
 			isa = PBXGroup;
 			children = (
-				8195E8BB27A41BD200D58297 /* InlineErrorView.swift */,
+				81A6FB69280037CD00D71BE6 /* DefaultToolbar.swift */,
 				817A119027EF355700058C11 /* MonthPickerView.swift */,
+				8195E8BB27A41BD200D58297 /* InlineErrorView.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -339,7 +349,7 @@
 		81B284E427A0010700EE51EB /* Controller */ = {
 			isa = PBXGroup;
 			children = (
-				81B284E527A0011800EE51EB /* ReportController.swift */,
+				81B284E527A0011800EE51EB /* OverviewController.swift */,
 				81B284E927A003FB00EE51EB /* BudgetController.swift */,
 			);
 			path = Controller;
@@ -517,16 +527,18 @@
 			buildActionMask = 2147483647;
 			files = (
 				8170340527B7E0E6001686FA /* FinanceElements.swift in Sources */,
-				8157AB8B27BEC3ED003FEB28 /* ReportFlow.swift in Sources */,
+				8157AB8B27BEC3ED003FEB28 /* BudgetsListFlow.swift in Sources */,
 				8170340727B7E1DF001686FA /* XCUIElement+Extensions.swift in Sources */,
 				8157AB8527BA7E5D003FEB28 /* SliceFlow.swift in Sources */,
-				8170340F27B7E6A5001686FA /* ReportElements.swift in Sources */,
+				8170340F27B7E6A5001686FA /* BudgetListViewElements.swift in Sources */,
 				817033F927B3D218001686FA /* AddBudgetUITests.swift in Sources */,
+				81A6FB6F2800495A00D71BE6 /* DashboardViewElements.swift in Sources */,
 				8170341427B7F5CA001686FA /* AccessibilityIdentifier.swift in Sources */,
 				8157AB8727BACCE9003FEB28 /* AddSliceUITests.swift in Sources */,
 				8157AB8327BA7E15003FEB28 /* NewSliceElements.swift in Sources */,
 				8170341127B7E6BD001686FA /* NewBudgetElements.swift in Sources */,
 				8170341327B7E6E4001686FA /* BudgetFlow.swift in Sources */,
+				81A6FB6D2800493E00D71BE6 /* DashboardFlow.swift in Sources */,
 				8170341627B7FB07001686FA /* CommonElements.swift in Sources */,
 				8157AB8927BACD2B003FEB28 /* FinanceUITestCase.swift in Sources */,
 				8170340927B7E2F6001686FA /* UIFlow.swift in Sources */,
@@ -538,6 +550,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				81BB5378274E1509002B46D6 /* AmountView.swift in Sources */,
+				81A6FB6A280037CD00D71BE6 /* DefaultToolbar.swift in Sources */,
 				81F24A792743D6DC00C37ADE /* DashboardView.swift in Sources */,
 				81F7E16C27D178B800D67EB8 /* NewBudgetSliceScheduleView.swift in Sources */,
 				81FC8750279B65460031D3AC /* Finance.xcdatamodeld in Sources */,
@@ -559,10 +572,10 @@
 				8170340227B59945001686FA /* AccessibilityIdentifier.swift in Sources */,
 				810F86A427FF91CB00A1CDD4 /* MonthlyBudgetOverview.swift in Sources */,
 				819993D52752F80C00FA3E03 /* Locale+Defaults.swift in Sources */,
-				817033E227B1B7BB001686FA /* Report.swift in Sources */,
+				817033E227B1B7BB001686FA /* YearlyBudgetOverview.swift in Sources */,
 				81CB8BF02746B92400A64785 /* Budget.swift in Sources */,
 				8195E8BC27A41BD200D58297 /* InlineErrorView.swift in Sources */,
-				81B284E627A0011800EE51EB /* ReportController.swift in Sources */,
+				81B284E627A0011800EE51EB /* OverviewController.swift in Sources */,
 				81947EAB27327FCF001C2AC9 /* FinanceApp.swift in Sources */,
 				81B284F027A02FB800EE51EB /* DomainError.swift in Sources */,
 				81B80D13278C5516002E002E /* DateFormatter+Defaults.swift in Sources */,
@@ -880,13 +893,14 @@
 		81FC874E279B65460031D3AC /* Finance.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				81A6FB6B28003D5400D71BE6 /* Finance 0. 5.xcdatamodel */,
 				81EB260E27D162C6006F53DA /* Finance 0. 4.xcdatamodel */,
 				81C222D8279CC4F600759CCB /* Finance 0. 3.xcdatamodel */,
 				81C222D7279CB5C700759CCB /* Finance 0. 2.xcdatamodel */,
 				81FCE397279C59F200A407A7 /* Finance 0.1.xcdatamodel */,
 				81FC874F279B65460031D3AC /* Finance.xcdatamodel */,
 			);
-			currentVersion = 81EB260E27D162C6006F53DA /* Finance 0. 4.xcdatamodel */;
+			currentVersion = 81A6FB6B28003D5400D71BE6 /* Finance 0. 5.xcdatamodel */;
 			path = Finance.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

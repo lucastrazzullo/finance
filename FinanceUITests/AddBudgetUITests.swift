@@ -13,7 +13,8 @@ final class AddBudgetUITests: FinanceUITestCase {
     // MARK: - Happy cases
 
     func testAddBudgetWithSlices() {
-        _ = ReportFlow(app: app)
+        _ = DashboardFlow(app: app)
+            .tapBudgetsTab()
             .assertBudgetLinkDoesntExists()
 
             .tapAddNewBudget()
@@ -27,7 +28,8 @@ final class AddBudgetUITests: FinanceUITestCase {
     // MARK: - Unhappy cases
 
     func testAddBudget_withSameName() {
-        _ = ReportFlow(app: app)
+        _ = DashboardFlow(app: app)
+            .tapBudgetsTab()
             .assertBudgetLinkDoesntExists()
 
             .tapAddNewBudget()
@@ -44,7 +46,8 @@ final class AddBudgetUITests: FinanceUITestCase {
     }
 
     func testAddBudget_withSameSlice() {
-        _ = ReportFlow(app: app)
+        _ = DashboardFlow(app: app)
+            .tapBudgetsTab()
             .assertBudgetLinkDoesntExists()
 
             .tapAddNewBudget()
@@ -56,7 +59,8 @@ final class AddBudgetUITests: FinanceUITestCase {
     }
 
     func testAddBudget_withoutName() {
-        _ = ReportFlow(app: app)
+        _ = DashboardFlow(app: app)
+            .tapBudgetsTab()
             .assertBudgetLinkDoesntExists()
 
             .tapAddNewBudget()
@@ -67,7 +71,8 @@ final class AddBudgetUITests: FinanceUITestCase {
     }
 
     func testAddBudget_withoutSlices() {
-        _ = ReportFlow(app: app)
+        _ = DashboardFlow(app: app)
+            .tapBudgetsTab()
             .assertBudgetLinkDoesntExists()
 
             .tapAddNewBudget()

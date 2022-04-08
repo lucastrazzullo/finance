@@ -11,7 +11,7 @@ protocol StorageProvider: AnyObject {
 
     // MARK: Fetch
 
-    func fetchReport() async throws -> Report
+    func fetchYearlyOverview(year: Int) async throws -> YearlyBudgetOverview
     func fetch(budgetWith identifier: Budget.ID) async throws -> Budget
 
     // MARK: Add
@@ -42,8 +42,8 @@ final actor Repository {
 
     // MARK: Fetch
 
-    func fetchReport() async throws -> Report {
-        return try await storageProvider.fetchReport()
+    func fetchYearlyOverview(year: Int) async throws -> YearlyBudgetOverview {
+        return try await storageProvider.fetchYearlyOverview(year: year)
     }
 
     func fetch(budgetWith id: Budget.ID) async throws -> Budget {
@@ -60,8 +60,8 @@ final actor Repository {
     }
 
     func add(budget: Budget) async throws {
-        let report = try await fetchReport()
-        try report.willAdd(budget: budget)
+        let overview = try await fetchYearlyOverview(year: budget.year)
+        try overview.willAdd(budget: budget)
 
         try await storageProvider.add(budget: budget)
     }
@@ -83,11 +83,11 @@ final actor Repository {
     // MARK: Update
 
     func update(name: String, inBudgetWith id: Budget.ID) async throws {
-        let report = try await fetchReport()
-        try report.willUpdate(budgetName: name)
-
         let budget = try await fetch(budgetWith: id)
         try budget.willUpdate(name: name)
+
+        let overview = try await fetchYearlyOverview(year: budget.year)
+        try overview.willUpdate(budgetName: name)
 
         try await storageProvider.update(name: name, inBudgetWith: id)
     }

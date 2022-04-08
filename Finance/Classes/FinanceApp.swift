@@ -13,7 +13,7 @@ struct FinanceApp: App {
     var body: some Scene {
         WindowGroup {
             if CommandLine.arguments.contains("testing") {
-                DashboardView(storageProvider: MockStorageProvider(budgets: []))
+                DashboardView(storageProvider: MockStorageProvider(overviewYear: 2022))
             } else {
                 DashboardView(storageProvider: CoreDataStorageProvider())
             }

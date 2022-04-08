@@ -7,10 +7,12 @@
 
 import SwiftUI
 
-struct BudgetsListView<ListItem: View>: View {
+struct BudgetsListView<Destination: View>: View {
 
-    @ViewBuilder let listItem: (Budget) -> ListItem
+    @ViewBuilder var destination: (Budget) -> Destination
 
+    let title: String
+    let subtitle: String
     let budgets: [Budget]
     let error: DomainError?
 
@@ -18,37 +20,54 @@ struct BudgetsListView<ListItem: View>: View {
     let onDelete: (IndexSet) -> Void
 
     var body: some View {
-        List {
-            Section(header: Text("Budgets")) {
-                ForEach(budgets) { budget in
-                    listItem(budget)
-                        .accessibilityIdentifier(AccessibilityIdentifier.ReportView.budgetLink)
-                }
-                .onDelete(perform: onDelete)
+        NavigationView {
+            List {
+                Section(header: Text("Budgets")) {
+                    ForEach(budgets) { budget in
+                        NavigationLink(destination: destination(budget)) {
+                            AmountListItem(label: budget.name, amount: budget.amount)
+                        }
+                        .accessibilityIdentifier(AccessibilityIdentifier.BudgetsListView.budgetLink)
+                    }
+                    .onDelete(perform: onDelete)
 
-                if let error = error {
-                    InlineErrorView(error: error)
-                }
+                    if let error = error {
+                        InlineErrorView(error: error)
+                    }
 
-                Button(action: onAdd) {
-                    Label("Add", systemImage: "plus")
-                        .accessibilityIdentifier(AccessibilityIdentifier.ReportView.addBudgetButton)
+                    Button(action: onAdd) {
+                        Label("Add", systemImage: "plus")
+                            .accessibilityIdentifier(AccessibilityIdentifier.BudgetsListView.addBudgetButton)
+                    }
                 }
             }
+            .listStyle(InsetListStyle())
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarItems(trailing: EditButton())
+            .toolbar(content: {
+                DefaultToolbar(
+                    title: title,
+                    subtitle: subtitle
+                )
+            })
         }
-        .listStyle(InsetListStyle())
     }
 }
 
 // MARK: - Previews
 
 struct BudgetsListView_Previews: PreviewProvider {
-    static let storageProvider = MockStorageProvider()
+    static let year = 2022
+    static let storageProvider = MockStorageProvider(overviewYear: year)
     static var previews: some View {
-        BudgetsListView(listItem: { budget in AmountListItem(label: budget.name, amount: budget.amount) },
-                        budgets: Mocks.budgets,
-                        error: nil,
-                        onAdd: {},
-                        onDelete: { _ in })
+        BudgetsListView(
+            destination: { budget in BudgetView(budget: budget, storageProvider: storageProvider) },
+            title: "Title",
+            subtitle: "Subtitle",
+            budgets: Mocks.budgets(withYear: year),
+            error: nil,
+            onAdd: {},
+            onDelete: { _ in }
+        )
     }
 }

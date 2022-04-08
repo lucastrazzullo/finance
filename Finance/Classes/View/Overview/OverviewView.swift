@@ -7,42 +7,52 @@
 
 import SwiftUI
 
-struct OverviewView<ListItem: View, ViewAllDestination: View>: View {
+struct OverviewView: View {
 
-    @ViewBuilder let listItem: (MonthlyBudgetOverview) -> ListItem
-    @ViewBuilder let viewAllDestination: () -> ViewAllDestination
-
-    let mostViewedOverviews: [MonthlyBudgetOverview]
+    let title: String
+    let subtitle: String
+    let favouriteBudgetOverviews: [MonthlyBudgetOverview]
     let lowestBudgetOverviews: [MonthlyBudgetOverview]
 
     var body: some View {
-        List {
-            Section(header: Text("Most viewed in April")) {
-                ForEach(mostViewedOverviews, id: \.self) { overview in
-                    listItem(overview).listRowSeparator(.hidden)
+        NavigationView {
+            List {
+                Section(header: Text("Favourites")) {
+                    ForEach(favouriteBudgetOverviews, id: \.self) { overview in
+                        MonthlyBudgetOverviewItem(overview: overview)
+                            .listRowSeparator(.hidden)
+                    }
+
+                    NavigationLink(destination: EmptyView()) {
+                        Text("View all")
+                    }
                 }
 
-                NavigationLink(destination: viewAllDestination()) {
-                    Text("View all")
+                Section(header: Text("Lowest budgets this month")) {
+                    ForEach(lowestBudgetOverviews, id: \.self) { overview in
+                        MonthlyBudgetOverviewItem(overview: overview)
+                            .listRowSeparator(.hidden)
+                    }
                 }
             }
-
-            Section(header: Text("Lowest budgets in April")) {
-                ForEach(lowestBudgetOverviews, id: \.self) { overview in
-                    listItem(overview).listRowSeparator(.hidden)
-                }
-            }
+            .listStyle(PlainListStyle())
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar(content: {
+                DefaultToolbar(
+                    title: title,
+                    subtitle: subtitle
+                )
+            })
         }
-        .listStyle(PlainListStyle())
     }
 }
 
 struct OverviewView_Previews: PreviewProvider {
     static var previews: some View {
         OverviewView(
-            listItem: { overview in MonthlyBudgetOverviewItem(overview: overview) },
-            viewAllDestination: { EmptyView() },
-            mostViewedOverviews: Mocks.monthlyOverviews,
+            title: "Title",
+            subtitle: "Subtitle",
+            favouriteBudgetOverviews: Mocks.monthlyOverviews,
             lowestBudgetOverviews: Mocks.montlyExpiringOverviews
         )
     }

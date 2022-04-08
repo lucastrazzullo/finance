@@ -15,6 +15,7 @@ struct NewBudgetView: View {
     @State private var submitError: DomainError?
     @State private var isInsertNewBudgetSlicePresented: Bool = false
 
+    let year: Int
     let onSubmit: (Budget) async throws -> Void
 
     var body: some View {
@@ -60,7 +61,7 @@ struct NewBudgetView: View {
     private func submit() {
         Task {
             do {
-                let budget = try Budget(name: budgetName, slices: budgetSlices)
+                let budget = try Budget(year: year, name: budgetName, slices: budgetSlices)
                 try await onSubmit(budget)
                 submitError = nil
             } catch {
@@ -101,6 +102,6 @@ private struct SlicesList: View {
 struct NewBudgetView_Previews: PreviewProvider {
 
     static var previews: some View {
-        NewBudgetView { _ in }
+        NewBudgetView(year: 2022) { _ in }
     }
 }

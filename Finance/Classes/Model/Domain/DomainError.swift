@@ -15,7 +15,7 @@ protocol DomainUnderlyingError {
 
 enum DomainError: Error, Identifiable {
 
-    case report(error: ReportError)
+    case budgetOverview(error: BudgetOverviewError)
     case budget(error: BudgetError)
     case budgetSlice(error: BudgetSliceError)
     case storageProvider(error: StorageProviderError)
@@ -39,7 +39,7 @@ enum DomainError: Error, Identifiable {
 
     var underlyingError: DomainUnderlyingError {
         switch self {
-        case .report(let error):
+        case .budgetOverview(let error):
             return error
         case .budget(let error):
             return error
@@ -57,9 +57,8 @@ enum DomainError: Error, Identifiable {
     }
 }
 
-enum ReportError: DomainUnderlyingError {
+enum BudgetOverviewError: DomainUnderlyingError {
 
-    case reportIsNotLoaded
     case nameNotValid
     case budgetAlreadyExistsWith(name: String)
     case cannotFetchTheBudgets
@@ -67,13 +66,11 @@ enum ReportError: DomainUnderlyingError {
     case cannotDeleteBudgets
 
     var id: String {
-        return "Report"
+        return "YearlyBudgetOverview"
     }
 
     var description: String {
         switch self {
-        case .reportIsNotLoaded:
-            return "Report is not loaded"
         case .nameNotValid:
             return "Name not valid!"
         case .budgetAlreadyExistsWith(let name):
@@ -211,6 +208,7 @@ enum BudgetSliceError: DomainUnderlyingError {
 }
 
 enum StorageProviderError: DomainUnderlyingError {
+    case overviewEntityNotFound
     case budgetEntityNotFound
     case cannotCreateBudgetWithEntity
     case underlying(error: Error)
@@ -221,6 +219,8 @@ enum StorageProviderError: DomainUnderlyingError {
 
     var description: String {
         switch self {
+        case .overviewEntityNotFound:
+            return "The overview you're looking for is missing"
         case .budgetEntityNotFound:
             return "The budget you're looking for is missing"
         case .cannotCreateBudgetWithEntity:

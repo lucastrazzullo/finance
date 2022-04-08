@@ -25,11 +25,11 @@ final class CoreDataStorageProvider: ObservableObject, StorageProvider {
 
     // MARK: Fetch
 
-    func fetchReport() async throws -> Report {
-        let budgetEntities = try fetchBudgetEntities()
+    func fetchYearlyOverview(year: Int) async throws -> YearlyBudgetOverview {
+        let budgetEntities = try fetchBudgetEntities(year: year)
         let budgets = budgetEntities.compactMap { return try? Budget.with(budgetEntity: $0) }
-        let report = Report.current(with: budgets)
-        return report
+        let overview = YearlyBudgetOverview.current(with: budgets)
+        return overview
     }
 
     func fetch(budgetWith identifier: Budget.ID) async throws -> Budget {
@@ -94,8 +94,13 @@ final class CoreDataStorageProvider: ObservableObject, StorageProvider {
 
     // MARK: - Private fetching methods
 
-    private func fetchBudgetEntities() throws -> [BudgetEntity] {
+    private func fetchBudgetEntities(year: Int? = nil) throws -> [BudgetEntity] {
         let fetchBudgetsRequest: NSFetchRequest<BudgetEntity> = BudgetEntity.fetchRequest()
+
+        if let year = year {
+            let predicate = NSPredicate(format: "%K == %@", #keyPath(BudgetEntity.year), year as CVarArg)
+            fetchBudgetsRequest.predicate = predicate
+        }
 
         do {
             let entities = try persistentContainer.viewContext.fetch(fetchBudgetsRequest)
@@ -106,8 +111,9 @@ final class CoreDataStorageProvider: ObservableObject, StorageProvider {
     }
 
     private func fetchBudgetEntity(with identifier: Budget.ID) throws -> BudgetEntity {
-        let predicate = NSPredicate(format: "%K == %@", #keyPath(BudgetEntity.identifier), identifier as CVarArg)
         let fetchBudgetsRequest: NSFetchRequest<BudgetEntity> = BudgetEntity.fetchRequest()
+
+        let predicate = NSPredicate(format: "%K == %@", #keyPath(BudgetEntity.identifier), identifier as CVarArg)
         fetchBudgetsRequest.predicate = predicate
 
         do {
@@ -121,8 +127,9 @@ final class CoreDataStorageProvider: ObservableObject, StorageProvider {
     }
 
     private func fetchBudgetSlicesEntities(forBudgetWith identifier: Budget.ID) throws -> [BudgetSliceEntity] {
-        let predicate = NSPredicate(format: "%K == %@", #keyPath(BudgetSliceEntity.budget.identifier), identifier as CVarArg)
         let fetchBudgetSlicesRequest: NSFetchRequest<BudgetSliceEntity> = BudgetSliceEntity.fetchRequest()
+
+        let predicate = NSPredicate(format: "%K == %@", #keyPath(BudgetSliceEntity.budget.identifier), identifier as CVarArg)
         fetchBudgetSlicesRequest.predicate = predicate
 
         do {
@@ -134,8 +141,9 @@ final class CoreDataStorageProvider: ObservableObject, StorageProvider {
     }
 
     private func fetchBudgetSliceEntity(with identifier: BudgetSlice.ID) throws -> BudgetSliceEntity {
-        let predicate = NSPredicate(format: "%K == %@", #keyPath(BudgetSliceEntity.identifier), identifier as CVarArg)
         let fetchBudgetSlicesRequest: NSFetchRequest<BudgetSliceEntity> = BudgetSliceEntity.fetchRequest()
+
+        let predicate = NSPredicate(format: "%K == %@", #keyPath(BudgetSliceEntity.identifier), identifier as CVarArg)
         fetchBudgetSlicesRequest.predicate = predicate
 
         do {
@@ -210,11 +218,12 @@ private extension Budget {
                   throw DomainError.storageProvider(error: .cannotCreateBudgetWithEntity)
         }
 
+        let year = Int(budgetEntity.year)
         let budgetSlices = slices
             .compactMap { $0 as? BudgetSliceEntity }
             .compactMap { BudgetSlice.with(budgetSliceEntity: $0) }
 
-        return try Budget(id: identifier, name: name, slices: budgetSlices)
+        return try Budget(id: identifier, year: year, name: name, slices: budgetSlices)
     }
 }
 

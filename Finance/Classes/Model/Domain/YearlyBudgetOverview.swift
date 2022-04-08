@@ -1,5 +1,5 @@
 //
-//  Report.swift
+//  YearlyBudgetOverview.swift
 //  Finance
 //
 //  Created by Luca Strazzullo on 07/02/2022.
@@ -7,10 +7,10 @@
 
 import Foundation
 
-struct Report: Identifiable {
+struct YearlyBudgetOverview: Identifiable {
 
-    static func current(with budgets: [Budget]) -> Report {
-        try! Report(id: .init(), name: "Amsterdam", year: 2022, budgets: budgets)
+    static func current(with budgets: [Budget]) -> YearlyBudgetOverview {
+        try! YearlyBudgetOverview(id: .init(), name: "Amsterdam", year: 2022, budgets: budgets)
     }
 
     let id: UUID
@@ -22,7 +22,7 @@ struct Report: Identifiable {
 
     init(id: ID, name: String, year: Int, budgets: [Budget]) throws {
         guard !name.isEmpty else {
-            throw DomainError.report(error: .nameNotValid)
+            throw DomainError.budgetOverview(error: .nameNotValid)
         }
         self.id = id
         self.name = name
@@ -58,6 +58,10 @@ struct Report: Identifiable {
         return Set(budgets(at: indices).map(\.id))
     }
 
+    func budgetIdentifiers() -> Set<Budget.ID> {
+        return Set(budgets.map(\.id))
+    }
+
     // MARK: Mutating methods
 
     mutating func delete(budgetWith id: Budget.ID) {
@@ -85,7 +89,7 @@ struct Report: Identifiable {
 
     private func willIntroduce(newBudgetName: String) throws {
         guard !budgets.contains(where: { $0.name == newBudgetName }) else {
-            throw DomainError.report(error: .budgetAlreadyExistsWith(name: newBudgetName))
+            throw DomainError.budgetOverview(error: .budgetAlreadyExistsWith(name: newBudgetName))
         }
     }
 }

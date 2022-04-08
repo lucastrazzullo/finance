@@ -9,11 +9,11 @@ import XCTest
 
 final class BudgetFlow<ParentFlow: UIFlow>: UIFlow {
 
-    private let reportElements: ReportElements
+    private let budgetsListElements: BudgetListViewElements
     private let newBudgetElements: NewBudgetElements
 
     init(app: XCUIApplication, parentFlow: ParentFlow? = nil) {
-        self.reportElements = ReportElements(app: app)
+        self.budgetsListElements = BudgetListViewElements(app: app)
         self.newBudgetElements = NewBudgetElements(app: app)
         super.init(app: app, parentFlow: parentFlow)
     }

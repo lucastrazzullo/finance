@@ -1,5 +1,5 @@
 //
-//  ReportController.swift
+//  OverviewController.swift
 //  Finance
 //
 //  Created by Luca Strazzullo on 25/01/2022.
@@ -7,26 +7,26 @@
 
 import Foundation
 
-final class ReportController: ObservableObject {
+final class OverviewController: ObservableObject {
 
-    @Published private(set) var report: Report
+    @Published private(set) var overview: YearlyBudgetOverview
 
     private let repository: Repository
 
     // MARK: Object life cycle
 
-    init(report: Report, storageProvider: StorageProvider) {
-        self.report = report
+    init(overview: YearlyBudgetOverview, storageProvider: StorageProvider) {
+        self.overview = overview
         self.repository = Repository(storageProvider: storageProvider)
     }
 
     // MARK: Internal methods
 
     func fetch() async throws {
-        let report = try await repository.fetchReport()
+        let overview = try await repository.fetchYearlyOverview(year: overview.year)
 
         DispatchQueue.main.async { [weak self] in
-            self?.report = report
+            self?.overview = overview
         }
     }
 
@@ -34,16 +34,16 @@ final class ReportController: ObservableObject {
         try await repository.add(budget: budget)
 
         DispatchQueue.main.async { [weak self] in
-            try? self?.report.append(budget: budget)
+            try? self?.overview.append(budget: budget)
         }
     }
 
     func delete(budgetsAt indices: IndexSet) async throws {
-        let budgetsIdentifiersToDelete = report.budgetIdentifiers(at: indices)
+        let budgetsIdentifiersToDelete = overview.budgetIdentifiers(at: indices)
         let deletedIdentifiers = try await repository.delete(budgetsWith: budgetsIdentifiersToDelete)
 
         DispatchQueue.main.async { [weak self] in
-            self?.report.delete(budgetsWith: deletedIdentifiers)
+            self?.overview.delete(budgetsWith: deletedIdentifiers)
         }
     }
 }
