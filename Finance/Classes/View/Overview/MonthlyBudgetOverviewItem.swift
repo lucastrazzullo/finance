@@ -17,7 +17,7 @@ struct MonthlyBudgetOverviewItem: View {
                 HStack(alignment: .firstTextBaseline) {
                     switch overview.icon {
                     case .system(let name):
-                        Image(systemName: name)
+                        Image(systemName: name).symbolRenderingMode(.hierarchical)
                     }
                     Text(overview.name).font(.headline)
                 }
