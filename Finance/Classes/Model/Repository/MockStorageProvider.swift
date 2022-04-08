@@ -61,9 +61,9 @@ enum Mocks {
 
     static func budgets(withYear year: Int) -> [Budget] {
         [
-            try! .init(id: UUID(), year: 2022, name: "House", slices: Mocks.slices),
-            try! .init(id: UUID(), year: 2022, name: "Groceries", monthlyAmount: .value(200.01)),
-            try! .init(id: UUID(), year: 2022, name: "Health", monthlyAmount: .value(200.01))
+            try! .init(id: UUID(), year: 2022, name: "House", icon: .system(name: "house"), slices: Mocks.slices),
+            try! .init(id: UUID(), year: 2022, name: "Groceries", icon: .system(name: "fork.knife"), monthlyAmount: .value(200.01)),
+            try! .init(id: UUID(), year: 2022, name: "Health", icon: .system(name: "leaf"), monthlyAmount: .value(200.01))
         ]
     }
 

@@ -11,10 +11,15 @@ struct Budget: Identifiable, Hashable, AmountHolder {
 
     typealias ID = UUID
 
+    enum Icon: Hashable {
+        case system(name: String)
+    }
+
     private static let defaultSliceName: String = "Default"
 
     let id: ID
     let year: Int
+    let icon: Icon?
     private(set) var name: String
     private(set) var slices: [BudgetSlice]
 
@@ -24,19 +29,20 @@ struct Budget: Identifiable, Hashable, AmountHolder {
 
     // MARK: Object life cycle
 
-    init(id: ID = .init(), year: Int, name: String, monthlyAmount: MoneyValue = .zero) throws {
+    init(id: ID = .init(), year: Int, name: String, icon: Icon?, monthlyAmount: MoneyValue = .zero) throws {
         let slices = [
             try BudgetSlice(id: .init(), name: Self.defaultSliceName, configuration: .montly(amount: monthlyAmount))
         ]
-        try self.init(id: id, year: year, name: name, slices: slices)
+        try self.init(id: id, year: year, name: name, icon: icon, slices: slices)
     }
 
-    init(id: ID = .init(), year: Int, name: String, slices: [BudgetSlice]) throws {
+    init(id: ID = .init(), year: Int, name: String, icon: Icon?, slices: [BudgetSlice]) throws {
         try Self.canUse(name: name)
         try Self.canUse(slices: slices)
 
         self.id = id
         self.year = year
+        self.icon = icon
         self.name = name
         self.slices = slices
     }

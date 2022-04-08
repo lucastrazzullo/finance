@@ -61,7 +61,7 @@ struct NewBudgetView: View {
     private func submit() {
         Task {
             do {
-                let budget = try Budget(year: year, name: budgetName, slices: budgetSlices)
+                let budget = try Budget(year: year, name: budgetName, icon: nil, slices: budgetSlices)
                 try await onSubmit(budget)
                 submitError = nil
             } catch {

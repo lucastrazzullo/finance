@@ -23,7 +23,15 @@ struct BudgetsListView<Destination: View>: View {
                 Section(header: Text("Budgets")) {
                     ForEach(overview.budgets) { budget in
                         NavigationLink(destination: destination(budget)) {
-                            AmountListItem(label: budget.name, amount: budget.amount)
+                            HStack {
+                                let viewModel = BudgetViewModel(budget: budget)
+                                Label(viewModel.name, systemImage: viewModel.iconSystemName)
+                                    .font(.body.bold())
+                                    .accentColor(.black)
+                                Spacer()
+                                AmountView(amount: viewModel.amount)
+                            }
+                            .padding(.vertical, 8)
                         }
                         .accessibilityIdentifier(AccessibilityIdentifier.BudgetsListView.budgetLink)
                     }

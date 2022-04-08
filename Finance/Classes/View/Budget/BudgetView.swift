@@ -25,9 +25,12 @@ struct BudgetView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            AmountView(amount: controller.budget.amount)
-                .font(.headline)
-                .padding(.horizontal)
+            VStack {
+                AmountView(amount: controller.budget.amount)
+            }
+            .font(.headline)
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal)
 
             List {
                 NameSection(
@@ -52,8 +55,19 @@ struct BudgetView: View {
                 isInsertNewSlicePresented = false
             }
         }
-        .navigationTitle(isEditing ? updatingBudgetName : controller.budget.name)
-        .toolbar { EditButton() }
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                HStack {
+                    let viewModel = BudgetViewModel(budget: controller.budget)
+                    Text(isEditing ? updatingBudgetName : viewModel.name)
+                    Image(systemName: viewModel.iconSystemName)
+                }
+            }
+            ToolbarItem(placement: .navigationBarTrailing) {
+                EditButton()
+            }
+        }
         .onAppear { fetch() }
         .onChange(of: isEditing) { newVaue in
             if !newVaue {

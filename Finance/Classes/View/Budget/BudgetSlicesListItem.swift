@@ -91,6 +91,6 @@ struct BudgetSlicesListItem_Previews: PreviewProvider {
                 }
             }
         }
-        .listStyle(InsetGroupedListStyle())
+        .listStyle(InsetListStyle())
     }
 }

@@ -224,7 +224,7 @@ private extension Budget {
             .compactMap { $0 as? BudgetSliceEntity }
             .compactMap { BudgetSlice.with(budgetSliceEntity: $0) }
 
-        return try Budget(id: identifier, year: year, name: name, slices: budgetSlices)
+        return try Budget(id: identifier, year: year, name: name, icon: nil, slices: budgetSlices)
     }
 }
 
