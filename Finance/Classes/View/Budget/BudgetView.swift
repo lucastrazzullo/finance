@@ -34,20 +34,26 @@ struct BudgetView: View {
             .padding(.horizontal)
 
             List {
-                InfoSection(
-                    name: $updatingBudgetName,
-                    icon: $updatingBudgetIcon,
-                    isEditing: isEditing,
-                    error: updateBudgetInfoError
-                )
+                if isEditing {
+                    InfoSection(saveAction: saveUpdatedValues, name: $updatingBudgetName, icon: $updatingBudgetIcon) {
+                        if let error = updateBudgetInfoError, isEditing {
+                            InlineErrorView(error: error)
+                        }
+                    }
+                }
 
-                SlicesListSection(
-                    slices: controller.budget.slices,
-                    isEditing: isEditing,
-                    error: deleteSlicesError,
-                    onAdd: { isInsertNewSlicePresented = true },
-                    onDelete: deleteSlices(at:)
-                )
+                SlicesListSection(slices: controller.budget.slices,onDelete: isEditing ? deleteSlices(at:) : nil) {
+                    if isEditing {
+                        VStack {
+                            Label("Add", systemImage: "plus")
+                                .onTapGesture(perform: { isInsertNewSlicePresented = true })
+
+                            if let error = deleteSlicesError {
+                                InlineErrorView(error: error)
+                            }
+                        }
+                    }
+                }
             }
             .listStyle(InsetListStyle())
         }
@@ -66,19 +72,13 @@ struct BudgetView: View {
                     Image(systemName: isEditing ? updatingBudgetIcon : viewModel.iconSystemName)
                         .symbolRenderingMode(.hierarchical)
                 }
+                .frame(maxWidth: .infinity)
             }
             ToolbarItem(placement: .navigationBarTrailing) {
                 EditButton()
             }
         }
         .onAppear { fetch() }
-        .onChange(of: isEditing) { newVaue in
-            if !newVaue {
-                updateBudgetInfoError = nil
-                deleteSlicesError = nil
-                saveUpdatedValues()
-            }
-        }
     }
 
     // MARK: Object life cycle
@@ -122,63 +122,54 @@ struct BudgetView: View {
     }
 }
 
-private struct InfoSection: View {
+private struct InfoSection<Footer: View>: View {
+
+    let saveAction: () -> Void
 
     @Binding var name: String
     @Binding var icon: String
 
-    let isEditing: Bool
-    let error: DomainError?
+    @ViewBuilder var footer: () -> Footer
 
     var body: some View {
-        if isEditing || error != nil {
-            Section(header: Text("Info")) {
-                HStack {
+        Section(header: Text("Info")) {
+            VStack(alignment: .leading) {
+                HStack(spacing: 24) {
                     TextField("Budget Name", text: $name)
-                        .disabled(!isEditing)
-
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
                     BudgetIconPicker(selection: $icon, label: "Icon")
-                        .disabled(!isEditing)
+                        .padding(4)
+                        .background(.quaternary)
+                        .cornerRadius(6)
+
+                    Button(action: saveAction) {
+                        Text("Save")
+                    }
+                    .buttonStyle(BorderedButtonStyle())
                 }
 
-                if let error = error {
-                    InlineErrorView(error: error)
-                }
+                footer()
             }
         }
+        .listRowSeparator(.hidden)
     }
 }
 
-private struct SlicesListSection: View {
+private struct SlicesListSection<Footer: View>: View {
 
     let slices: [BudgetSlice]
-    let isEditing: Bool
-    let error: DomainError?
+    let onDelete: ((IndexSet) -> Void)?
 
-    let onAdd: () -> Void
-    let onDelete: (IndexSet) -> Void
+    @ViewBuilder var footer: () -> Footer
 
     var body: some View {
         Section(header: Text("Slices")) {
-            if isEditing {
-                ForEach(slices, id: \.id) { slice in
-                    BudgetSlicesListItem(slice: slice, totalBudgetAmount: slices.totalAmount)
-                }
-                .onDelete(perform: onDelete)
-            } else {
-                ForEach(slices, id: \.id) { slice in
-                    BudgetSlicesListItem(slice: slice, totalBudgetAmount: slices.totalAmount)
-                }
+            ForEach(slices, id: \.id) { slice in
+                BudgetSlicesListItem(slice: slice, totalBudgetAmount: slices.totalAmount)
             }
+            .onDelete(perform: onDelete)
 
-            if isEditing {
-                Label("Add", systemImage: "plus")
-                    .onTapGesture(perform: onAdd)
-            }
-
-            if let error = error {
-                InlineErrorView(error: error)
-            }
+            footer()
         }
     }
 }
