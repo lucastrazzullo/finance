@@ -17,7 +17,6 @@ struct MonthPickerView: View {
                 Text(month.name)
             }
         }
-        .pickerStyle(WheelPickerStyle())
     }
 }
 

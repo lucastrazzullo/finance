@@ -53,10 +53,12 @@ struct BudgetsListView<Destination: View>: View {
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarItems(trailing: EditButton())
             .toolbar(content: {
-                DefaultToolbar(
-                    title: overview.name,
-                    subtitle: "Budgets \(String(overview.year))"
-                )
+                ToolbarItem(placement: .navigationBarLeading) {
+                    DefaultToolbar(
+                        title: overview.name,
+                        subtitle: "Budgets \(String(overview.year))"
+                    )
+                }
             })
             .onAppear(perform: { Task { await onAppear() }})
         }
@@ -66,12 +68,11 @@ struct BudgetsListView<Destination: View>: View {
 // MARK: - Previews
 
 struct BudgetsListView_Previews: PreviewProvider {
-    static let year = 2022
-    static let storageProvider = MockStorageProvider(overviewYear: year)
+    static let storageProvider = MockStorageProvider(overviewYear: Mocks.year)
     static var previews: some View {
         BudgetsListView(
             destination: { budget in BudgetView(budget: budget, storageProvider: storageProvider) },
-            overview: try! YearlyBudgetOverview(name: "Amsterdam", year: year, budgets: Mocks.budgets(withYear: year)),
+            overview: Mocks.overview,
             error: nil,
             onAppear: {},
             onAdd: {},

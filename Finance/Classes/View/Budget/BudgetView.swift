@@ -177,11 +177,10 @@ private struct SlicesListSection<Footer: View>: View {
 // MARK: - Previews
 
 struct BudgetView_Previews: PreviewProvider {
-    static let year = 2022
-    static let storageProvider = MockStorageProvider(overviewYear: year)
+    static let storageProvider = MockStorageProvider(overviewYear: Mocks.year)
     static var previews: some View {
         NavigationView {
-            BudgetView(budget: Mocks.budgets(withYear: year)[0], storageProvider: storageProvider)
+            BudgetView(budget: Mocks.budgets[0], storageProvider: storageProvider)
         }
     }
 }

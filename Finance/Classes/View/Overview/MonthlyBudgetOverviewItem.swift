@@ -18,6 +18,8 @@ struct MonthlyBudgetOverviewItem: View {
                     switch overview.icon {
                     case .system(let name):
                         Image(systemName: name).symbolRenderingMode(.hierarchical)
+                    case .none:
+                        EmptyView()
                     }
                     Text(overview.name).font(.headline)
                 }

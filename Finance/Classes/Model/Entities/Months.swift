@@ -56,7 +56,9 @@ struct Months {
 
 struct Month: Identifiable, Equatable {
 
-    let id: String
+    typealias ID = String
+
+    let id: ID
     let name: String
 
     fileprivate init(id: String, name: String) {

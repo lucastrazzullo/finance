@@ -9,63 +9,46 @@ import Foundation
 
 enum Mocks {
 
-    // MARK: - Overviews
+    static let year: Int = 2022
 
-    static let monthlyFavouriteOverviews: [MonthlyBudgetOverview] = {
-        [
-            .init(
-                name: "Ilenia",
-                icon: .system(name: "face.dashed.fill"),
-                startingAmount: .value(1200),
-                totalExpenses: .value(300)
-            ),
-            .init(
-                name: "Groceries",
-                icon: .system(name: "fork.knife"),
-                startingAmount: .value(800),
-                totalExpenses: .value(700)
-            ),
-            .init(
-                name: "Car",
-                icon: .system(name: "bolt.car"),
-                startingAmount: .value(800),
-                totalExpenses: .value(1000)
-            ),
-            .init(
-                name: "Health",
-                icon: .system(name: "leaf"),
-                startingAmount: .value(1000),
-                totalExpenses: .value(500)
-            )
-        ]
-    }()
-
-    static let montlyExpiringOverviews: [MonthlyBudgetOverview] = {
-        [
-            .init(
-                name: "Luca",
-                icon: .system(name: "face.smiling.fill"),
-                startingAmount: .value(1200),
-                totalExpenses: .value(1000)
-            ),
-            .init(
-                name: "Travel",
-                icon: .system(name: "airplane"),
-                startingAmount: .value(800),
-                totalExpenses: .value(700)
-            )
-        ]
+    static let overview: YearlyBudgetOverview = {
+        try! YearlyBudgetOverview(name: "Amsterdam", year: year, budgets: Mocks.budgets)
     }()
 
     // MARK: - Budgets
 
-    static func budgets(withYear year: Int) -> [Budget] {
-        [
-            try! .init(id: UUID(), year: 2022, name: "House", icon: .system(name: "house"), slices: Mocks.slices),
-            try! .init(id: UUID(), year: 2022, name: "Groceries", icon: .system(name: "fork.knife"), monthlyAmount: .value(200.01)),
-            try! .init(id: UUID(), year: 2022, name: "Health", icon: .system(name: "leaf"), monthlyAmount: .value(200.01))
-        ]
+    static func randomBudgetIdentifiers(count: Int) -> [Budget.ID] {
+        let favouriteBudgetsIdentifiers: Set<Budget.ID> = Set(favouriteBudgetsIdentifiers)
+        var budgets = budgets.map(\.id).shuffled()
+        budgets.removeAll(where: { favouriteBudgetsIdentifiers.contains($0) })
+        guard budgets.count > count else {
+            return budgets
+        }
+        return Array(budgets[0..<count])
     }
+
+    static let favouriteBudgetsIdentifiers: [Budget.ID] = {
+        return [
+            budgets.first(where: { $0.name == "Ilenia" })?.id,
+            budgets.first(where: { $0.name == "Groceries" })?.id,
+            budgets.first(where: { $0.name == "Car" })?.id,
+            budgets.first(where: { $0.name == "Health" })?.id
+        ].compactMap({$0})
+    }()
+
+    static let budgets: [Budget] = {
+        [
+            try! .init(id: UUID(), year: year, name: "House", icon: .system(name: "house"), slices: Mocks.slices),
+            try! .init(id: UUID(), year: year, name: "Groceries", icon: .system(name: "fork.knife"), monthlyAmount: .value(200.01)),
+            try! .init(id: UUID(), year: year, name: "Health", icon: .system(name: "leaf"), monthlyAmount: .value(200.01)),
+            try! .init(id: UUID(), year: year, name: "Luca", icon: .system(name: "face.smiling.fill"), monthlyAmount: .value(250.01)),
+            try! .init(id: UUID(), year: year, name: "Travel", icon: .system(name: "airplane"), monthlyAmount: .value(1000.00)),
+            try! .init(id: UUID(), year: year, name: "Ilenia", icon: .system(name: "face.dashed.fill"), monthlyAmount: .value(1000.00)),
+            try! .init(id: UUID(), year: year, name: "Groceries", icon: .system(name: "fork.knife"), monthlyAmount: .value(1000.00)),
+            try! .init(id: UUID(), year: year, name: "Car", icon: .system(name: "bolt.car"), monthlyAmount: .value(1000.00)),
+            try! .init(id: UUID(), year: year, name: "Health", icon: .system(name: "leaf"), monthlyAmount: .value(1000.00))
+        ]
+    }()
 
     static let slices: [BudgetSlice] = {
         [

@@ -7,17 +7,15 @@
 
 import SwiftUI
 
-struct DefaultToolbar: ToolbarContent {
+struct DefaultToolbar: View {
 
     let title: String
     let subtitle: String
 
-    var body: some ToolbarContent {
-        ToolbarItem(placement: .navigationBarLeading) {
-            VStack(alignment: .leading) {
-                Text(title).font(.title2.bold())
-                Text(subtitle).font(.caption)
-            }
+    var body: some View {
+        VStack(alignment: .leading) {
+            Text(title).font(.title2.bold())
+            Text(subtitle).font(.caption)
         }
     }
 }

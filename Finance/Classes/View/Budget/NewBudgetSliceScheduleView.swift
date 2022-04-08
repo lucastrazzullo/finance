@@ -20,6 +20,7 @@ struct NewBudgetSliceScheduleView: View {
             Section(header: Text("New Slice Schedule")) {
                 AmountTextField(amountValue: $newScheduleAmount, title: "Amount", prompt: nil)
                 MonthPickerView(month: $newScheduleMonth)
+                    .pickerStyle(WheelPickerStyle())
             }
 
             Section {
