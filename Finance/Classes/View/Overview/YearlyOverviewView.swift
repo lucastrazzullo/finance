@@ -1,5 +1,5 @@
 //
-//  OverviewView.swift
+//  YearlyOverviewView.swift
 //  Finance
 //
 //  Created by Luca Strazzullo on 07/04/2022.
@@ -7,12 +7,17 @@
 
 import SwiftUI
 
-struct OverviewView: View {
+struct YearlyOverviewView: View {
 
-    let title: String
-    let subtitle: String
-    let favouriteBudgetOverviews: [MonthlyBudgetOverview]
-    let lowestBudgetOverviews: [MonthlyBudgetOverview]
+    let overview: YearlyBudgetOverview
+
+    var favouriteBudgetOverviews: [MonthlyBudgetOverview] {
+        Mocks.monthlyFavouriteOverviews
+    }
+
+    var lowestBudgetOverviews: [MonthlyBudgetOverview] {
+        Mocks.montlyExpiringOverviews
+    }
 
     var body: some View {
         NavigationView {
@@ -35,8 +40,8 @@ struct OverviewView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar(content: {
                 DefaultToolbar(
-                    title: title,
-                    subtitle: subtitle
+                    title: overview.name,
+                    subtitle: "Overview \(String(overview.year))"
                 )
             })
         }
@@ -44,12 +49,8 @@ struct OverviewView: View {
 }
 
 struct OverviewView_Previews: PreviewProvider {
+    let overview = try! YearlyBudgetOverview(name: "Amsterdam", year: 2022, budgets: Mocks.budgets(withYear: 2022))
     static var previews: some View {
-        OverviewView(
-            title: "Title",
-            subtitle: "Subtitle",
-            favouriteBudgetOverviews: Mocks.monthlyOverviews,
-            lowestBudgetOverviews: Mocks.montlyExpiringOverviews
-        )
+        YearlyOverviewView(overview: try! .init(name: "Amsterdam", year: 2022, budgets: []))
     }
 }

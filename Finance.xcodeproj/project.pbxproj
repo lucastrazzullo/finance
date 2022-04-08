@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		810F869F27FF4E1C00A1CDD4 /* BudgetsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 810F869E27FF4E1C00A1CDD4 /* BudgetsListView.swift */; };
-		810F86A227FF833600A1CDD4 /* OverviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 810F86A127FF833600A1CDD4 /* OverviewView.swift */; };
+		810F86A227FF833600A1CDD4 /* YearlyOverviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 810F86A127FF833600A1CDD4 /* YearlyOverviewView.swift */; };
 		810F86A427FF91CB00A1CDD4 /* MonthlyBudgetOverview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 810F86A327FF91CA00A1CDD4 /* MonthlyBudgetOverview.swift */; };
 		810F86A628002CD700A1CDD4 /* MonthlyBudgetOverviewItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 810F86A528002CD700A1CDD4 /* MonthlyBudgetOverviewItem.swift */; };
 		811F7BD3278C2A3500F1B8C9 /* BudgetSlice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 811F7BD2278C2A3500F1B8C9 /* BudgetSlice.swift */; };
@@ -81,7 +81,7 @@
 
 /* Begin PBXFileReference section */
 		810F869E27FF4E1C00A1CDD4 /* BudgetsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetsListView.swift; sourceTree = "<group>"; };
-		810F86A127FF833600A1CDD4 /* OverviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverviewView.swift; sourceTree = "<group>"; };
+		810F86A127FF833600A1CDD4 /* YearlyOverviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YearlyOverviewView.swift; sourceTree = "<group>"; };
 		810F86A327FF91CA00A1CDD4 /* MonthlyBudgetOverview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthlyBudgetOverview.swift; sourceTree = "<group>"; };
 		810F86A528002CD700A1CDD4 /* MonthlyBudgetOverviewItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthlyBudgetOverviewItem.swift; sourceTree = "<group>"; };
 		811F7BD2278C2A3500F1B8C9 /* BudgetSlice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetSlice.swift; sourceTree = "<group>"; };
@@ -170,7 +170,7 @@
 		810F86A027FF832000A1CDD4 /* Overview */ = {
 			isa = PBXGroup;
 			children = (
-				810F86A127FF833600A1CDD4 /* OverviewView.swift */,
+				810F86A127FF833600A1CDD4 /* YearlyOverviewView.swift */,
 				810F86A528002CD700A1CDD4 /* MonthlyBudgetOverviewItem.swift */,
 			);
 			path = Overview;
@@ -191,10 +191,8 @@
 			children = (
 				8170340127B59945001686FA /* AccessibilityIdentifier.swift */,
 				81B284EF27A02FB800EE51EB /* DomainError.swift */,
-				81CB8BEF2746B92400A64785 /* Budget.swift */,
-				811F7BD2278C2A3500F1B8C9 /* BudgetSlice.swift */,
-				817033E127B1B7BB001686FA /* YearlyBudgetOverview.swift */,
-				810F86A327FF91CA00A1CDD4 /* MonthlyBudgetOverview.swift */,
+				81A6FB702800538D00D71BE6 /* Budget */,
+				81A6FB712800539400D71BE6 /* Overview */,
 			);
 			path = Domain;
 			sourceTree = "<group>";
@@ -344,6 +342,24 @@
 				8195E8BB27A41BD200D58297 /* InlineErrorView.swift */,
 			);
 			path = Common;
+			sourceTree = "<group>";
+		};
+		81A6FB702800538D00D71BE6 /* Budget */ = {
+			isa = PBXGroup;
+			children = (
+				81CB8BEF2746B92400A64785 /* Budget.swift */,
+				811F7BD2278C2A3500F1B8C9 /* BudgetSlice.swift */,
+			);
+			path = Budget;
+			sourceTree = "<group>";
+		};
+		81A6FB712800539400D71BE6 /* Overview */ = {
+			isa = PBXGroup;
+			children = (
+				817033E127B1B7BB001686FA /* YearlyBudgetOverview.swift */,
+				810F86A327FF91CA00A1CDD4 /* MonthlyBudgetOverview.swift */,
+			);
+			path = Overview;
 			sourceTree = "<group>";
 		};
 		81B284E427A0010700EE51EB /* Controller */ = {
@@ -560,7 +576,7 @@
 				81C222DC279CD11F00759CCB /* MockStorageProvider.swift in Sources */,
 				81F7E16A27D16F3F00D67EB8 /* BudgetSlicesListItem.swift in Sources */,
 				81EC7CAD279A17AD006194C9 /* Repository.swift in Sources */,
-				810F86A227FF833600A1CDD4 /* OverviewView.swift in Sources */,
+				810F86A227FF833600A1CDD4 /* YearlyOverviewView.swift in Sources */,
 				81735ACC279A2B8D007C9AA3 /* Array+Extensions.swift in Sources */,
 				819993D72752FAA300FA3E03 /* AmountTextField.swift in Sources */,
 				811F7BD3278C2A3500F1B8C9 /* BudgetSlice.swift in Sources */,

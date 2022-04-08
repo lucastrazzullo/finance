@@ -9,20 +9,20 @@ import Foundation
 
 struct YearlyBudgetOverview: Identifiable {
 
-    static func current(with budgets: [Budget]) -> YearlyBudgetOverview {
-        try! YearlyBudgetOverview(id: .init(), name: "Amsterdam", year: 2022, budgets: budgets)
-    }
-
     let id: UUID
     let name: String
     let year: Int
+
     private(set) var budgets: [Budget]
 
     // MARK: Object life cycle
 
-    init(id: ID, name: String, year: Int, budgets: [Budget]) throws {
+    init(id: ID = .init(), name: String, year: Int, budgets: [Budget]) throws {
         guard !name.isEmpty else {
             throw DomainError.budgetOverview(error: .nameNotValid)
+        }
+        guard budgets.allSatisfy({ $0.year == year }) else {
+            throw DomainError.budgetOverview(error: .budgetsListNotValid)
         }
         self.id = id
         self.name = name

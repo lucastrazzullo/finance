@@ -11,46 +11,51 @@ struct DashboardView<StorageProviderType: StorageProvider & ObservableObject>: V
 
     @ObservedObject private var overviewController: OverviewController
 
-    @State private var isAddNewBudgetPresented: Bool = false
+    @State private var addNewBudgetForOverview: YearlyBudgetOverview?
     @State private var deleteBudgetsError: DomainError?
 
     private let storageProvider: StorageProviderType
 
     var body: some View {
         TabView {
-            OverviewView(
-                title: overviewController.overview.name,
-                subtitle: "Overview \(String(overviewController.overview.year))",
-                favouriteBudgetOverviews: Mocks.monthlyOverviews,
-                lowestBudgetOverviews: Mocks.montlyExpiringOverviews
-            )
+            ZStack {
+                if let overview = overviewController.overview {
+                    YearlyOverviewView(overview: overview)
+                } else {
+                    Text("Fetching ...")
+                }
+            }
             .tabItem {
                 Label("Overview", systemImage: "list.bullet.below.rectangle")
             }
 
-            BudgetsListView(
-                destination: { budget in BudgetView(budget: budget, storageProvider: storageProvider) },
-                title: overviewController.overview.name,
-                subtitle: "Budgets \(String(overviewController.overview.year))",
-                budgets: overviewController.overview.budgets,
-                error: deleteBudgetsError,
-                onAdd: { isAddNewBudgetPresented = true },
-                onDelete: deleteBudgets(at:)
-            )
-            .onAppear {
-                Task {
-                    try? await overviewController.fetch()
+            ZStack {
+                if let overview = overviewController.overview {
+                    BudgetsListView(
+                        destination: { budget in BudgetView(budget: budget, storageProvider: storageProvider) },
+                        overview: overview,
+                        error: deleteBudgetsError,
+                        onAdd: { addNewBudgetForOverview = overviewController.overview },
+                        onDelete: deleteBudgets(at:)
+                    )
+                } else {
+                    Text("Fetching ...")
                 }
             }
-            .sheet(isPresented: $isAddNewBudgetPresented) {
-                NewBudgetView(year: overviewController.overview.year) { budget in
+            .sheet(item: $addNewBudgetForOverview) { overview in
+                NewBudgetView(year: overview.year) { budget in
                     try await overviewController.add(budget: budget)
-                    isAddNewBudgetPresented = false
+                    addNewBudgetForOverview = nil
                 }
             }
             .tabItem {
                 Label("Budgets", systemImage: "list.dash")
                     .accessibilityIdentifier(AccessibilityIdentifier.DashboardView.budgetsTab)
+            }
+        }
+        .onAppear {
+            Task {
+                try? await overviewController.fetch()
             }
         }
     }
@@ -70,14 +75,15 @@ struct DashboardView<StorageProviderType: StorageProvider & ObservableObject>: V
 
     // MARK: Object life cycle
 
-    init(storageProvider: StorageProviderType) {
+    init(overviewYear: Int, storageProvider: StorageProviderType) {
         self.storageProvider = storageProvider
-        self.overviewController = OverviewController(overview: YearlyBudgetOverview.current(with: []), storageProvider: storageProvider)
+        self.overviewController = OverviewController(overviewYear: overviewYear, storageProvider: storageProvider)
     }
 }
 
 struct DashboardView_Previews: PreviewProvider {
+    static let year: Int = 2022
     static var previews: some View {
-        DashboardView(storageProvider: MockStorageProvider(overviewYear: 2022))
+        DashboardView(overviewYear: year, storageProvider: MockStorageProvider(overviewYear: year))
     }
 }

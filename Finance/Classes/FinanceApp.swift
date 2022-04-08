@@ -10,12 +10,14 @@ import SwiftUI
 @main
 struct FinanceApp: App {
 
+    private let year: Int = 2022
+
     var body: some Scene {
         WindowGroup {
             if CommandLine.arguments.contains("testing") {
-                DashboardView(storageProvider: MockStorageProvider(overviewYear: 2022))
+                DashboardView(overviewYear: year, storageProvider: MockStorageProvider(overviewYear: year))
             } else {
-                DashboardView(storageProvider: CoreDataStorageProvider())
+                DashboardView(overviewYear: year, storageProvider: CoreDataStorageProvider())
             }
         }
     }

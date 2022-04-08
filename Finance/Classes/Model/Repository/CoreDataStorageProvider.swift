@@ -28,7 +28,7 @@ final class CoreDataStorageProvider: ObservableObject, StorageProvider {
     func fetchYearlyOverview(year: Int) async throws -> YearlyBudgetOverview {
         let budgetEntities = try fetchBudgetEntities(year: year)
         let budgets = budgetEntities.compactMap { return try? Budget.with(budgetEntity: $0) }
-        let overview = YearlyBudgetOverview.current(with: budgets)
+        let overview = try YearlyBudgetOverview(name: "Default Overview", year: year, budgets: budgets)
         return overview
     }
 
@@ -160,6 +160,7 @@ final class CoreDataStorageProvider: ObservableObject, StorageProvider {
 
     private func setupBudgetEntity(_ budgetEntity: BudgetEntity, with budget: Budget) {
         budgetEntity.identifier = budget.id
+        budgetEntity.year = Int64(budget.year)
         budgetEntity.name = budget.name
         budgetEntity.slices = NSSet(array: budget.slices.map { slice in
             let sliceEntity = BudgetSliceEntity(context: persistentContainer.viewContext)

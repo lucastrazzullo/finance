@@ -11,9 +11,7 @@ struct BudgetsListView<Destination: View>: View {
 
     @ViewBuilder var destination: (Budget) -> Destination
 
-    let title: String
-    let subtitle: String
-    let budgets: [Budget]
+    let overview: YearlyBudgetOverview
     let error: DomainError?
 
     let onAdd: () -> Void
@@ -23,7 +21,7 @@ struct BudgetsListView<Destination: View>: View {
         NavigationView {
             List {
                 Section(header: Text("Budgets")) {
-                    ForEach(budgets) { budget in
+                    ForEach(overview.budgets) { budget in
                         NavigationLink(destination: destination(budget)) {
                             AmountListItem(label: budget.name, amount: budget.amount)
                         }
@@ -46,8 +44,8 @@ struct BudgetsListView<Destination: View>: View {
             .navigationBarItems(trailing: EditButton())
             .toolbar(content: {
                 DefaultToolbar(
-                    title: title,
-                    subtitle: subtitle
+                    title: overview.name,
+                    subtitle: "Budgets \(String(overview.year))"
                 )
             })
         }
@@ -62,9 +60,7 @@ struct BudgetsListView_Previews: PreviewProvider {
     static var previews: some View {
         BudgetsListView(
             destination: { budget in BudgetView(budget: budget, storageProvider: storageProvider) },
-            title: "Title",
-            subtitle: "Subtitle",
-            budgets: Mocks.budgets(withYear: year),
+            overview: try! YearlyBudgetOverview(name: "Amsterdam", year: year, budgets: Mocks.budgets(withYear: year)),
             error: nil,
             onAdd: {},
             onDelete: { _ in }

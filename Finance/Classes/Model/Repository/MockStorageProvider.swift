@@ -11,7 +11,7 @@ enum Mocks {
 
     // MARK: - Overviews
 
-    static let monthlyOverviews: [MonthlyBudgetOverview] = {
+    static let monthlyFavouriteOverviews: [MonthlyBudgetOverview] = {
         [
             .init(
                 name: "Ilenia",
