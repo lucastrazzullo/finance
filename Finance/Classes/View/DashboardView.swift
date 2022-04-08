@@ -19,9 +19,14 @@ struct DashboardView<StorageProviderType: StorageProvider & ObservableObject>: V
     var body: some View {
         TabView {
             NavigationView {
-                OverviewView()
-                    .navigationBarTitleDisplayMode(.inline)
-                    .toolbar(content: makeToolbarPrimaryItem)
+                OverviewView(
+                    listItem: { overview in MonthlyBudgetOverviewItem(overview: overview) },
+                    viewAllDestination: { EmptyView() },
+                    mostViewedOverviews: Mocks.monthlyOverviews,
+                    lowestBudgetOverviews: Mocks.montlyExpiringOverviews
+                )
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar(content: makeToolbarPrimaryItem)
             }
             .tabItem {
                 Label("Overview", systemImage: "list.bullet.below.rectangle")

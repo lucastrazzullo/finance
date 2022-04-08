@@ -10,6 +10,54 @@ import Foundation
 #if DEBUG
 enum Mocks {
 
+    // MARK: - Overviews
+
+    static let monthlyOverviews: [MonthlyBudgetOverview] = {
+        [
+            .init(
+                name: "Ilenia",
+                icon: .system(name: "face.dashed.fill"),
+                startingAmount: .value(1200),
+                totalExpenses: .value(300)
+            ),
+            .init(
+                name: "Groceries",
+                icon: .system(name: "fork.knife"),
+                startingAmount: .value(800),
+                totalExpenses: .value(700)
+            ),
+            .init(
+                name: "Car",
+                icon: .system(name: "bolt.car"),
+                startingAmount: .value(800),
+                totalExpenses: .value(1000)
+            ),
+            .init(
+                name: "Health",
+                icon: .system(name: "leaf"),
+                startingAmount: .value(1000),
+                totalExpenses: .value(500)
+            )
+        ]
+    }()
+
+    static let montlyExpiringOverviews: [MonthlyBudgetOverview] = {
+        [
+            .init(
+                name: "Luca",
+                icon: .system(name: "face.smiling.fill"),
+                startingAmount: .value(1200),
+                totalExpenses: .value(1000)
+            ),
+            .init(
+                name: "Travel",
+                icon: .system(name: "airplane"),
+                startingAmount: .value(800),
+                totalExpenses: .value(700)
+            )
+        ]
+    }()
+
     // MARK: - Budgets
 
     static let budgets: [Budget] = {

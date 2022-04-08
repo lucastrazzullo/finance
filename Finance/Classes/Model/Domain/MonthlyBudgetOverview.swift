@@ -8,6 +8,13 @@
 import Foundation
 
 struct MonthlyBudgetOverview: Hashable {
+
+    enum Icon: Hashable {
+        case system(name: String)
+    }
+
+    let name: String
+    let icon: Icon
     let startingAmount: MoneyValue
     let totalExpenses: MoneyValue
 

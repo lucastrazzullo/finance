@@ -10,6 +10,7 @@
 		810F869F27FF4E1C00A1CDD4 /* BudgetsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 810F869E27FF4E1C00A1CDD4 /* BudgetsListView.swift */; };
 		810F86A227FF833600A1CDD4 /* OverviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 810F86A127FF833600A1CDD4 /* OverviewView.swift */; };
 		810F86A427FF91CB00A1CDD4 /* MonthlyBudgetOverview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 810F86A327FF91CA00A1CDD4 /* MonthlyBudgetOverview.swift */; };
+		810F86A628002CD700A1CDD4 /* MonthlyBudgetOverviewItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 810F86A528002CD700A1CDD4 /* MonthlyBudgetOverviewItem.swift */; };
 		811F7BD3278C2A3500F1B8C9 /* BudgetSlice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 811F7BD2278C2A3500F1B8C9 /* BudgetSlice.swift */; };
 		8157AB8327BA7E15003FEB28 /* NewSliceElements.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8157AB8227BA7E15003FEB28 /* NewSliceElements.swift */; };
 		8157AB8527BA7E5D003FEB28 /* SliceFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8157AB8427BA7E5D003FEB28 /* SliceFlow.swift */; };
@@ -79,6 +80,7 @@
 		810F869E27FF4E1C00A1CDD4 /* BudgetsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetsListView.swift; sourceTree = "<group>"; };
 		810F86A127FF833600A1CDD4 /* OverviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverviewView.swift; sourceTree = "<group>"; };
 		810F86A327FF91CA00A1CDD4 /* MonthlyBudgetOverview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthlyBudgetOverview.swift; sourceTree = "<group>"; };
+		810F86A528002CD700A1CDD4 /* MonthlyBudgetOverviewItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthlyBudgetOverviewItem.swift; sourceTree = "<group>"; };
 		811F7BD2278C2A3500F1B8C9 /* BudgetSlice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetSlice.swift; sourceTree = "<group>"; };
 		8157AB8227BA7E15003FEB28 /* NewSliceElements.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSliceElements.swift; sourceTree = "<group>"; };
 		8157AB8427BA7E5D003FEB28 /* SliceFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SliceFlow.swift; sourceTree = "<group>"; };
@@ -162,7 +164,7 @@
 			isa = PBXGroup;
 			children = (
 				810F86A127FF833600A1CDD4 /* OverviewView.swift */,
-				810F86A327FF91CA00A1CDD4 /* MonthlyBudgetOverview.swift */,
+				810F86A528002CD700A1CDD4 /* MonthlyBudgetOverviewItem.swift */,
 			);
 			path = Overview;
 			sourceTree = "<group>";
@@ -185,6 +187,7 @@
 				817033E127B1B7BB001686FA /* Report.swift */,
 				81CB8BEF2746B92400A64785 /* Budget.swift */,
 				811F7BD2278C2A3500F1B8C9 /* BudgetSlice.swift */,
+				810F86A327FF91CA00A1CDD4 /* MonthlyBudgetOverview.swift */,
 			);
 			path = Domain;
 			sourceTree = "<group>";
@@ -551,6 +554,7 @@
 				81B284E827A0035700EE51EB /* NewBudgetSliceView.swift in Sources */,
 				817A119127EF355700058C11 /* MonthPickerView.swift in Sources */,
 				81CB8BFE2746DA8F00A64785 /* AmountHolder.swift in Sources */,
+				810F86A628002CD700A1CDD4 /* MonthlyBudgetOverviewItem.swift in Sources */,
 				81CB8BF42746BC4A00A64785 /* MoneyValue.swift in Sources */,
 				8170340227B59945001686FA /* AccessibilityIdentifier.swift in Sources */,
 				810F86A427FF91CB00A1CDD4 /* MonthlyBudgetOverview.swift in Sources */,
