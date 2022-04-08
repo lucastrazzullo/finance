@@ -98,7 +98,7 @@ final class CoreDataStorageProvider: ObservableObject, StorageProvider {
         let fetchBudgetsRequest: NSFetchRequest<BudgetEntity> = BudgetEntity.fetchRequest()
 
         if let year = year {
-            let predicate = NSPredicate(format: "%K == %@", #keyPath(BudgetEntity.year), year as CVarArg)
+            let predicate = NSPredicate(format: "%K == %i", #keyPath(BudgetEntity.year), year as CVarArg)
             fetchBudgetsRequest.predicate = predicate
         }
 
