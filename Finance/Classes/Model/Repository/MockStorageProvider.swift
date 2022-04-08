@@ -7,7 +7,6 @@
 
 import Foundation
 
-#if DEBUG
 enum Mocks {
 
     // MARK: - Overviews
@@ -192,4 +191,3 @@ final class MockStorageProvider: StorageProvider, ObservableObject {
         try budgetOverviews[overviewIndex].append(budget: budget)
     }
 }
-#endif
