@@ -48,7 +48,7 @@ final class MockStorageProvider: StorageProvider, ObservableObject {
     // MARK: Object life cycle
 
     init(budgets: [Budget] = Mocks.budgets) {
-        self.report = try! Report(id: .init(), name: "Mock Report", budgets: budgets)
+        self.report = try! Report(id: .init(), name: "Mock Report", year: 2022, budgets: budgets)
     }
 
     // MARK: Fetch

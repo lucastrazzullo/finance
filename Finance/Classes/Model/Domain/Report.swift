@@ -9,22 +9,24 @@ import Foundation
 
 struct Report: Identifiable {
 
-    static func `default`(with budgets: [Budget]) -> Report {
-        try! Report(id: .init(), name: "Default Report", budgets: budgets)
+    static func current(with budgets: [Budget]) -> Report {
+        try! Report(id: .init(), name: "Amsterdam", year: 2022, budgets: budgets)
     }
 
     let id: UUID
     let name: String
+    let year: Int
     private(set) var budgets: [Budget]
 
     // MARK: Object life cycle
 
-    init(id: ID, name: String, budgets: [Budget]) throws {
+    init(id: ID, name: String, year: Int, budgets: [Budget]) throws {
         guard !name.isEmpty else {
             throw DomainError.report(error: .nameNotValid)
         }
         self.id = id
         self.name = name
+        self.year = year
         self.budgets = budgets
     }
 

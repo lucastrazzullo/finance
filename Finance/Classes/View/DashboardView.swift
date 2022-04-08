@@ -21,14 +21,7 @@ struct DashboardView<StorageProviderType: StorageProvider & ObservableObject>: V
             NavigationView {
                 OverviewView()
                     .navigationBarTitleDisplayMode(.inline)
-                    .toolbar {
-                        ToolbarItem(placement: .navigationBarLeading) {
-                            VStack(alignment: .leading) {
-                                Text(reportController.report.name).font(.title2.bold())
-                                Text("Overview").font(.caption)
-                            }
-                        }
-                    }
+                    .toolbar(content: makeToolbarPrimaryItem)
             }
             .tabItem {
                 Label("Overview", systemImage: "list.bullet.below.rectangle")
@@ -59,18 +52,8 @@ struct DashboardView<StorageProviderType: StorageProvider & ObservableObject>: V
                     }
                 }
                 .navigationBarTitleDisplayMode(.inline)
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarLeading) {
-                        VStack(alignment: .leading) {
-                            Text(reportController.report.name).font(.title2.bold())
-                            Text("Budgets").font(.caption)
-                        }
-                    }
-
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        EditButton()
-                    }
-                }
+                .navigationBarItems(trailing: EditButton())
+                .toolbar(content: makeToolbarPrimaryItem)
             }
             .tabItem {
                 Label("Budgets", systemImage: "list.dash")
@@ -95,7 +78,16 @@ struct DashboardView<StorageProviderType: StorageProvider & ObservableObject>: V
 
     init(storageProvider: StorageProviderType) {
         self.storageProvider = storageProvider
-        self.reportController = ReportController(report: Report.default(with: []), storageProvider: storageProvider)
+        self.reportController = ReportController(report: Report.current(with: []), storageProvider: storageProvider)
+    }
+
+    func makeToolbarPrimaryItem() -> some ToolbarContent {
+        ToolbarItem(placement: .navigationBarLeading) {
+            VStack(alignment: .leading) {
+                Text(reportController.report.name).font(.title2.bold())
+                Text("Overview \(String(reportController.report.year))").font(.caption)
+            }
+        }
     }
 }
 
