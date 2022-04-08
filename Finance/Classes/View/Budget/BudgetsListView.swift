@@ -26,8 +26,10 @@ struct BudgetsListView<Destination: View>: View {
                             HStack {
                                 let viewModel = BudgetViewModel(budget: budget)
                                 Label(viewModel.name, systemImage: viewModel.iconSystemName)
+                                    .symbolVariant(.fill)
+                                    .symbolRenderingMode(.hierarchical)
                                     .font(.body.bold())
-                                    .accentColor(.black)
+                                    .accentColor(.secondary)
                                 Spacer()
                                 AmountView(amount: viewModel.amount)
                             }
