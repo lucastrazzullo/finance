@@ -10,7 +10,7 @@ import SwiftUI
 struct NewBudgetSliceScheduleView: View {
 
     @State private var newScheduleAmount: String = ""
-    @State private var newScheduleMonth: Month.ID = Months.default.current.id
+    @State private var newScheduleMonth: Int = Calendar.current.component(.month, from: .now)
     @State private var submitError: DomainError?
 
     let onSubmit: (BudgetSlice.Schedule) throws -> Void
@@ -42,13 +42,8 @@ struct NewBudgetSliceScheduleView: View {
             return
         }
 
-        guard let month = Months.default[newScheduleMonth] else {
-            submitError = .budgetSlice(error: .scheduleMonthNotValid)
-            return
-        }
-
         do {
-            try onSubmit(BudgetSlice.Schedule(amount: amount, month: month))
+            try onSubmit(BudgetSlice.Schedule(amount: amount, month: newScheduleMonth))
             submitError = nil
         } catch {
             submitError = error as? DomainError

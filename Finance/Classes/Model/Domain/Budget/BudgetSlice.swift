@@ -13,7 +13,7 @@ struct BudgetSlice: Identifiable, Hashable, AmountHolder {
 
     struct Schedule: AmountHolder, Equatable {
         let amount: MoneyValue
-        let month: Month
+        let month: Int
     }
 
     enum Configuration: AmountHolder, Equatable {
@@ -73,7 +73,8 @@ struct BudgetSlice: Identifiable, Hashable, AmountHolder {
 
     static func willAdd(schedule: Schedule, to list: [Schedule]) throws {
         guard !list.contains(where: { $0.month == schedule.month }) else {
-            throw DomainError.budgetSlice(error: .scheduleAlreadyExistsFor(month: schedule.month.name))
+            let monthName = Calendar.current.standaloneMonthSymbols[schedule.month - 1]
+            throw DomainError.budgetSlice(error: .scheduleAlreadyExistsFor(month: monthName))
         }
     }
 }

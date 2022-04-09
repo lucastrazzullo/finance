@@ -9,23 +9,18 @@ import SwiftUI
 
 struct YearlyOverviewView: View {
 
-    @State private var selectedMonth: Month.ID = Months.default.current.id
+    @State private var selectedMonth: Int = Calendar.current.component(.month, from: .now)
 
     let overview: YearlyBudgetOverview
 
     var favouriteBudgetOverviews: [MonthlyBudgetOverview] {
-        Mocks.favouriteBudgetsIdentifiers
+        guard overview.budgets.count > 1 else {
+            return []
+        }
+        return overview.budgets[0...1]
+            .map(\.id)
             .compactMap { identifier -> MonthlyBudgetOverview? in
-                guard let budget = Mocks.overview.budget(with: identifier) else {
-                    return nil
-                }
-
-                return MonthlyBudgetOverview(
-                    name: budget.name,
-                    icon: budget.icon,
-                    startingAmount: .value(Decimal(Int.random(in: 0..<10000))),
-                    totalExpenses: .value(Decimal(Int.random(in: 0..<10000)))
-                )
+                return overview.monthlyOverview(month: selectedMonth, forBudgetWith: identifier)
             }
     }
 
@@ -48,17 +43,21 @@ struct YearlyOverviewView: View {
     var body: some View {
         NavigationView {
             List {
-                Section(header: Text("Favourites")) {
-                    ForEach(favouriteBudgetOverviews, id: \.self) { overview in
-                        MonthlyBudgetOverviewItem(overview: overview)
-                            .listRowSeparator(.hidden)
+                if favouriteBudgetOverviews.count > 0 {
+                    Section(header: Text("Favourites")) {
+                        ForEach(favouriteBudgetOverviews, id: \.self) { overview in
+                            MonthlyBudgetOverviewItem(overview: overview)
+                                .listRowSeparator(.hidden)
+                        }
                     }
                 }
 
-                Section(header: Text("Lowest budgets this month")) {
-                    ForEach(lowestBudgetAvailabilityOverviews, id: \.self) { overview in
-                        MonthlyBudgetOverviewItem(overview: overview)
-                            .listRowSeparator(.hidden)
+                if lowestBudgetAvailabilityOverviews.count > 0 {
+                    Section(header: Text("Lowest budgets this month")) {
+                        ForEach(lowestBudgetAvailabilityOverviews, id: \.self) { overview in
+                            MonthlyBudgetOverviewItem(overview: overview)
+                                .listRowSeparator(.hidden)
+                        }
                     }
                 }
             }

@@ -60,9 +60,9 @@ enum Mocks {
 
     static let sliceScheduledAmounts: [BudgetSlice.Schedule] = {
         [
-            .init(amount: .value(100), month: Months.default[0]!),
-            .init(amount: .value(200), month: Months.default[2]!),
-            .init(amount: .value(300), month: Months.default[7]!)
+            .init(amount: .value(100), month: 0),
+            .init(amount: .value(200), month: 2),
+            .init(amount: .value(300), month: 7)
         ]
     }()
 }

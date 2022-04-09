@@ -9,11 +9,18 @@ import Foundation
 
 struct YearlyBudgetOverview: Identifiable {
 
+    struct Transaction: AmountHolder {
+        let budgetSliceId: BudgetSlice.ID
+        let amount: MoneyValue
+        let date: Date
+    }
+
     let id: UUID
     let name: String
     let year: Int
 
     private(set) var budgets: [Budget]
+    private(set) var transactions: [Transaction]
 
     // MARK: Object life cycle
 
@@ -28,9 +35,42 @@ struct YearlyBudgetOverview: Identifiable {
         self.name = name
         self.year = year
         self.budgets = budgets
+        self.transactions = budgets.map { budget in
+            Transaction(budgetSliceId: budget.slices.first!.id, amount: .value(100), date: .now)
+        }
     }
 
-    // MARK: Getter methods
+    // MARK: Overview
+
+    func monthlyOverview(month: Int, forBudgetWith identifier: Budget.ID) -> MonthlyBudgetOverview? {
+        guard let budget = budget(with: identifier) else {
+            return nil
+        }
+
+        let allTransactionsUntilSelectedMonth = transactions.filter({ transaction in
+            let transactionMonth = Calendar.current.component(.month, from: transaction.date)
+            return transactionMonth <= month
+        })
+
+        let budgetAvailabilityUntilSelectedMonth = budget.slices
+            .reduce(MoneyValue.zero) { accumulatedAmount, slice in
+                switch slice.configuration {
+                case .montly(let amount):
+                    return accumulatedAmount + (amount * .value(Decimal(month)))
+                case .scheduled(let schedules):
+                    return accumulatedAmount + schedules.filter({ $0.month <= month }).totalAmount
+                }
+            }
+
+        return MonthlyBudgetOverview(
+            name: budget.name,
+            icon: budget.icon,
+            startingAmount: budgetAvailabilityUntilSelectedMonth,
+            totalExpenses: allTransactionsUntilSelectedMonth.totalAmount
+        )
+    }
+
+    // MARK: Budget
 
     func budget(with identifier: Budget.ID) -> Budget? {
         return budgets.first(where: { $0.id == identifier })

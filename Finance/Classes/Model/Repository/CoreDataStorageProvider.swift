@@ -202,7 +202,7 @@ final class CoreDataStorageProvider: ObservableObject, StorageProvider {
 
     private func setupSliceScheduleEntity(_ scheduledAmountEntry: BudgetSliceScheduledAmountEntity, with schedule: BudgetSlice.Schedule) {
         scheduledAmountEntry.amount = NSDecimalNumber(decimal: schedule.amount.value)
-        scheduledAmountEntry.monthIdentifier = schedule.month.id
+        scheduledAmountEntry.month = Int16(schedule.month)
     }
 
     // MARK: Private saving methods
@@ -292,11 +292,10 @@ private extension BudgetSlice.Schedule {
 
     static func with(budgetSliceScheduleEntity: NSSet.Element) -> Self? {
         guard let schedule = budgetSliceScheduleEntity as? BudgetSliceScheduledAmountEntity,
-              let monthIdentifier = schedule.monthIdentifier, let month = Months.default[monthIdentifier],
               let amount = schedule.amount else {
             return nil
         }
-
+        let month = Int(schedule.month)
         return .init(amount: .value(amount.decimalValue), month: month)
     }
 }

@@ -30,7 +30,6 @@
 		8170341427B7F5CA001686FA /* AccessibilityIdentifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8170340127B59945001686FA /* AccessibilityIdentifier.swift */; };
 		8170341627B7FB07001686FA /* CommonElements.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8170341527B7FB07001686FA /* CommonElements.swift */; };
 		81735ACC279A2B8D007C9AA3 /* Array+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81735ACB279A2B8D007C9AA3 /* Array+Extensions.swift */; };
-		81735ACF279B2179007C9AA3 /* Months.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81735ACE279B2179007C9AA3 /* Months.swift */; };
 		817A119127EF355700058C11 /* MonthPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 817A119027EF355700058C11 /* MonthPickerView.swift */; };
 		81947EAB27327FCF001C2AC9 /* FinanceApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81947EAA27327FCF001C2AC9 /* FinanceApp.swift */; };
 		81947EAF27327FD1001C2AC9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 81947EAE27327FD1001C2AC9 /* Assets.xcassets */; };
@@ -92,6 +91,7 @@
 		8157AB8627BACCE9003FEB28 /* AddSliceUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddSliceUITests.swift; sourceTree = "<group>"; };
 		8157AB8827BACD2B003FEB28 /* FinanceUITestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceUITestCase.swift; sourceTree = "<group>"; };
 		8157AB8A27BEC3ED003FEB28 /* BudgetsListFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetsListFlow.swift; sourceTree = "<group>"; };
+		816A24CA2801DA1200AAF8C0 /* Finance 0. 6.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Finance 0. 6.xcdatamodel"; sourceTree = "<group>"; };
 		817033E127B1B7BB001686FA /* YearlyBudgetOverview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YearlyBudgetOverview.swift; sourceTree = "<group>"; };
 		817033E927B25F9F001686FA /* FinanceTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FinanceTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		817033EB27B25F9F001686FA /* RepositoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepositoryTests.swift; sourceTree = "<group>"; };
@@ -106,7 +106,6 @@
 		8170341227B7E6E4001686FA /* BudgetFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetFlow.swift; sourceTree = "<group>"; };
 		8170341527B7FB07001686FA /* CommonElements.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonElements.swift; sourceTree = "<group>"; };
 		81735ACB279A2B8D007C9AA3 /* Array+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+Extensions.swift"; sourceTree = "<group>"; };
-		81735ACE279B2179007C9AA3 /* Months.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Months.swift; sourceTree = "<group>"; };
 		817A119027EF355700058C11 /* MonthPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthPickerView.swift; sourceTree = "<group>"; };
 		81947EA727327FCF001C2AC9 /* Finance.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Finance.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		81947EAA27327FCF001C2AC9 /* FinanceApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceApp.swift; sourceTree = "<group>"; };
@@ -183,7 +182,6 @@
 		811F7BCE278C250700F1B8C9 /* Entities */ = {
 			isa = PBXGroup;
 			children = (
-				81735ACE279B2179007C9AA3 /* Months.swift */,
 				81CB8BF32746BC4A00A64785 /* MoneyValue.swift */,
 				81CB8BFD2746DA8F00A64785 /* AmountHolder.swift */,
 			);
@@ -614,7 +612,6 @@
 				81CB8BF82746CA6500A64785 /* AmountListItem.swift in Sources */,
 				81B284E327A0008D00EE51EB /* NewBudgetView.swift in Sources */,
 				81B284EA27A003FB00EE51EB /* BudgetController.swift in Sources */,
-				81735ACF279B2179007C9AA3 /* Months.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -925,6 +922,7 @@
 		81FC874E279B65460031D3AC /* Finance.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				816A24CA2801DA1200AAF8C0 /* Finance 0. 6.xcdatamodel */,
 				81A6FB6B28003D5400D71BE6 /* Finance 0. 5.xcdatamodel */,
 				81EB260E27D162C6006F53DA /* Finance 0. 4.xcdatamodel */,
 				81C222D8279CC4F600759CCB /* Finance 0. 3.xcdatamodel */,
@@ -932,7 +930,7 @@
 				81FCE397279C59F200A407A7 /* Finance 0.1.xcdatamodel */,
 				81FC874F279B65460031D3AC /* Finance.xcdatamodel */,
 			);
-			currentVersion = 81A6FB6B28003D5400D71BE6 /* Finance 0. 5.xcdatamodel */;
+			currentVersion = 816A24CA2801DA1200AAF8C0 /* Finance 0. 6.xcdatamodel */;
 			path = Finance.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

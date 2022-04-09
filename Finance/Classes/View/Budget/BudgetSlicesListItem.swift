@@ -53,8 +53,8 @@ struct TrailingView: View {
 
         case .scheduled(let schedules):
             VStack(alignment: .trailing, spacing: 12) {
-                ForEach(schedules, id: \.month.id) { schedule in
-                    TrailingViewItem(label: schedule.month.name,
+                ForEach(schedules, id: \.month) { schedule in
+                    TrailingViewItem(label: Calendar.current.standaloneMonthSymbols[schedule.month - 1],
                                      iconSystemName: "calendar",
                                      amount: schedule.amount)
                 }

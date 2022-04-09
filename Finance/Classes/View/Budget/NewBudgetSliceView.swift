@@ -103,8 +103,9 @@ private struct SchedulesList: View {
 
     var body: some View {
         List {
-            ForEach(schedules, id: \.month.id) { schedule in
-                AmountListItem(label: schedule.month.name, amount: schedule.amount)
+            ForEach(schedules, id: \.month) { schedule in
+                let monthName = Calendar.current.standaloneMonthSymbols[schedule.month - 1]
+                AmountListItem(label: monthName, amount: schedule.amount)
                     .padding(4)
             }
             .onDelete(perform: delete(at:))

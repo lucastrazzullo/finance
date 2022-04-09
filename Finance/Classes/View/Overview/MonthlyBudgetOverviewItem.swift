@@ -48,7 +48,7 @@ struct MonthlyBudgetOverviewItem: View {
     }
 
     private var backgroundColor: Color {
-        if overview.remainingAmount.value > 0 {
+        if overview.remainingAmount.value >= 0 {
             return .clear
         } else {
             return Color.brown.opacity(0.2)
@@ -56,7 +56,7 @@ struct MonthlyBudgetOverviewItem: View {
     }
 
     private var remainingLabel: String {
-        if overview.remainingAmount.value > 0 {
+        if overview.remainingAmount.value >= 0 {
             return "Remaining"
         } else {
             return "Negative"
