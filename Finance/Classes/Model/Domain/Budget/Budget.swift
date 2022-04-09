@@ -99,6 +99,18 @@ struct Budget: Identifiable, Hashable, AmountHolder {
 
     // MARK: Getters
 
+    func availability(upTo month: Int) -> MoneyValue {
+        slices
+            .reduce(MoneyValue.zero) { accumulatedAmount, slice in
+                switch slice.configuration {
+                case .montly(let amount):
+                    return accumulatedAmount + (amount * .value(Decimal(month)))
+                case .scheduled(let schedules):
+                    return accumulatedAmount + schedules.filter({ $0.month <= month }).totalAmount
+                }
+            }
+    }
+
     func sliceIdentifiers(at indices: IndexSet) -> Set<BudgetSlice.ID> {
         return Set(slices(at: indices).map(\.id))
     }

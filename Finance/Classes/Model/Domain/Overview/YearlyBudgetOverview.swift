@@ -47,26 +47,18 @@ struct YearlyBudgetOverview: Identifiable {
             return nil
         }
 
-        let allTransactionsUntilSelectedMonth = transactions.filter({ transaction in
-            let transactionMonth = Calendar.current.component(.month, from: transaction.date)
-            return transactionMonth <= month
-        })
-
-        let budgetAvailabilityUntilSelectedMonth = budget.slices
-            .reduce(MoneyValue.zero) { accumulatedAmount, slice in
-                switch slice.configuration {
-                case .montly(let amount):
-                    return accumulatedAmount + (amount * .value(Decimal(month)))
-                case .scheduled(let schedules):
-                    return accumulatedAmount + schedules.filter({ $0.month <= month }).totalAmount
-                }
+        let totalAmountSpentUpToSelectedMonth = transactions
+            .filter { transaction in
+                let transactionMonth = Calendar.current.component(.month, from: transaction.date)
+                return transactionMonth <= month
             }
+            .totalAmount
 
         return MonthlyBudgetOverview(
             name: budget.name,
             icon: budget.icon,
-            startingAmount: budgetAvailabilityUntilSelectedMonth,
-            totalExpenses: allTransactionsUntilSelectedMonth.totalAmount
+            startingAmount: budget.availability(upTo: month),
+            totalExpenses: totalAmountSpentUpToSelectedMonth
         )
     }
 
