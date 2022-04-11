@@ -52,8 +52,8 @@ enum Mocks {
 
     static let slices: [BudgetSlice] = {
         [
-            try! .init(id: .init(), name: "Mortgage", configuration: .montly(amount: .value(120.23))),
-            try! .init(id: .init(), name: "Furnitures", configuration: .montly(amount: .value(120.23))),
+            try! .init(id: .init(), name: "Mortgage", configuration: .monthly(amount: .value(120.23))),
+            try! .init(id: .init(), name: "Furnitures", configuration: .monthly(amount: .value(120.23))),
             try! .init(id: .init(), name: "Works", configuration: .scheduled(schedules: sliceScheduledAmounts))
         ]
     }()

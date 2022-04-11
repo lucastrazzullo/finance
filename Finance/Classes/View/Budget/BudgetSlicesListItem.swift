@@ -46,7 +46,7 @@ struct TrailingView: View {
 
     var body: some View {
         switch configuration {
-        case .montly(let amount):
+        case .monthly(let amount):
             TrailingViewItem(label: "Every month",
                              iconSystemName: "arrow.counterclockwise",
                              amount: amount)

@@ -187,7 +187,7 @@ final class CoreDataStorageProvider: ObservableObject, StorageProvider {
         sliceEntity.configurationType = slice.configuration.configurationType
 
         switch slice.configuration {
-        case .montly(let amount):
+        case .monthly(let amount):
             sliceEntity.amount = NSDecimalNumber(decimal: amount.value)
         case .scheduled(let schedules):
             sliceEntity.schedules = NSSet(array: schedules.map { schedule in
@@ -270,7 +270,7 @@ private extension BudgetSlice.Configuration {
 
         switch (configurationType, monthlyAmount, schedules) {
         case let (0, monthlyAmount?, _):
-            return .montly(amount: .value(monthlyAmount.decimalValue))
+            return .monthly(amount: .value(monthlyAmount.decimalValue))
         case let (1, _, schedules?) where schedules.count > 0:
             return .scheduled(schedules: schedules)
         default:
@@ -280,7 +280,7 @@ private extension BudgetSlice.Configuration {
 
     var configurationType: Int16 {
         switch self {
-        case .montly:
+        case .monthly:
             return 0
         case .scheduled:
             return 1

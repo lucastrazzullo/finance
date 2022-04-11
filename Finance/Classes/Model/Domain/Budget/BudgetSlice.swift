@@ -17,12 +17,12 @@ struct BudgetSlice: Identifiable, Hashable, AmountHolder {
     }
 
     enum Configuration: AmountHolder, Equatable {
-        case montly(amount: MoneyValue)
+        case monthly(amount: MoneyValue)
         case scheduled(schedules: [Schedule])
 
         var amount: MoneyValue {
             switch self {
-            case .montly(let amount):
+            case .monthly(let amount):
                 return .value(amount.value * 12)
             case .scheduled(let schedules):
                 return schedules.totalAmount
@@ -45,15 +45,20 @@ struct BudgetSlice: Identifiable, Hashable, AmountHolder {
             throw DomainError.budgetSlice(error: .amountNotValid)
         }
 
-        try self.init(name: name, configuration: .montly(amount: monthlyAmount))
+        try self.init(name: name, configuration: .monthly(amount: monthlyAmount))
     }
 
     init(id: UUID = .init(), name: String, configuration: Configuration) throws {
         guard !name.isEmpty else {
             throw DomainError.budgetSlice(error: .nameNotValid)
         }
-        if case .scheduled(let schedules) = configuration, schedules.count == 0 {
+        switch configuration {
+        case .monthly(let amount) where amount == .zero:
+            throw DomainError.budgetSlice(error: .amountNotValid)
+        case .scheduled(let schedules) where schedules.isEmpty:
             throw DomainError.budgetSlice(error: .thereMustBeAtLeastOneSchedule)
+        default:
+            break
         }
 
         self.id = id

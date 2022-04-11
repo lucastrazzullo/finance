@@ -32,7 +32,7 @@ struct Budget: Identifiable, Hashable, AmountHolder {
 
     init(id: ID = .init(), year: Int, name: String, icon: Icon, monthlyAmount: MoneyValue = .zero) throws {
         let slices = [
-            try BudgetSlice(id: .init(), name: Self.defaultSliceName, configuration: .montly(amount: monthlyAmount))
+            try BudgetSlice(id: .init(), name: Self.defaultSliceName, configuration: .monthly(amount: monthlyAmount))
         ]
         try self.init(id: id, year: year, name: name, icon: icon, slices: slices)
     }
@@ -103,7 +103,7 @@ struct Budget: Identifiable, Hashable, AmountHolder {
         slices
             .reduce(MoneyValue.zero) { accumulatedAmount, slice in
                 switch slice.configuration {
-                case .montly(let amount):
+                case .monthly(let amount):
                     return accumulatedAmount + (amount * .value(Decimal(month)))
                 case .scheduled(let schedules):
                     return accumulatedAmount + schedules.filter({ $0.month <= month }).totalAmount
@@ -124,6 +124,14 @@ struct Budget: Identifiable, Hashable, AmountHolder {
 
     // MARK: Helpers
 
+    func willUpdate(name: String) throws {
+        try Self.canUse(name: name)
+    }
+
+    func willUpdate(iconSystemName: String) throws {
+        try Self.canUse(iconSystemName: iconSystemName)
+    }
+
     func willAdd(slice: BudgetSlice) throws {
         try Self.willAdd(slice: slice, to: slices)
     }
@@ -132,14 +140,6 @@ struct Budget: Identifiable, Hashable, AmountHolder {
         var updatedSlices = slices
         updatedSlices.removeAll(where: { identifiers.contains($0.id) })
         try Self.canUse(slices: updatedSlices)
-    }
-
-    func willUpdate(name: String) throws {
-        try Self.canUse(name: name)
-    }
-
-    func willUpdate(iconSystemName: String) throws {
-        try Self.canUse(iconSystemName: iconSystemName)
     }
 
     static func willAdd(slice: BudgetSlice, to list: [BudgetSlice]) throws {

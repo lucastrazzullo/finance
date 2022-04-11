@@ -153,8 +153,8 @@ class RepositoryTests: XCTestCase {
 
     func testUpdateBudget_addSlices() async throws {
         let year = 2022
-        let slice1 = try BudgetSlice(name: "Slice 1", configuration: .montly(amount: .value(100)))
-        let slice2 = try BudgetSlice(name: "Slice 2", configuration: .montly(amount: .value(200)))
+        let slice1 = try BudgetSlice(name: "Slice 1", configuration: .monthly(amount: .value(100)))
+        let slice2 = try BudgetSlice(name: "Slice 2", configuration: .monthly(amount: .value(200)))
         let budget = try Budget(year: year, name: "Test", icon: .none, slices: [slice1])
 
         storageProvider = MockStorageProvider(budgets: [budget])
