@@ -85,6 +85,6 @@ struct DashboardView<StorageProviderType: StorageProvider & ObservableObject>: V
 struct DashboardView_Previews: PreviewProvider {
     static let year: Int = 2022
     static var previews: some View {
-        DashboardView(overviewYear: year, storageProvider: MockStorageProvider(overviewYear: year))
+        DashboardView(overviewYear: year, storageProvider: MockStorageProvider(budgets: Mocks.budgets, transactions: Mocks.transactions))
     }
 }
