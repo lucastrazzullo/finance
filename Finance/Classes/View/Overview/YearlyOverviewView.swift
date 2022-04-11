@@ -13,39 +13,28 @@ struct YearlyOverviewView: View {
 
     let overview: YearlyBudgetOverview
 
-    var favouriteBudgetOverviews: [MonthlyBudgetOverview] {
-        guard overview.budgets.count > 1 else {
-            return []
-        }
-        return overview.budgets[0...1]
+    var allOverviews: [MonthlyBudgetOverview] {
+        return overview
+            .budgets
             .map(\.id)
-            .compactMap { identifier -> MonthlyBudgetOverview? in
-                return overview.monthlyOverview(month: selectedMonth, forBudgetWith: identifier)
-            }
+            .compactMap({ overview.monthlyOverview(month: selectedMonth, forBudgetWith: $0) })
     }
 
     var lowestBudgetAvailabilityOverviews: [MonthlyBudgetOverview] {
-        Mocks.randomBudgetIdentifiers(count: 3)
-            .compactMap { identifier in
-                guard let budget = Mocks.overview.budget(with: identifier) else {
-                    return nil
-                }
-
-                return MonthlyBudgetOverview(
-                    name: budget.name,
-                    icon: budget.icon,
-                    startingAmount: .value(1000),
-                    totalExpenses: .value(900)
-                )
-            }
+        return overview
+            .budgets
+            .map(\.id)
+            .compactMap({ overview.monthlyOverview(month: selectedMonth, forBudgetWith: $0) })
+            .filter({ $0.remainingAmount <= .value(100) })
+            .sorted(by: { $0.remainingAmount < $1.remainingAmount })
     }
 
     var body: some View {
         NavigationView {
             List {
-                if favouriteBudgetOverviews.count > 0 {
-                    Section(header: Text("Favourites")) {
-                        ForEach(favouriteBudgetOverviews, id: \.self) { overview in
+                if allOverviews.count > 0 {
+                    Section(header: Text("All Overviews")) {
+                        ForEach(allOverviews, id: \.self) { overview in
                             MonthlyBudgetOverviewItem(overview: overview)
                                 .listRowSeparator(.hidden)
                         }
