@@ -47,7 +47,7 @@ final class RepositoryTests: XCTestCase {
         let budgetId = UUID()
         let budget = try Budget(id: budgetId, year: 2022, name: "Test", icon: .none, monthlyAmount: .value(100))
 
-        storageProvider = MockStorageProvider(budgets: [budget])
+        storageProvider = MockStorageProvider(budgets: [budget], transactions: [])
         repository = Repository(storageProvider: storageProvider)
 
         let fetchedBudget = try await repository.fetch(budgetWith: budgetId)
@@ -55,7 +55,7 @@ final class RepositoryTests: XCTestCase {
     }
 
     func testFetchUnesistingBudget() async throws {
-        storageProvider = MockStorageProvider(budgets: [])
+        storageProvider = MockStorageProvider(budgets: [], transactions: [])
         repository = Repository(storageProvider: storageProvider)
 
         do {
@@ -114,7 +114,7 @@ final class RepositoryTests: XCTestCase {
         let budget1 = try Budget(year: year, name: "Test 1", icon: .none, monthlyAmount: .value(100))
         let budget2 = try Budget(year: year, name: "Test 2", icon: .none, monthlyAmount: .value(100))
 
-        storageProvider = MockStorageProvider(budgets: [budget1, budget2])
+        storageProvider = MockStorageProvider(budgets: [budget1, budget2], transactions: [])
         repository = Repository(storageProvider: storageProvider)
 
         try await repository.delete(budgetsWith: [budget1.id])
@@ -129,7 +129,7 @@ final class RepositoryTests: XCTestCase {
         let budget1 = try Budget(year: year, name: "Test 1", icon: .none, monthlyAmount: .value(100))
         let budget2 = try Budget(year: year, name: "Test 2", icon: .none, monthlyAmount: .value(100))
 
-        storageProvider = MockStorageProvider(budgets: [budget1, budget2])
+        storageProvider = MockStorageProvider(budgets: [budget1, budget2], transactions: [])
         repository = Repository(storageProvider: storageProvider)
 
         try await repository.delete(budgetsWith: [budget1.id, budget2.id])
@@ -140,7 +140,7 @@ final class RepositoryTests: XCTestCase {
     }
 
     func testDeleteUnexistingBudget() async throws {
-        storageProvider = MockStorageProvider(budgets: [])
+        storageProvider = MockStorageProvider(budgets: [], transactions: [])
         repository = Repository(storageProvider: storageProvider)
 
         do {
@@ -157,7 +157,7 @@ final class RepositoryTests: XCTestCase {
         let slice2 = try BudgetSlice(name: "Slice 2", configuration: .monthly(amount: .value(200)))
         let budget = try Budget(year: year, name: "Test", icon: .none, slices: [slice1])
 
-        storageProvider = MockStorageProvider(budgets: [budget])
+        storageProvider = MockStorageProvider(budgets: [budget], transactions: [])
         repository = Repository(storageProvider: storageProvider)
 
         try await repository.add(slice: slice2, toBudgetWith: budget.id)
@@ -171,7 +171,7 @@ final class RepositoryTests: XCTestCase {
         let budget1 = try Budget(year: year, name: "Test 1", icon: .none, monthlyAmount: .value(100))
         let budget2 = try Budget(year: year, name: "Test 2", icon: .none, monthlyAmount: .value(100))
 
-        storageProvider = MockStorageProvider(budgets: [budget1, budget2])
+        storageProvider = MockStorageProvider(budgets: [budget1, budget2], transactions: [])
         repository = Repository(storageProvider: storageProvider)
 
         let _ = try await repository.update(name: "Test 3", iconSystemName: nil, inBudgetWith: budget1.id)
@@ -181,7 +181,7 @@ final class RepositoryTests: XCTestCase {
         let year = 2022
         let budget1 = try Budget(year: year, name: "Test 1", icon: .none, monthlyAmount: .value(100))
 
-        storageProvider = MockStorageProvider(budgets: [budget1])
+        storageProvider = MockStorageProvider(budgets: [budget1], transactions: [])
         repository = Repository(storageProvider: storageProvider)
 
         let _ = try await repository.update(name: budget1.name, iconSystemName: "leaf", inBudgetWith: budget1.id)
@@ -192,7 +192,7 @@ final class RepositoryTests: XCTestCase {
         let budget1 = try Budget(year: year, name: "Test 1", icon: .none, monthlyAmount: .value(100))
         let budget2 = try Budget(year: year, name: "Test 2", icon: .none, monthlyAmount: .value(100))
 
-        storageProvider = MockStorageProvider(budgets: [budget1, budget2])
+        storageProvider = MockStorageProvider(budgets: [budget1, budget2], transactions: [])
         repository = Repository(storageProvider: storageProvider)
 
         do {

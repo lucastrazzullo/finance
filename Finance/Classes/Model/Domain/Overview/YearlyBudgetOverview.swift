@@ -9,12 +9,6 @@ import Foundation
 
 struct YearlyBudgetOverview: Identifiable {
 
-    struct Transaction: AmountHolder {
-        let budgetSliceId: BudgetSlice.ID
-        let amount: MoneyValue
-        let date: Date
-    }
-
     let id: UUID
     let name: String
     let year: Int
@@ -24,22 +18,24 @@ struct YearlyBudgetOverview: Identifiable {
 
     // MARK: Object life cycle
 
-    init(id: ID = .init(), name: String, year: Int, budgets: [Budget], transactions: [Transaction] = []) throws {
+    init(id: ID = .init(), name: String, year: Int, budgets: [Budget], transactions: [Transaction]) throws {
         guard !name.isEmpty else {
             throw DomainError.budgetOverview(error: .nameNotValid)
         }
         guard budgets.allSatisfy({ $0.year == year }) else {
             throw DomainError.budgetOverview(error: .budgetsListNotValid)
         }
+
+        let allBudgetSlicesIdentifiers = budgets.flatMap({ $0.slices }).map(\.id)
+        guard transactions.allSatisfy({ $0.year == year && allBudgetSlicesIdentifiers.contains($0.budgetSliceId) }) else {
+            throw DomainError.budgetOverview(error: .transactionsListNotValid)
+        }
+
         self.id = id
         self.name = name
         self.year = year
         self.budgets = budgets
-
-        // Mocking transactions until those are implemented in the repository
-        self.transactions = !transactions.isEmpty ? transactions : budgets.map { budget in
-            Transaction(budgetSliceId: budget.slices.first!.id, amount: .value(100), date: .now)
-        }
+        self.transactions = transactions
     }
 
     // MARK: Overview
@@ -51,17 +47,11 @@ struct YearlyBudgetOverview: Identifiable {
 
         let budgetAvailabilityUpToSelectedMonth = budget.availability(upTo: month)
         let totalAmountSpentUpToSelectedMonth = transactions
-            .filter { transaction in
-                let transactionMonth = Calendar.current.component(.month, from: transaction.date)
-                return transactionMonth < month
-            }
+            .filter { transaction in return transaction.month < month }
             .totalAmount
 
         let totalAmountSpentWithinSelectedMonth = transactions
-            .filter { transaction in
-                let transactionMonth = Calendar.current.component(.month, from: transaction.date)
-                return transactionMonth == month
-            }
+            .filter { transaction in return transaction.month == month }
             .totalAmount
 
         return MonthlyBudgetOverview(

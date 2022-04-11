@@ -62,9 +62,9 @@ enum BudgetOverviewError: DomainUnderlyingError {
     case nameNotValid
     case budgetsListNotValid
     case budgetAlreadyExistsWith(name: String)
-    case cannotFetchTheBudgets
     case cannotAddBudget
     case cannotDeleteBudgets
+    case transactionsListNotValid
 
     var id: String {
         return "YearlyBudgetOverview"
@@ -78,12 +78,12 @@ enum BudgetOverviewError: DomainUnderlyingError {
             return "Budget list not valid!"
         case .budgetAlreadyExistsWith(let name):
             return "A budget named: \(name) already exists"
-        case .cannotFetchTheBudgets:
-            return "Budgets cannot be fetched right now"
         case .cannotAddBudget:
             return "Cannot add budget"
         case .cannotDeleteBudgets:
             return "Cannot delete budgets"
+        case .transactionsListNotValid:
+            return "The list of transactions is not valid"
         }
     }
 

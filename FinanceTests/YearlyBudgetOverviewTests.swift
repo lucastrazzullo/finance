@@ -12,18 +12,30 @@ final class YearlyBudgetOverviewTests: XCTestCase {
 
     // MARK: Instantiating
 
-    func testInstantiateOverview_withValidData() {
-        XCTAssertNoThrow(try YearlyBudgetOverview(name: "Name", year: 2000, budgets: []))
-        XCTAssertNoThrow(try YearlyBudgetOverview(name: "Name", year: 2000, budgets: [
-            try Budget(year: 2000, name: "Name", icon: .none, monthlyAmount: .value(100))
-        ]))
+    func testInstantiateOverview_withValidData() throws {
+        XCTAssertNoThrow(try YearlyBudgetOverview(name: "Name", year: 2000, budgets: [], transactions: []))
+
+        let slice = try BudgetSlice(name: "Name", configuration: .monthly(amount: .value(100)))
+        let budget = try Budget(year: 2000, name: "Name", icon: .none, slices: [slice])
+        let transaction = makeTransaction(date: "2000-02-02", budgetSliceId: slice.id, amount: .value(100))
+        XCTAssertNoThrow(try YearlyBudgetOverview(name: "Name", year: 2000, budgets: [budget], transactions: [transaction]))
     }
 
-    func testInstantiateOverview_withInvalidData() {
-        XCTAssertThrowsError(try YearlyBudgetOverview(name: "", year: 2000, budgets: []))
-        XCTAssertThrowsError(try YearlyBudgetOverview(name: "Name", year: 2000, budgets: [
-            try Budget(year: 2001, name: "Name", icon: .none, monthlyAmount: .value(100))
-        ]))
+    func testInstantiateOverview_withInvalidData() throws {
+        XCTAssertThrowsError(try YearlyBudgetOverview(name: "", year: 2000, budgets: [], transactions: []))
+
+        // Throws when instantiating with budget that has a different year than the overview
+        let slice = try BudgetSlice(name: "Name", configuration: .monthly(amount: .value(100)))
+        let budget = try Budget(year: 2001, name: "Name", icon: .none, slices: [slice])
+        XCTAssertThrowsError(try YearlyBudgetOverview(name: "Name", year: 2000, budgets: [budget], transactions: []))
+
+        // Throws when instantiating with transaction that has slice id not present in budget's slices
+        var transaction = makeTransaction(date: "2001-02-02", budgetSliceId: .init(), amount: .value(100))
+        XCTAssertThrowsError(try YearlyBudgetOverview(name: "Name", year: 2001, budgets: [budget], transactions: [transaction]))
+
+        // Throws when instantiating with transaction thah has year different than overview
+        transaction = makeTransaction(date: "2000-02-02", budgetSliceId: slice.id, amount: .value(100))
+        XCTAssertThrowsError(try YearlyBudgetOverview(name: "Name", year: 2001, budgets: [budget], transactions: [transaction]))
     }
 
     // MARK: Getting
@@ -71,11 +83,11 @@ final class YearlyBudgetOverviewTests: XCTestCase {
 
     // MARK: Private factory methods
 
-    private func makeTransaction(date: String, budgetSliceId: BudgetSlice.ID, amount: MoneyValue) -> YearlyBudgetOverview.Transaction {
+    private func makeTransaction(date: String, budgetSliceId: BudgetSlice.ID, amount: MoneyValue) -> Transaction {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
 
         let date = dateFormatter.date(from: date)!
-        return YearlyBudgetOverview.Transaction(budgetSliceId: budgetSliceId, amount: amount, date: date)
+        return Transaction(amount: amount, date: date, budgetSliceId: budgetSliceId)
     }
 }

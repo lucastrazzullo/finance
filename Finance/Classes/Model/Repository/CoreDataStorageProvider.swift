@@ -28,7 +28,7 @@ final class CoreDataStorageProvider: ObservableObject, StorageProvider {
     func fetchYearlyOverview(year: Int) async throws -> YearlyBudgetOverview {
         let budgetEntities = try fetchBudgetEntities(year: year)
         let budgets = budgetEntities.compactMap { return try? Budget.with(budgetEntity: $0) }
-        let overview = try YearlyBudgetOverview(name: "Default Overview", year: year, budgets: budgets)
+        let overview = try YearlyBudgetOverview(name: "Default Overview", year: year, budgets: budgets, transactions: [])
         return overview
     }
 

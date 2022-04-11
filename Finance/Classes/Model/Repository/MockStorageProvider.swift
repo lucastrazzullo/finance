@@ -12,7 +12,7 @@ enum Mocks {
     static let year: Int = 2022
 
     static let overview: YearlyBudgetOverview = {
-        try! YearlyBudgetOverview(name: "Amsterdam", year: year, budgets: Mocks.budgets)
+        try! YearlyBudgetOverview(name: "Amsterdam", year: year, budgets: Mocks.budgets, transactions: Mocks.transactions)
     }()
 
     // MARK: - Budgets
@@ -65,6 +65,14 @@ enum Mocks {
             try! .init(amount: .value(300), month: 7)
         ]
     }()
+
+    static let transactions: [Transaction] = {
+        [
+            Transaction(amount: .value(100), date: .now, budgetSliceId: slices[0].id),
+            Transaction(amount: .value(100), date: .now, budgetSliceId: slices[1].id),
+            Transaction(amount: .value(100), date: .now, budgetSliceId: slices[2].id)
+        ]
+    }()
 }
 
 final class MockStorageProvider: StorageProvider, ObservableObject {
@@ -77,17 +85,17 @@ final class MockStorageProvider: StorageProvider, ObservableObject {
 
     // MARK: Object life cycle
 
-    init(budgets: [Budget]) {
+    init(budgets: [Budget], transactions: [Transaction]) {
         let years = Set(budgets.map(\.year))
         let sortedYears = years.sorted(by: { $0 < $1 })
         self.budgetOverviews = sortedYears.map { year in
-            try! YearlyBudgetOverview(id: .init(), name: "Mock Overview", year: year, budgets: budgets)
+            try! YearlyBudgetOverview(id: .init(), name: "Mock Overview", year: year, budgets: budgets, transactions: transactions)
         }
     }
 
     init(overviewYear: Int) {
         self.budgetOverviews = [
-            try! YearlyBudgetOverview(id: .init(), name: "Mock Overview", year: overviewYear, budgets: [])
+            try! YearlyBudgetOverview(id: .init(), name: "Mock Overview", year: overviewYear, budgets: [], transactions: [])
         ]
     }
 

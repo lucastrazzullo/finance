@@ -83,6 +83,6 @@ struct YearlyOverviewView: View {
 struct OverviewView_Previews: PreviewProvider {
     let overview = Mocks.overview
     static var previews: some View {
-        YearlyOverviewView(overview: try! .init(name: "Amsterdam", year: 2022, budgets: []))
+        YearlyOverviewView(overview: try! .init(name: "Amsterdam", year: 2022, budgets: [], transactions: []))
     }
 }
