@@ -19,7 +19,7 @@ struct BudgetIconPicker: View {
                 Image(systemName: name.rawValue)
             }
         }
-        .pickerStyle(MenuPickerStyle())
+        .pickerStyle(.menu)
         .symbolRenderingMode(.hierarchical)
         .accentColor(.primary)
     }

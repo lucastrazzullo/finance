@@ -49,11 +49,11 @@ struct BudgetsListView<Destination: View>: View {
                     }
                 }
             }
-            .listStyle(InsetListStyle())
+            .listStyle(.inset)
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarItems(trailing: EditButton())
             .toolbar(content: {
-                ToolbarItem(placement: .navigationBarLeading) {
+                ToolbarItem(placement: .principal) {
                     DefaultToolbar(
                         title: overview.name,
                         subtitle: "Budgets \(String(overview.year))"

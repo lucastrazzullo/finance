@@ -9,6 +9,7 @@ import Foundation
 
 struct Transaction: AmountHolder {
 
+    let description: String?
     let amount: MoneyValue
     let date: Date
     let budgetSliceId: BudgetSlice.ID

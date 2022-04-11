@@ -39,4 +39,8 @@ enum AccessibilityIdentifier {
         static let amountInputField = "SliceAmountInputField"
         static let saveButton = "SaveSliceButton"
     }
+
+    enum NewTransactionView {
+        static let descriptionInputField = "DescriptionInputField"
+    }
 }

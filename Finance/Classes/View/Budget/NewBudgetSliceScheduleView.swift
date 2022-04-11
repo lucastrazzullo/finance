@@ -9,7 +9,7 @@ import SwiftUI
 
 struct NewBudgetSliceScheduleView: View {
 
-    @State private var newScheduleAmount: String = ""
+    @State private var newScheduleAmount: Decimal? = nil
     @State private var newScheduleMonth: Int = Calendar.current.component(.month, from: .now)
     @State private var submitError: DomainError?
 
@@ -18,9 +18,9 @@ struct NewBudgetSliceScheduleView: View {
     var body: some View {
         Form {
             Section(header: Text("New Slice Schedule")) {
-                AmountTextField(amountValue: $newScheduleAmount, title: "Amount", prompt: nil)
+                AmountTextField(amountValue: $newScheduleAmount, title: "Amount")
                 MonthPickerView(month: $newScheduleMonth)
-                    .pickerStyle(WheelPickerStyle())
+                    .pickerStyle(.wheel)
             }
 
             Section {
@@ -37,10 +37,7 @@ struct NewBudgetSliceScheduleView: View {
     // MARK: Private helper methods
 
     private func submit() {
-        guard let amount = MoneyValue.string(newScheduleAmount) else {
-            submitError = .budgetSlice(error: .amountNotValid)
-            return
-        }
+        let amount = MoneyValue.value(newScheduleAmount ?? 0)
 
         do {
             try onSubmit(BudgetSlice.Schedule(amount: amount, month: newScheduleMonth))

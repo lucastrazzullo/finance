@@ -9,13 +9,12 @@ import SwiftUI
 
 struct AmountTextField: View {
 
-    @Binding var amountValue: String
+    @Binding var amountValue: Decimal?
 
     let title: String
-    let prompt: Text?
 
     var body: some View {
-        TextField(title, text: $amountValue, prompt: prompt)
+        TextField(title, value: $amountValue, format: .currency(code: Locale.current.currencyCodeOrDefault))
             .keyboardType(.decimalPad)
             .padding(.vertical)
     }
@@ -23,6 +22,6 @@ struct AmountTextField: View {
 
 struct AmountTextField_Previews: PreviewProvider {
     static var previews: some View {
-        AmountTextField(amountValue: .constant(""), title: "Amount", prompt: nil).padding()
+        AmountTextField(amountValue: .constant(100), title: "Amount").padding()
     }
 }

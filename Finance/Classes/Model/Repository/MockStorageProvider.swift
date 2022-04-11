@@ -68,9 +68,9 @@ enum Mocks {
 
     static let transactions: [Transaction] = {
         [
-            Transaction(amount: .value(100), date: .now, budgetSliceId: slices[0].id),
-            Transaction(amount: .value(100), date: .now, budgetSliceId: slices[1].id),
-            Transaction(amount: .value(1000), date: .now, budgetSliceId: slices[2].id)
+            Transaction(description: nil, amount: .value(100), date: .now, budgetSliceId: slices[0].id),
+            Transaction(description: nil, amount: .value(100), date: .now, budgetSliceId: slices[1].id),
+            Transaction(description: nil, amount: .value(1000), date: .now, budgetSliceId: slices[2].id)
         ]
     }()
 }

@@ -88,6 +88,6 @@ final class YearlyBudgetOverviewTests: XCTestCase {
         dateFormatter.dateFormat = "yyyy-MM-dd"
 
         let date = dateFormatter.date(from: date)!
-        return Transaction(amount: amount, date: date, budgetSliceId: budgetSliceId)
+        return Transaction(description: nil, amount: amount, date: date, budgetSliceId: budgetSliceId)
     }
 }

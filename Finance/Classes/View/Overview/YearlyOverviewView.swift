@@ -10,17 +10,16 @@ import SwiftUI
 struct YearlyOverviewView: View {
 
     @State private var selectedMonth: Int = Calendar.current.component(.month, from: .now)
+    @State private var addTransactionPresented: Bool = false
 
-    let overview: YearlyBudgetOverview
-
-    var allOverviews: [MonthlyBudgetOverview] {
+    private var allOverviews: [MonthlyBudgetOverview] {
         return overview
             .budgets
             .map(\.id)
             .compactMap({ overview.monthlyOverview(month: selectedMonth, forBudgetWith: $0) })
     }
 
-    var lowestBudgetAvailabilityOverviews: [MonthlyBudgetOverview] {
+    private var lowestBudgetAvailabilityOverviews: [MonthlyBudgetOverview] {
         return overview
             .budgets
             .map(\.id)
@@ -28,6 +27,8 @@ struct YearlyOverviewView: View {
             .filter({ $0.remainingAmount <= .value(100) })
             .sorted(by: { $0.remainingAmount < $1.remainingAmount })
     }
+
+    let overview: YearlyBudgetOverview
 
     var body: some View {
         NavigationView {
@@ -50,10 +51,15 @@ struct YearlyOverviewView: View {
                     }
                 }
             }
-            .listStyle(PlainListStyle())
+            .listStyle(.plain)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar(content: {
                 ToolbarItem(placement: .navigationBarLeading) {
+                    MonthPickerView(month: $selectedMonth)
+                        .pickerStyle(MenuPickerStyle())
+                }
+
+                ToolbarItem(placement: .principal) {
                     DefaultToolbar(
                         title: overview.name,
                         subtitle: "Overview \(String(overview.year))"
@@ -61,10 +67,15 @@ struct YearlyOverviewView: View {
                 }
 
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    MonthPickerView(month: $selectedMonth)
-                        .pickerStyle(MenuPickerStyle())
+                    Button(action: { addTransactionPresented = true }) {
+                        Label("New transaction", systemImage: "plus")
+                    }
                 }
             })
+        }
+        .sheet(isPresented: $addTransactionPresented) {
+            NewTransactionView { transaction in
+            }
         }
     }
 }
@@ -72,6 +83,6 @@ struct YearlyOverviewView: View {
 struct OverviewView_Previews: PreviewProvider {
     let overview = Mocks.overview
     static var previews: some View {
-        YearlyOverviewView(overview: try! .init(name: "Amsterdam", year: 2022, budgets: [], transactions: []))
+        YearlyOverviewView(overview: try! .init(name: "Amsterdam", year: 2022, budgets: Mocks.budgets, transactions: Mocks.transactions))
     }
 }

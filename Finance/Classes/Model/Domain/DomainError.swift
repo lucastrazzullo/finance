@@ -18,6 +18,7 @@ enum DomainError: Error, Identifiable {
     case budgetOverview(error: BudgetOverviewError)
     case budget(error: BudgetError)
     case budgetSlice(error: BudgetSliceError)
+    case transaction(error: TransactionError)
     case storageProvider(error: StorageProviderError)
     case underlying(error: AnyUnderlyingError)
 
@@ -44,6 +45,8 @@ enum DomainError: Error, Identifiable {
         case .budget(let error):
             return error
         case .budgetSlice(let error):
+            return error
+        case .transaction(let error):
             return error
         case .storageProvider(let error):
             return error
@@ -103,7 +106,6 @@ enum BudgetError: DomainUnderlyingError {
 
     case nameNotValid
     case iconSystemNameNotValid
-    case amountNotValid
     case multipleSlicesWithSameName
     case sliceAlreadyExistsWith(name: String)
     case thereMustBeAtLeastOneSlice
@@ -124,8 +126,6 @@ enum BudgetError: DomainUnderlyingError {
             return "Please use a valid name"
         case .iconSystemNameNotValid:
             return "Please use a valid icon system name"
-        case .amountNotValid:
-            return "Please use a valid amount"
         case .multipleSlicesWithSameName:
             return "The budget cannot have slices with the same name"
         case .sliceAlreadyExistsWith(let name):
@@ -151,8 +151,6 @@ enum BudgetError: DomainUnderlyingError {
         switch self {
         case .nameNotValid:
             return AccessibilityIdentifier.Error.invalidNameError
-        case .amountNotValid:
-            return AccessibilityIdentifier.Error.invalidAmountError
         case .multipleSlicesWithSameName:
             return AccessibilityIdentifier.Error.sameNameError
         case .sliceAlreadyExistsWith:
@@ -207,6 +205,31 @@ enum BudgetSliceError: DomainUnderlyingError {
             return AccessibilityIdentifier.Error.invalidNameError
         case .amountNotValid:
             return AccessibilityIdentifier.Error.invalidAmountError
+        default:
+            return AccessibilityIdentifier.Error.someError
+        }
+    }
+}
+
+enum TransactionError: DomainUnderlyingError {
+    case budgetSliceIsMissing
+    case amountNotValid
+
+    var id: String {
+        return "Transaction"
+    }
+
+    var description: String {
+        switch self {
+        case .budgetSliceIsMissing:
+            return "The budget slice is missing"
+        case .amountNotValid:
+            return "The amount is not valid"
+        }
+    }
+
+    var accessibilityIdentifier: String {
+        switch self {
         default:
             return AccessibilityIdentifier.Error.someError
         }

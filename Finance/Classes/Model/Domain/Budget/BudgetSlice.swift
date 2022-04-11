@@ -51,14 +51,6 @@ struct BudgetSlice: Identifiable, Hashable, AmountHolder {
 
     // MARK: Object life cycle
 
-    init(name: String, monthlyAmount: String) throws {
-        guard let monthlyAmount = MoneyValue.string(monthlyAmount) else {
-            throw DomainError.budgetSlice(error: .amountNotValid)
-        }
-
-        try self.init(name: name, configuration: .monthly(amount: monthlyAmount))
-    }
-
     init(id: UUID = .init(), name: String, configuration: Configuration) throws {
         guard !name.isEmpty else {
             throw DomainError.budgetSlice(error: .nameNotValid)

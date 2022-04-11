@@ -56,7 +56,7 @@ final class BudgetTests: XCTestCase {
 
     func testInstantiateBudget_totalAmount_withSlices() throws {
         let budget = try Budget(year: 2000, name: "Name", icon: .none, slices: [
-            BudgetSlice(name: "Name 1", monthlyAmount: "100"),
+            BudgetSlice(name: "Name 1", configuration: .monthly(amount: .value(100))),
             BudgetSlice(name: "Name 2", configuration: .monthly(amount: .value(100))),
             BudgetSlice(name: "Name 3", configuration: .scheduled(schedules: [
                 BudgetSlice.Schedule(amount: .value(100), month: 1),

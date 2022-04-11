@@ -13,7 +13,7 @@ struct DefaultToolbar: View {
     let subtitle: String
 
     var body: some View {
-        VStack(alignment: .leading) {
+        VStack {
             Text(title).font(.title2.bold())
             Text(subtitle).font(.caption)
         }

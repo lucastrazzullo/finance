@@ -18,7 +18,7 @@ struct NewBudgetSliceView: View {
 
     @State private var sliceName: String = ""
     @State private var sliceConfigurationType: Schedule = .monthly
-    @State private var sliceMonthlyAmount: String = ""
+    @State private var sliceMonthlyAmount: Decimal? = nil
 
     @State private var sliceSchedules: [BudgetSlice.Schedule] = []
     @State private var isInsertNewSchedulePresented: Bool = false
@@ -40,12 +40,12 @@ struct NewBudgetSliceView: View {
                         Text(type.rawValue)
                     }
                 }
-                .pickerStyle(SegmentedPickerStyle())
+                .pickerStyle(.segmented)
                 .padding(.vertical)
 
                 switch sliceConfigurationType {
                 case .monthly:
-                    AmountTextField(amountValue: $sliceMonthlyAmount, title: "Monthly Amount", prompt: nil)
+                    AmountTextField(amountValue: $sliceMonthlyAmount, title: "Monthly Amount")
                         .accessibilityIdentifier(AccessibilityIdentifier.NewSliceView.amountInputField)
                 case .scheduled:
                     SchedulesList(schedules: $sliceSchedules)
@@ -90,7 +90,7 @@ struct NewBudgetSliceView: View {
     private func makeSlice() throws -> BudgetSlice {
         switch sliceConfigurationType {
         case .monthly:
-            return try BudgetSlice(name: sliceName, monthlyAmount: sliceMonthlyAmount)
+            return try BudgetSlice(name: sliceName, configuration: .monthly(amount: .value(sliceMonthlyAmount ?? 0)))
         case .scheduled:
             return try BudgetSlice(name: sliceName, configuration: .scheduled(schedules: sliceSchedules))
         }

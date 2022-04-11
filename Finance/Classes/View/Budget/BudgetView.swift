@@ -55,7 +55,7 @@ struct BudgetView: View {
                     }
                 }
             }
-            .listStyle(InsetListStyle())
+            .listStyle(.inset)
         }
         .sheet(isPresented: $isInsertNewSlicePresented) {
             NewBudgetSliceView { newSlice in

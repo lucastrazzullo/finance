@@ -13,8 +13,8 @@ struct NewBudgetView: View {
     @State private var budgetIcon: String = BudgetViewModel.SystemIcon.default.rawValue
     @State private var budgetSlices: [BudgetSlice] = []
 
-    @State private var submitError: DomainError?
     @State private var isInsertNewBudgetSlicePresented: Bool = false
+    @State private var submitError: DomainError?
 
     let year: Int
     let onSubmit: (Budget) async throws -> Void

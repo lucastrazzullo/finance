@@ -23,6 +23,6 @@ struct InlineErrorView: View {
 
 struct InlineErrorView_Previews: PreviewProvider {
     static var previews: some View {
-        InlineErrorView(error: .budget(error: .amountNotValid))
+        InlineErrorView(error: .budget(error: .nameNotValid))
     }
 }
