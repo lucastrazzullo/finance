@@ -14,6 +14,17 @@ struct BudgetSlice: Identifiable, Hashable, AmountHolder {
     struct Schedule: AmountHolder, Equatable {
         let amount: MoneyValue
         let month: Int
+
+        init(amount: MoneyValue, month: Int) throws {
+            guard amount > .zero else {
+                throw DomainError.budgetSlice(error: .amountNotValid)
+            }
+            guard (1...12).contains(month) else {
+                throw DomainError.budgetSlice(error: .scheduleMonthNotValid)
+            }
+            self.amount = amount
+            self.month = month
+        }
     }
 
     enum Configuration: AmountHolder, Equatable {

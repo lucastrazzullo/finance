@@ -237,9 +237,9 @@ private extension Budget {
             }
         }()
 
-        let budgetSlices = slices
+        let budgetSlices = try slices
             .compactMap { $0 as? BudgetSliceEntity }
-            .compactMap { BudgetSlice.with(budgetSliceEntity: $0) }
+            .compactMap { try BudgetSlice.with(budgetSliceEntity: $0) }
 
         return try Budget(id: identifier, year: year, name: name, icon: icon, slices: budgetSlices)
     }
@@ -247,13 +247,13 @@ private extension Budget {
 
 private extension BudgetSlice {
 
-    static func with(budgetSliceEntity: BudgetSliceEntity) -> Self? {
+    static func with(budgetSliceEntity: BudgetSliceEntity) throws -> Self? {
         guard let identifier = budgetSliceEntity.identifier,
               let name = budgetSliceEntity.name else {
             return nil
         }
 
-        if let configuration = BudgetSlice.Configuration.with(budgetSliceEntity: budgetSliceEntity) {
+        if let configuration = try BudgetSlice.Configuration.with(budgetSliceEntity: budgetSliceEntity) {
             return try? BudgetSlice(id: identifier, name: name, configuration: configuration)
         } else {
             return nil
@@ -263,10 +263,10 @@ private extension BudgetSlice {
 
 private extension BudgetSlice.Configuration {
 
-    static func with(budgetSliceEntity: BudgetSliceEntity) -> Self? {
+    static func with(budgetSliceEntity: BudgetSliceEntity) throws -> Self? {
         let configurationType = budgetSliceEntity.configurationType
         let monthlyAmount = budgetSliceEntity.amount
-        let schedules = budgetSliceEntity.schedules?.compactMap(BudgetSlice.Schedule.with(budgetSliceScheduleEntity:))
+        let schedules = try budgetSliceEntity.schedules?.compactMap(BudgetSlice.Schedule.with(budgetSliceScheduleEntity:))
 
         switch (configurationType, monthlyAmount, schedules) {
         case let (0, monthlyAmount?, _):
@@ -290,12 +290,12 @@ private extension BudgetSlice.Configuration {
 
 private extension BudgetSlice.Schedule {
 
-    static func with(budgetSliceScheduleEntity: NSSet.Element) -> Self? {
+    static func with(budgetSliceScheduleEntity: NSSet.Element) throws -> Self? {
         guard let schedule = budgetSliceScheduleEntity as? BudgetSliceScheduledAmountEntity,
               let amount = schedule.amount else {
             return nil
         }
         let month = Int(schedule.month)
-        return .init(amount: .value(amount.decimalValue), month: month)
+        return try .init(amount: .value(amount.decimalValue), month: month)
     }
 }
