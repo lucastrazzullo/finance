@@ -8,7 +8,7 @@
 import XCTest
 @testable import Finance
 
-class BudgetSliceTests: XCTestCase {
+final class BudgetSliceTests: XCTestCase {
 
     // MARK: Instantiating
 

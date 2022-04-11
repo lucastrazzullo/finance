@@ -24,7 +24,7 @@ struct YearlyBudgetOverview: Identifiable {
 
     // MARK: Object life cycle
 
-    init(id: ID = .init(), name: String, year: Int, budgets: [Budget]) throws {
+    init(id: ID = .init(), name: String, year: Int, budgets: [Budget], transactions: [Transaction] = []) throws {
         guard !name.isEmpty else {
             throw DomainError.budgetOverview(error: .nameNotValid)
         }
@@ -35,7 +35,9 @@ struct YearlyBudgetOverview: Identifiable {
         self.name = name
         self.year = year
         self.budgets = budgets
-        self.transactions = budgets.map { budget in
+
+        // Mocking transactions until those are implemented in the repository
+        self.transactions = !transactions.isEmpty ? transactions : budgets.map { budget in
             Transaction(budgetSliceId: budget.slices.first!.id, amount: .value(100), date: .now)
         }
     }
@@ -47,18 +49,26 @@ struct YearlyBudgetOverview: Identifiable {
             return nil
         }
 
+        let budgetAvailabilityUpToSelectedMonth = budget.availability(upTo: month)
         let totalAmountSpentUpToSelectedMonth = transactions
             .filter { transaction in
                 let transactionMonth = Calendar.current.component(.month, from: transaction.date)
-                return transactionMonth <= month
+                return transactionMonth < month
+            }
+            .totalAmount
+
+        let totalAmountSpentWithinSelectedMonth = transactions
+            .filter { transaction in
+                let transactionMonth = Calendar.current.component(.month, from: transaction.date)
+                return transactionMonth == month
             }
             .totalAmount
 
         return MonthlyBudgetOverview(
             name: budget.name,
             icon: budget.icon,
-            startingAmount: budget.availability(upTo: month),
-            totalExpenses: totalAmountSpentUpToSelectedMonth
+            startingAmount: budgetAvailabilityUpToSelectedMonth - totalAmountSpentUpToSelectedMonth,
+            totalExpenses: totalAmountSpentWithinSelectedMonth
         )
     }
 

@@ -8,7 +8,7 @@
 import XCTest
 @testable import Finance
 
-class BudgetTests: XCTestCase {
+final class BudgetTests: XCTestCase {
 
     // MARK: Factories
 
@@ -32,12 +32,12 @@ class BudgetTests: XCTestCase {
     // MARK: Instantiating
 
     func testInstantiateBudget_withValidData() {
-        XCTAssertNotNil(try Budget(year: 2000, name: "Name", icon: .system(name: "some"), monthlyAmount: .value(100)))
-        XCTAssertNotNil(try Budget(year: 2000, name: "Name", icon: .none, monthlyAmount: .value(100)))
-        XCTAssertNotNil(try Budget(year: 2000, name: "Name", icon: .none, slices: [
+        XCTAssertNoThrow(try Budget(year: 2000, name: "Name", icon: .system(name: "some"), monthlyAmount: .value(100)))
+        XCTAssertNoThrow(try Budget(year: 2000, name: "Name", icon: .none, monthlyAmount: .value(100)))
+        XCTAssertNoThrow(try Budget(year: 2000, name: "Name", icon: .none, slices: [
             try makeSlice(name: "Name"),
         ]))
-        XCTAssertNotNil(try Budget(year: 2000, name: "Name", icon: .none, slices: [
+        XCTAssertNoThrow(try Budget(year: 2000, name: "Name", icon: .none, slices: [
             try makeSlice(name: "Name 1"),
             try makeSlice(name: "Name 2")
         ]))
@@ -77,19 +77,18 @@ class BudgetTests: XCTestCase {
         XCTAssertThrowsError(try budget.willUpdate(name: ""))
         XCTAssertThrowsError(try budget.update(name: ""))
 
-        try budget.willUpdate(name: name)
-        try budget.update(name: name)
+        XCTAssertNoThrow(try budget.willUpdate(name: name))
+        XCTAssertNoThrow(try budget.update(name: name))
 
-        try budget.willUpdate(name: "Any other name")
-        try budget.update(name: "Any other name")
+        XCTAssertNoThrow(try budget.willUpdate(name: "Any other name"))
+        XCTAssertNoThrow(try budget.update(name: "Any other name"))
     }
 
     func testUpdateBudgetIcon() throws {
         var budget = try makeBudget()
 
         XCTAssertThrowsError(try budget.update(iconSystemName: ""))
-
-        try budget.update(iconSystemName: "some")
+        XCTAssertNoThrow(try budget.update(iconSystemName: "some"))
     }
 
     func testUpdateBudget_appensSlice() throws {
@@ -100,8 +99,8 @@ class BudgetTests: XCTestCase {
         // When: appending a slice with a different name
         // Then: no error thrown
         let slice3 = try makeSlice(name: "Name 3")
-        try budget.willAdd(slice: slice3)
-        try budget.append(slice: slice3)
+        XCTAssertNoThrow(try budget.willAdd(slice: slice3))
+        XCTAssertNoThrow(try budget.append(slice: slice3))
 
         // When: appending a slice with the same name as others in the budget
         // Then: throw an error, becasue there can't be slices with the same name
@@ -124,8 +123,8 @@ class BudgetTests: XCTestCase {
         // When: deleting only one slice
         // Then: no errors are thrown
         deletingIndexSet = IndexSet(integer: 0)
-        try budget.willDelete(slicesWith: [slice1.id])
-        try budget.delete(slicesAt: deletingIndexSet)
+        XCTAssertNoThrow(try budget.willDelete(slicesWith: [slice1.id]))
+        XCTAssertNoThrow(try budget.delete(slicesAt: deletingIndexSet))
 
         // When: deleting the only one left slice
         // Then: throw an error, becasue there can't be a budget without slices

@@ -8,7 +8,7 @@
 import XCTest
 @testable import Finance
 
-class RepositoryTests: XCTestCase {
+final class RepositoryTests: XCTestCase {
 
     private var storageProvider: StorageProvider!
     private var repository: Repository!
