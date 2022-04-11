@@ -45,7 +45,7 @@ final class RepositoryTests: XCTestCase {
 
     func testFetchBudget() async throws {
         let budgetId = UUID()
-        let budget = try Budget(id: budgetId, year: 2022, name: "Test", icon: .none)
+        let budget = try Budget(id: budgetId, year: 2022, name: "Test", icon: .none, monthlyAmount: .value(100))
 
         storageProvider = MockStorageProvider(budgets: [budget])
         repository = Repository(storageProvider: storageProvider)
@@ -77,8 +77,8 @@ final class RepositoryTests: XCTestCase {
         storageProvider = MockStorageProvider(overviewYear: year)
         repository = Repository(storageProvider: storageProvider)
 
-        let budget1 = try Budget(year: year, name: "Test 1", icon: .none)
-        let budget2 = try Budget(year: year, name: "Test 2", icon: .none)
+        let budget1 = try Budget(year: year, name: "Test 1", icon: .none, monthlyAmount: .value(100))
+        let budget2 = try Budget(year: year, name: "Test 2", icon: .none, monthlyAmount: .value(100))
         try await repository.add(budget: budget1)
         try await repository.add(budget: budget2)
 
@@ -93,8 +93,8 @@ final class RepositoryTests: XCTestCase {
         storageProvider = MockStorageProvider(overviewYear: year)
         repository = Repository(storageProvider: storageProvider)
 
-        let budget1 = try Budget(year: year, name: "Test", icon: .none)
-        let budget2 = try Budget(year: year, name: "Test", icon: .none)
+        let budget1 = try Budget(year: year, name: "Test", icon: .none, monthlyAmount: .value(100))
+        let budget2 = try Budget(year: year, name: "Test", icon: .none, monthlyAmount: .value(100))
 
         do {
             let _ = try await repository.add(budget: budget1)
@@ -111,8 +111,8 @@ final class RepositoryTests: XCTestCase {
 
     func testDeleteBudget() async throws {
         let year = 2022
-        let budget1 = try Budget(year: year, name: "Test 1", icon: .none)
-        let budget2 = try Budget(year: year, name: "Test 2", icon: .none)
+        let budget1 = try Budget(year: year, name: "Test 1", icon: .none, monthlyAmount: .value(100))
+        let budget2 = try Budget(year: year, name: "Test 2", icon: .none, monthlyAmount: .value(100))
 
         storageProvider = MockStorageProvider(budgets: [budget1, budget2])
         repository = Repository(storageProvider: storageProvider)
@@ -126,8 +126,8 @@ final class RepositoryTests: XCTestCase {
 
     func testDeleteMultipleBudgets() async throws {
         let year = 2022
-        let budget1 = try Budget(year: year, name: "Test 1", icon: .none)
-        let budget2 = try Budget(year: year, name: "Test 2", icon: .none)
+        let budget1 = try Budget(year: year, name: "Test 1", icon: .none, monthlyAmount: .value(100))
+        let budget2 = try Budget(year: year, name: "Test 2", icon: .none, monthlyAmount: .value(100))
 
         storageProvider = MockStorageProvider(budgets: [budget1, budget2])
         repository = Repository(storageProvider: storageProvider)

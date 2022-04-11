@@ -30,7 +30,7 @@ struct Budget: Identifiable, Hashable, AmountHolder {
 
     // MARK: Object life cycle
 
-    init(id: ID = .init(), year: Int, name: String, icon: Icon, monthlyAmount: MoneyValue = .zero) throws {
+    init(id: ID = .init(), year: Int, name: String, icon: Icon, monthlyAmount: MoneyValue) throws {
         let slices = [
             try BudgetSlice(id: .init(), name: Self.defaultSliceName, configuration: .monthly(amount: monthlyAmount))
         ]

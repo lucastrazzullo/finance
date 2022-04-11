@@ -84,10 +84,13 @@ struct MonthlyBudgetOverviewItem: View {
 
 struct MonthlyBudgetOverviewItem_Previews: PreviewProvider {
     static var previews: some View {
-        MonthlyBudgetOverviewItem(overview: MonthlyBudgetOverview(
-            name: "Test Overview",
-            icon: .system(name: "leaf"),
-            startingAmount: .value(1000),
-            totalExpenses: .value(100)))
+        MonthlyBudgetOverviewItem(
+            overview: MonthlyBudgetOverview(
+                name: "Test Overview",
+                icon: .system(name: "leaf"),
+                startingAmount: .value(1000),
+                totalExpenses: .value(100)
+            )
+        )
     }
 }
