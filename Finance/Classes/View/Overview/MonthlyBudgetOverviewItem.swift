@@ -27,6 +27,11 @@ struct MonthlyBudgetOverviewItem: View {
                     Text("Starting amount").font(.caption2)
                     AmountView(amount: overview.startingAmount).font(.caption2.bold())
                 }
+
+                HStack(spacing: 2) {
+                    Text("Expenses").font(.caption2)
+                    AmountView(amount: overview.totalExpenses).font(.caption2.bold())
+                }
             }
             Spacer()
 
