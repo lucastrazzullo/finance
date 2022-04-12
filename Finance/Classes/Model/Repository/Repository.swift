@@ -60,7 +60,8 @@ final actor Repository {
 
     func add(budget: Budget) async throws {
         let overview = try await fetchYearlyOverview(year: budget.year)
-        try overview.willAdd(budget: budget)
+        let budgetList = BudgetList(budgets: overview.budgets)
+        try budgetList.willAdd(budget: budget)
 
         try await storageProvider.add(budget: budget)
     }
@@ -90,7 +91,8 @@ final actor Repository {
         }
 
         let overview = try await fetchYearlyOverview(year: budget.year)
-        try overview.willUpdate(budgetName: name, forBudgetWith: id)
+        let budgetList = BudgetList(budgets: overview.budgets)
+        try budgetList.willUpdate(budgetName: name, forBudgetWith: id)
 
         try await storageProvider.update(name: name, iconSystemName: iconSystemName, inBudgetWith: id)
     }

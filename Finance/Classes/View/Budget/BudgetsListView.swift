@@ -70,7 +70,7 @@ struct BudgetsListView<Destination: View>: View {
 // MARK: - Previews
 
 struct BudgetsListView_Previews: PreviewProvider {
-    static let storageProvider = MockStorageProvider(overviewYear: Mocks.year)
+    static let storageProvider = try! MockStorageProvider(year: Mocks.year)
     static var previews: some View {
         BudgetsListView(
             destination: { budget in BudgetView(budget: budget, storageProvider: storageProvider) },

@@ -15,7 +15,7 @@ struct FinanceApp: App {
     var body: some Scene {
         WindowGroup {
             if CommandLine.arguments.contains("testing") {
-                DashboardView(overviewYear: year, storageProvider: MockStorageProvider(overviewYear: year))
+                DashboardView(overviewYear: year, storageProvider: try! MockStorageProvider(year: year))
             } else {
                 DashboardView(overviewYear: year, storageProvider: CoreDataStorageProvider())
             }

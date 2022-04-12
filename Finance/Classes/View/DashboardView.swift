@@ -32,14 +32,14 @@ struct DashboardView<StorageProviderType: StorageProvider & ObservableObject>: V
                         onAppear: { try? await overviewController.fetch() },
                         onAdd: { addNewTransactionForOverview = overviewController.overview }
                     )
+                    .sheet(item: $addNewTransactionForOverview) { overview in
+                        NewTransactionView(budgets: overview.budgets) { transaction in
+                            overviewController.add(transaction: transaction)
+                            addNewTransactionForOverview = nil
+                        }
+                    }
                 } else {
                     Text("Fetching ...")
-                }
-            }
-            .sheet(item: $addNewTransactionForOverview) { overview in
-                NewTransactionView(budgets: overview.budgets) { transaction in
-                    overviewController.add(transaction: transaction)
-                    addNewTransactionForOverview = nil
                 }
             }
             .tabItem {
@@ -51,21 +51,21 @@ struct DashboardView<StorageProviderType: StorageProvider & ObservableObject>: V
                     BudgetsListView(
                         destination: { budget in BudgetView(budget: budget, storageProvider: storageProvider) },
                         title: overview.name,
-                        subtitle: "Budgets \(String(Mocks.overview.year))",
+                        subtitle: "Budgets \(String(overview.year))",
                         budgets: overview.budgets,
                         error: deleteBudgetsError,
                         onAppear: { try? await overviewController.fetch() },
                         onAdd: { addNewBudgetForOverview = overviewController.overview },
                         onDelete: deleteBudgets(at:)
                     )
+                    .sheet(item: $addNewBudgetForOverview) { overview in
+                        NewBudgetView(year: overview.year) { budget in
+                            try await overviewController.add(budget: budget)
+                            addNewBudgetForOverview = nil
+                        }
+                    }
                 } else {
                     Text("Fetching ...")
-                }
-            }
-            .sheet(item: $addNewBudgetForOverview) { overview in
-                NewBudgetView(year: overview.year) { budget in
-                    try await overviewController.add(budget: budget)
-                    addNewBudgetForOverview = nil
                 }
             }
             .tabItem {
@@ -97,13 +97,13 @@ struct DashboardView<StorageProviderType: StorageProvider & ObservableObject>: V
 
     init(overviewYear: Int, storageProvider: StorageProviderType) {
         self.storageProvider = storageProvider
-        self.overviewController = OverviewController(overviewYear: overviewYear, storageProvider: storageProvider)
+        self.overviewController = OverviewController(year: overviewYear, storageProvider: storageProvider)
     }
 }
 
 struct DashboardView_Previews: PreviewProvider {
-    static let year: Int = 2022
+    static let storageProvider: MockStorageProvider = try! MockStorageProvider(year: Mocks.year, budgets: Mocks.budgets, transactions: Mocks.transactions)
     static var previews: some View {
-        DashboardView(overviewYear: year, storageProvider: MockStorageProvider(budgets: Mocks.budgets, transactions: Mocks.transactions))
+        DashboardView(overviewYear: Mocks.year, storageProvider: storageProvider)
     }
 }
