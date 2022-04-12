@@ -39,6 +39,10 @@ final class OverviewController: ObservableObject {
         }
     }
 
+    func add(transaction: Transaction) {
+        overview?.append(transaction: transaction)
+    }
+
     func delete(budgetsAt indices: IndexSet) async throws {
         guard let budgetsIdentifiersToDelete = overview?.budgetIdentifiers(at: indices) else {
             return

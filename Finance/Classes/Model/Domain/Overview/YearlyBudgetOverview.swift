@@ -94,7 +94,7 @@ struct YearlyBudgetOverview: Identifiable {
         return Set(budgets.map(\.id))
     }
 
-    // MARK: Mutating methods
+    // MARK: - Mutating methods
 
     mutating func delete(budgetWith id: Budget.ID) {
         budgets.removeAll(where: { $0.id == id })
@@ -107,6 +107,10 @@ struct YearlyBudgetOverview: Identifiable {
     mutating func append(budget: Budget) throws {
         try willAdd(budget: budget)
         budgets.append(budget)
+    }
+
+    mutating func append(transaction: Transaction) {
+        self.transactions.append(transaction)
     }
 
     // MARK: Helper methods

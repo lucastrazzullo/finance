@@ -12,19 +12,36 @@ struct NewTransactionView: View {
     @State private var transactionDescription: String = ""
     @State private var transactionDate: Date = .now
     @State private var transactionAmount: Decimal? = nil
-    @State private var budgetSliceId: BudgetSlice.ID?
+
+    @State private var budgetIndex: Int = 0
+    @State private var budgetSliceIndex: Int = 0
 
     @State private var submitError: DomainError?
 
+    let budgets: [Budget]
     let onSubmit: (Transaction) async throws -> Void
 
     var body: some View {
-        VStack {
-            Text("New transaction")
-                .font(.title3.bold())
-                .padding(.top)
-
+        NavigationView {
             Form {
+                Section(header: Text("Budget")) {
+                    Picker("Select Budget", selection: $budgetIndex) {
+                        ForEach(0..<budgets.count, id:\.self) { budgetIndex in
+                            let budget = budgets[budgetIndex]
+                            Text(budget.name)
+                        }
+                    }
+                    .pickerStyle(DefaultPickerStyle())
+
+                    Picker("Select Slice", selection: $budgetSliceIndex) {
+                        ForEach(0..<budgets[budgetIndex].slices.count, id:\.self) { sliceIndex in
+                            let slice = budgets[budgetIndex].slices[sliceIndex]
+                            Text(slice.name)
+                        }
+                    }
+                    .pickerStyle(DefaultPickerStyle())
+                }
+
                 Section(header: Text("Info")) {
                     TextField("Description", text: $transactionDescription)
                         .accessibilityIdentifier(AccessibilityIdentifier.NewTransactionView.descriptionInputField)
@@ -44,6 +61,8 @@ struct NewTransactionView: View {
                         .accessibilityIdentifier(AccessibilityIdentifier.NewBudgetView.saveButton)
                 }
             }
+            .navigationTitle("New transaction")
+            .navigationBarTitleDisplayMode(.inline)
         }
     }
 
@@ -52,9 +71,6 @@ struct NewTransactionView: View {
     private func submit() {
         Task {
             do {
-                guard let budgetSliceId = budgetSliceId else {
-                    throw DomainError.transaction(error: .budgetSliceIsMissing)
-                }
                 guard let transactionAmount = transactionAmount else {
                     throw DomainError.transaction(error: .amountNotValid)
                 }
@@ -65,7 +81,7 @@ struct NewTransactionView: View {
                     description: transactionDescription,
                     amount: MoneyValue.value(transactionAmount),
                     date: transactionDate,
-                    budgetSliceId: budgetSliceId
+                    budgetSliceId: budgets[budgetIndex].slices[budgetSliceIndex].id
                 )
 
                 try await onSubmit(transaction)
@@ -79,6 +95,6 @@ struct NewTransactionView: View {
 
 struct NewTransactionView_Previews: PreviewProvider {
     static var previews: some View {
-        NewTransactionView() { _ in }
+        NewTransactionView(budgets: Mocks.budgets) { _ in }
     }
 }

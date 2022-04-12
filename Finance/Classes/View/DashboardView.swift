@@ -14,15 +14,27 @@ struct DashboardView<StorageProviderType: StorageProvider & ObservableObject>: V
     @State private var addNewBudgetForOverview: YearlyBudgetOverview?
     @State private var deleteBudgetsError: DomainError?
 
+    @State private var addNewTransactionForOverview: YearlyBudgetOverview?
+
     private let storageProvider: StorageProviderType
 
     var body: some View {
         TabView {
             ZStack {
                 if let overview = overviewController.overview {
-                    YearlyOverviewView(overview: overview)
+                    YearlyOverviewView(
+                        overview: overview,
+                        onAppear: { try? await overviewController.fetch() },
+                        onAdd: { addNewTransactionForOverview = overviewController.overview }
+                    )
                 } else {
                     Text("Fetching ...")
+                }
+            }
+            .sheet(item: $addNewTransactionForOverview) { overview in
+                NewTransactionView(budgets: overview.budgets) { transaction in
+                    overviewController.add(transaction: transaction)
+                    addNewTransactionForOverview = nil
                 }
             }
             .tabItem {

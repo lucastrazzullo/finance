@@ -10,7 +10,6 @@ import SwiftUI
 struct YearlyOverviewView: View {
 
     @State private var selectedMonth: Int = Calendar.current.component(.month, from: .now)
-    @State private var addTransactionPresented: Bool = false
 
     private var allOverviews: [MonthlyBudgetOverview] {
         return overview
@@ -29,6 +28,9 @@ struct YearlyOverviewView: View {
     }
 
     let overview: YearlyBudgetOverview
+
+    let onAppear: () async -> Void
+    let onAdd: () -> Void
 
     var body: some View {
         NavigationView {
@@ -67,15 +69,12 @@ struct YearlyOverviewView: View {
                 }
 
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: { addTransactionPresented = true }) {
+                    Button(action: onAdd) {
                         Label("New transaction", systemImage: "plus")
                     }
                 }
             })
-        }
-        .sheet(isPresented: $addTransactionPresented) {
-            NewTransactionView { transaction in
-            }
+            .onAppear(perform: { Task { await onAppear() }})
         }
     }
 }
@@ -83,6 +82,15 @@ struct YearlyOverviewView: View {
 struct OverviewView_Previews: PreviewProvider {
     let overview = Mocks.overview
     static var previews: some View {
-        YearlyOverviewView(overview: try! .init(name: "Amsterdam", year: 2022, budgets: Mocks.budgets, transactions: Mocks.transactions))
+        YearlyOverviewView(
+            overview: try! .init(
+                name: "Amsterdam",
+                year: 2022,
+                budgets: Mocks.budgets,
+                transactions: Mocks.transactions
+            ),
+            onAppear: {},
+            onAdd: {}
+        )
     }
 }
