@@ -1,5 +1,5 @@
 //
-//  YearlyOverviewView.swift
+//  OverviewListView.swift
 //  Finance
 //
 //  Created by Luca Strazzullo on 07/04/2022.
@@ -7,27 +7,19 @@
 
 import SwiftUI
 
-struct YearlyOverviewView: View {
+struct OverviewListView: View {
 
-    @State private var selectedMonth: Int = Calendar.current.component(.month, from: .now)
-
-    private var allOverviews: [MonthlyBudgetOverview] {
-        return overview
-            .budgets
-            .map(\.id)
-            .compactMap({ overview.monthlyOverview(month: selectedMonth, forBudgetWith: $0) })
-    }
-
-    private var lowestBudgetAvailabilityOverviews: [MonthlyBudgetOverview] {
-        return overview
-            .budgets
-            .map(\.id)
-            .compactMap({ overview.monthlyOverview(month: selectedMonth, forBudgetWith: $0) })
+    private var overviewsWithLowestAvailability: [MonthlyBudgetOverview] {
+        overviews
             .filter({ $0.remainingAmount <= .value(100) })
             .sorted(by: { $0.remainingAmount < $1.remainingAmount })
     }
 
-    let overview: YearlyBudgetOverview
+    @Binding var month: Int
+
+    let title: String
+    let subtitle: String
+    let overviews: [MonthlyBudgetOverview]
 
     let onAppear: () async -> Void
     let onAdd: () -> Void
@@ -35,18 +27,18 @@ struct YearlyOverviewView: View {
     var body: some View {
         NavigationView {
             List {
-                if allOverviews.count > 0 {
+                if overviews.count > 0 {
                     Section(header: Text("All Overviews")) {
-                        ForEach(allOverviews, id: \.self) { overview in
+                        ForEach(overviews, id: \.self) { overview in
                             MonthlyBudgetOverviewItem(overview: overview)
                                 .listRowSeparator(.hidden)
                         }
                     }
                 }
 
-                if lowestBudgetAvailabilityOverviews.count > 0 {
+                if overviewsWithLowestAvailability.count > 0 {
                     Section(header: Text("Lowest budgets this month")) {
-                        ForEach(lowestBudgetAvailabilityOverviews, id: \.self) { overview in
+                        ForEach(overviewsWithLowestAvailability, id: \.self) { overview in
                             MonthlyBudgetOverviewItem(overview: overview)
                                 .listRowSeparator(.hidden)
                         }
@@ -57,14 +49,14 @@ struct YearlyOverviewView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar(content: {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    MonthPickerView(month: $selectedMonth)
+                    MonthPickerView(month: $month)
                         .pickerStyle(MenuPickerStyle())
                 }
 
                 ToolbarItem(placement: .principal) {
                     DefaultToolbar(
-                        title: overview.name,
-                        subtitle: "Overview \(String(overview.year))"
+                        title: title,
+                        subtitle: subtitle
                     )
                 }
 
@@ -82,13 +74,11 @@ struct YearlyOverviewView: View {
 struct OverviewView_Previews: PreviewProvider {
     let overview = Mocks.overview
     static var previews: some View {
-        YearlyOverviewView(
-            overview: try! .init(
-                name: "Amsterdam",
-                year: 2022,
-                budgets: Mocks.budgets,
-                transactions: Mocks.transactions
-            ),
+        OverviewListView(
+            month: .constant(1),
+            title: "Amsterdam",
+            subtitle: "2022",
+            overviews: Mocks.overview.monthlyOverviews(month: 1),
             onAppear: {},
             onAdd: {}
         )

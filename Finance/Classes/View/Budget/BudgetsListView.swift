@@ -11,7 +11,9 @@ struct BudgetsListView<Destination: View>: View {
 
     @ViewBuilder var destination: (Budget) -> Destination
 
-    let overview: YearlyBudgetOverview
+    let title: String
+    let subtitle: String
+    let budgets: [Budget]
     let error: DomainError?
 
     let onAppear: () async -> Void
@@ -22,7 +24,7 @@ struct BudgetsListView<Destination: View>: View {
         NavigationView {
             List {
                 Section(header: Text("Budgets")) {
-                    ForEach(overview.budgets) { budget in
+                    ForEach(budgets) { budget in
                         NavigationLink(destination: destination(budget)) {
                             HStack {
                                 let viewModel = BudgetViewModel(budget: budget)
@@ -55,8 +57,8 @@ struct BudgetsListView<Destination: View>: View {
             .toolbar(content: {
                 ToolbarItem(placement: .principal) {
                     DefaultToolbar(
-                        title: overview.name,
-                        subtitle: "Budgets \(String(overview.year))"
+                        title: title,
+                        subtitle: subtitle
                     )
                 }
             })
@@ -72,7 +74,9 @@ struct BudgetsListView_Previews: PreviewProvider {
     static var previews: some View {
         BudgetsListView(
             destination: { budget in BudgetView(budget: budget, storageProvider: storageProvider) },
-            overview: Mocks.overview,
+            title: "Title",
+            subtitle: "Subtitle",
+            budgets: Mocks.budgets,
             error: nil,
             onAppear: {},
             onAdd: {},

@@ -11,6 +11,8 @@ struct DashboardView<StorageProviderType: StorageProvider & ObservableObject>: V
 
     @ObservedObject private var overviewController: OverviewController
 
+    @State private var selectedMonth: Int = Calendar.current.component(.month, from: .now)
+
     @State private var addNewBudgetForOverview: YearlyBudgetOverview?
     @State private var deleteBudgetsError: DomainError?
 
@@ -22,8 +24,11 @@ struct DashboardView<StorageProviderType: StorageProvider & ObservableObject>: V
         TabView {
             ZStack {
                 if let overview = overviewController.overview {
-                    YearlyOverviewView(
-                        overview: overview,
+                    OverviewListView(
+                        month: $selectedMonth,
+                        title: overview.name,
+                        subtitle: "Overview \(String(overview.year))",
+                        overviews: overview.monthlyOverviews(month: selectedMonth),
                         onAppear: { try? await overviewController.fetch() },
                         onAdd: { addNewTransactionForOverview = overviewController.overview }
                     )
@@ -45,7 +50,9 @@ struct DashboardView<StorageProviderType: StorageProvider & ObservableObject>: V
                 if let overview = overviewController.overview {
                     BudgetsListView(
                         destination: { budget in BudgetView(budget: budget, storageProvider: storageProvider) },
-                        overview: overview,
+                        title: overview.name,
+                        subtitle: "Budgets \(String(Mocks.overview.year))",
+                        budgets: overview.budgets,
                         error: deleteBudgetsError,
                         onAppear: { try? await overviewController.fetch() },
                         onAdd: { addNewBudgetForOverview = overviewController.overview },

@@ -40,6 +40,12 @@ struct YearlyBudgetOverview: Identifiable {
 
     // MARK: Overview
 
+    func monthlyOverviews(month: Int) -> [MonthlyBudgetOverview] {
+        return budgets
+            .map(\.id)
+            .compactMap({ monthlyOverview(month: month, forBudgetWith: $0) })
+    }
+
     func monthlyOverview(month: Int, forBudgetWith identifier: Budget.ID) -> MonthlyBudgetOverview? {
         guard let budget = budget(with: identifier) else {
             return nil

@@ -21,7 +21,7 @@ final class OverviewController: ObservableObject {
         self.repository = Repository(storageProvider: storageProvider)
     }
 
-    // MARK: Internal methods
+    // MARK: Overview
 
     func fetch() async throws {
         let overview = try await repository.fetchYearlyOverview(year: overviewYear)
@@ -31,16 +31,14 @@ final class OverviewController: ObservableObject {
         }
     }
 
+    // MARK: Budget
+
     func add(budget: Budget) async throws {
         try await repository.add(budget: budget)
 
         DispatchQueue.main.async { [weak self] in
             try? self?.overview?.append(budget: budget)
         }
-    }
-
-    func add(transaction: Transaction) {
-        overview?.append(transaction: transaction)
     }
 
     func delete(budgetsAt indices: IndexSet) async throws {
@@ -52,5 +50,11 @@ final class OverviewController: ObservableObject {
         DispatchQueue.main.async { [weak self] in
             self?.overview?.delete(budgetsWith: deletedIdentifiers)
         }
+    }
+
+    // MARK: Transaction
+
+    func add(transaction: Transaction) {
+        overview?.append(transaction: transaction)
     }
 }

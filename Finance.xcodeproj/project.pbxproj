@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		810F869F27FF4E1C00A1CDD4 /* BudgetsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 810F869E27FF4E1C00A1CDD4 /* BudgetsListView.swift */; };
-		810F86A227FF833600A1CDD4 /* YearlyOverviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 810F86A127FF833600A1CDD4 /* YearlyOverviewView.swift */; };
+		810F86A227FF833600A1CDD4 /* OverviewListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 810F86A127FF833600A1CDD4 /* OverviewListView.swift */; };
 		810F86A427FF91CB00A1CDD4 /* MonthlyBudgetOverview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 810F86A327FF91CA00A1CDD4 /* MonthlyBudgetOverview.swift */; };
 		810F86A628002CD700A1CDD4 /* MonthlyBudgetOverviewItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 810F86A528002CD700A1CDD4 /* MonthlyBudgetOverviewItem.swift */; };
 		811F7BD3278C2A3500F1B8C9 /* BudgetSlice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 811F7BD2278C2A3500F1B8C9 /* BudgetSlice.swift */; };
@@ -88,7 +88,7 @@
 
 /* Begin PBXFileReference section */
 		810F869E27FF4E1C00A1CDD4 /* BudgetsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetsListView.swift; sourceTree = "<group>"; };
-		810F86A127FF833600A1CDD4 /* YearlyOverviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YearlyOverviewView.swift; sourceTree = "<group>"; };
+		810F86A127FF833600A1CDD4 /* OverviewListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverviewListView.swift; sourceTree = "<group>"; };
 		810F86A327FF91CA00A1CDD4 /* MonthlyBudgetOverview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthlyBudgetOverview.swift; sourceTree = "<group>"; };
 		810F86A528002CD700A1CDD4 /* MonthlyBudgetOverviewItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthlyBudgetOverviewItem.swift; sourceTree = "<group>"; };
 		811F7BD2278C2A3500F1B8C9 /* BudgetSlice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetSlice.swift; sourceTree = "<group>"; };
@@ -185,7 +185,7 @@
 		810F86A027FF832000A1CDD4 /* Overview */ = {
 			isa = PBXGroup;
 			children = (
-				810F86A127FF833600A1CDD4 /* YearlyOverviewView.swift */,
+				810F86A127FF833600A1CDD4 /* OverviewListView.swift */,
 				810F86A528002CD700A1CDD4 /* MonthlyBudgetOverviewItem.swift */,
 			);
 			path = Overview;
@@ -618,7 +618,7 @@
 				81C222DC279CD11F00759CCB /* MockStorageProvider.swift in Sources */,
 				81F7E16A27D16F3F00D67EB8 /* BudgetSlicesListItem.swift in Sources */,
 				81EC7CAD279A17AD006194C9 /* Repository.swift in Sources */,
-				810F86A227FF833600A1CDD4 /* YearlyOverviewView.swift in Sources */,
+				810F86A227FF833600A1CDD4 /* OverviewListView.swift in Sources */,
 				81735ACC279A2B8D007C9AA3 /* Array+Extensions.swift in Sources */,
 				819993D72752FAA300FA3E03 /* AmountTextField.swift in Sources */,
 				81F3B9132804949A00A1B89F /* NewTransactionView.swift in Sources */,
