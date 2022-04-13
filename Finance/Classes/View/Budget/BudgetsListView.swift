@@ -7,17 +7,6 @@
 
 import SwiftUI
 
-protocol BudgetsListViewModel: ObservableObject {
-    var listYear: Int { get }
-    var listTitle: String { get }
-    var listSubtitle: String { get }
-    var listBudgets: [Budget] { get }
-
-    func fetch() async throws
-    func add(budget: Budget) async throws
-    func delete(budgetsAt indices: IndexSet) async throws
-}
-
 struct BudgetsListView<Destination: View, ViewModel: BudgetsListViewModel>: View {
 
     @ViewBuilder var destination: (Budget) -> Destination

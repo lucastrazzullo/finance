@@ -14,6 +14,8 @@
 		811F7BD3278C2A3500F1B8C9 /* BudgetSlice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 811F7BD2278C2A3500F1B8C9 /* BudgetSlice.swift */; };
 		8126BA7D2805FE7A00C06C93 /* BudgetList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8126BA7C2805FE7A00C06C93 /* BudgetList.swift */; };
 		8126BA7F2806E98A00C06C93 /* StorageProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8126BA7E2806E98A00C06C93 /* StorageProvider.swift */; };
+		8126BA832807314100C06C93 /* BudgetsListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8126BA822807314100C06C93 /* BudgetsListViewModel.swift */; };
+		8126BA852807318F00C06C93 /* OverviewListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8126BA842807318F00C06C93 /* OverviewListViewModel.swift */; };
 		8157AB8327BA7E15003FEB28 /* NewSliceElements.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8157AB8227BA7E15003FEB28 /* NewSliceElements.swift */; };
 		8157AB8527BA7E5D003FEB28 /* SliceFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8157AB8427BA7E5D003FEB28 /* SliceFlow.swift */; };
 		8157AB8727BACCE9003FEB28 /* AddSliceUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8157AB8627BACCE9003FEB28 /* AddSliceUITests.swift */; };
@@ -97,6 +99,8 @@
 		8126BA7C2805FE7A00C06C93 /* BudgetList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetList.swift; sourceTree = "<group>"; };
 		8126BA7E2806E98A00C06C93 /* StorageProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageProvider.swift; sourceTree = "<group>"; };
 		8126BA802806F69A00C06C93 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		8126BA822807314100C06C93 /* BudgetsListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetsListViewModel.swift; sourceTree = "<group>"; };
+		8126BA842807318F00C06C93 /* OverviewListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverviewListViewModel.swift; sourceTree = "<group>"; };
 		8157AB8227BA7E15003FEB28 /* NewSliceElements.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSliceElements.swift; sourceTree = "<group>"; };
 		8157AB8427BA7E5D003FEB28 /* SliceFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SliceFlow.swift; sourceTree = "<group>"; };
 		8157AB8627BACCE9003FEB28 /* AddSliceUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddSliceUITests.swift; sourceTree = "<group>"; };
@@ -231,6 +235,16 @@
 			path = Budget;
 			sourceTree = "<group>";
 		};
+		8126BA812807310A00C06C93 /* Storage */ = {
+			isa = PBXGroup;
+			children = (
+				8126BA7E2806E98A00C06C93 /* StorageProvider.swift */,
+				81FC8751279B77240031D3AC /* CoreDataStorageProvider.swift */,
+				81C222DB279CD11F00759CCB /* MockStorageProvider.swift */,
+			);
+			path = Storage;
+			sourceTree = "<group>";
+		};
 		81542BD6279580F300A05B77 /* Amount */ = {
 			isa = PBXGroup;
 			children = (
@@ -316,9 +330,6 @@
 			isa = PBXGroup;
 			children = (
 				81EC7CAC279A17AD006194C9 /* Repository.swift */,
-				8126BA7E2806E98A00C06C93 /* StorageProvider.swift */,
-				81FC8751279B77240031D3AC /* CoreDataStorageProvider.swift */,
-				81C222DB279CD11F00759CCB /* MockStorageProvider.swift */,
 			);
 			path = Repository;
 			sourceTree = "<group>";
@@ -394,6 +405,8 @@
 			isa = PBXGroup;
 			children = (
 				81A6FB7328005EF800D71BE6 /* BudgetViewModel.swift */,
+				8126BA822807314100C06C93 /* BudgetsListViewModel.swift */,
+				8126BA842807318F00C06C93 /* OverviewListViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -428,6 +441,7 @@
 				81735ACB279A2B8D007C9AA3 /* Array+Extensions.swift */,
 				811F7BCE278C250700F1B8C9 /* Entities */,
 				811F7BCF278C250E00F1B8C9 /* Domain */,
+				8126BA812807310A00C06C93 /* Storage */,
 				81735ACD279A2DE3007C9AA3 /* Repository */,
 				81A6FB7228005EE900D71BE6 /* ViewModel */,
 			);
@@ -644,12 +658,14 @@
 				81CB8BF02746B92400A64785 /* Budget.swift in Sources */,
 				8195E8BC27A41BD200D58297 /* InlineErrorView.swift in Sources */,
 				8126BA7F2806E98A00C06C93 /* StorageProvider.swift in Sources */,
+				8126BA852807318F00C06C93 /* OverviewListViewModel.swift in Sources */,
 				81F3B90E2804333600A1B89F /* Transaction.swift in Sources */,
 				81B284E627A0011800EE51EB /* OverviewController.swift in Sources */,
 				81947EAB27327FCF001C2AC9 /* FinanceApp.swift in Sources */,
 				81B284F027A02FB800EE51EB /* DomainError.swift in Sources */,
 				81B80D13278C5516002E002E /* DateFormatter+Defaults.swift in Sources */,
 				81A6FB7428005EF800D71BE6 /* BudgetViewModel.swift in Sources */,
+				8126BA832807314100C06C93 /* BudgetsListViewModel.swift in Sources */,
 				81A6FB76280071EE00D71BE6 /* BudgetIconPicker.swift in Sources */,
 				81CB8BF82746CA6500A64785 /* AmountListItem.swift in Sources */,
 				81B284E327A0008D00EE51EB /* NewBudgetView.swift in Sources */,
