@@ -20,10 +20,7 @@ struct DashboardView: View {
                 Label("Overview", systemImage: "list.bullet.below.rectangle")
             }
 
-            BudgetsListView(
-                destination: { budget in BudgetView(budget: budget, storageProvider: storageProvider) },
-                viewModel: overviewController
-            )
+            BudgetsListView(viewModel: overviewController, storageProvider: storageProvider)
             .tabItem {
                 Label("Budgets", systemImage: "list.dash")
                     .accessibilityIdentifier(AccessibilityIdentifier.DashboardView.budgetsTab)
@@ -39,14 +36,13 @@ struct DashboardView: View {
     // MARK: Object life cycle
 
     init(overview: YearlyBudgetOverview, storageProvider: StorageProvider) {
-        self.storageProvider = storageProvider
         self.overviewController = OverviewController(overview: overview, storageProvider: storageProvider)
+        self.storageProvider = storageProvider
     }
 }
 
 struct DashboardView_Previews: PreviewProvider {
-    static let storageProvider = try! MockStorageProvider(budgets: Mocks.budgets, transactions: Mocks.transactions)
     static var previews: some View {
-        DashboardView(overview: Mocks.overview, storageProvider: storageProvider)
+        DashboardView(overview: Mocks.overview, storageProvider: try! MockStorageProvider())
     }
 }

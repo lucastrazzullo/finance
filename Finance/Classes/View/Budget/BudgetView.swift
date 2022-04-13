@@ -11,7 +11,7 @@ struct BudgetView: View {
 
     @Environment(\.editMode) private var editMode
 
-    @ObservedObject private var controller: BudgetController
+    @ObservedObject var controller: BudgetController
 
     @State private var updatingBudgetName: String
     @State private var updatingBudgetIcon: String
@@ -19,6 +19,8 @@ struct BudgetView: View {
 
     @State private var isInsertNewSlicePresented: Bool = false
     @State private var deleteSlicesError: DomainError?
+
+    private let viewModel: BudgetViewModel
 
     private var isEditing: Bool {
         editMode?.wrappedValue.isEditing == true
@@ -85,9 +87,8 @@ struct BudgetView: View {
 
     init(budget: Budget, storageProvider: StorageProvider) {
         self.controller = BudgetController(budget: budget, storageProvider: storageProvider)
-        self._updatingBudgetName = State<String>(wrappedValue: budget.name)
-
-        let viewModel = BudgetViewModel(budget: budget)
+        self.viewModel = BudgetViewModel(budget: budget)
+        self._updatingBudgetName = State<String>(wrappedValue: viewModel.name)
         self._updatingBudgetIcon = State<String>(wrappedValue: viewModel.iconSystemName)
     }
 
@@ -177,10 +178,9 @@ private struct SlicesListSection<Footer: View>: View {
 // MARK: - Previews
 
 struct BudgetView_Previews: PreviewProvider {
-    static let storageProvider = try! MockStorageProvider()
     static var previews: some View {
         NavigationView {
-            BudgetView(budget: Mocks.budgets[0], storageProvider: storageProvider)
+            BudgetView(budget: Mocks.budgets[0], storageProvider: try! MockStorageProvider())
         }
     }
 }

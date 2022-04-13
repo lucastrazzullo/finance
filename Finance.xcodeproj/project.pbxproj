@@ -16,6 +16,7 @@
 		8126BA7F2806E98A00C06C93 /* StorageProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8126BA7E2806E98A00C06C93 /* StorageProvider.swift */; };
 		8126BA832807314100C06C93 /* BudgetsListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8126BA822807314100C06C93 /* BudgetsListViewModel.swift */; };
 		8126BA852807318F00C06C93 /* OverviewListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8126BA842807318F00C06C93 /* OverviewListViewModel.swift */; };
+		8126BA8928073A7C00C06C93 /* ErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8126BA8828073A7C00C06C93 /* ErrorView.swift */; };
 		8157AB8327BA7E15003FEB28 /* NewSliceElements.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8157AB8227BA7E15003FEB28 /* NewSliceElements.swift */; };
 		8157AB8527BA7E5D003FEB28 /* SliceFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8157AB8427BA7E5D003FEB28 /* SliceFlow.swift */; };
 		8157AB8727BACCE9003FEB28 /* AddSliceUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8157AB8627BACCE9003FEB28 /* AddSliceUITests.swift */; };
@@ -101,6 +102,7 @@
 		8126BA802806F69A00C06C93 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8126BA822807314100C06C93 /* BudgetsListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetsListViewModel.swift; sourceTree = "<group>"; };
 		8126BA842807318F00C06C93 /* OverviewListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverviewListViewModel.swift; sourceTree = "<group>"; };
+		8126BA8828073A7C00C06C93 /* ErrorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorView.swift; sourceTree = "<group>"; };
 		8157AB8227BA7E15003FEB28 /* NewSliceElements.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSliceElements.swift; sourceTree = "<group>"; };
 		8157AB8427BA7E5D003FEB28 /* SliceFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SliceFlow.swift; sourceTree = "<group>"; };
 		8157AB8627BACCE9003FEB28 /* AddSliceUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddSliceUITests.swift; sourceTree = "<group>"; };
@@ -378,6 +380,7 @@
 				81A6FB69280037CD00D71BE6 /* DefaultToolbar.swift */,
 				817A119027EF355700058C11 /* MonthPickerView.swift */,
 				8195E8BB27A41BD200D58297 /* InlineErrorView.swift */,
+				8126BA8828073A7C00C06C93 /* ErrorView.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -654,6 +657,7 @@
 				8170340227B59945001686FA /* AccessibilityIdentifier.swift in Sources */,
 				810F86A427FF91CB00A1CDD4 /* MonthlyBudgetOverview.swift in Sources */,
 				819993D52752F80C00FA3E03 /* Locale+Defaults.swift in Sources */,
+				8126BA8928073A7C00C06C93 /* ErrorView.swift in Sources */,
 				817033E227B1B7BB001686FA /* YearlyBudgetOverview.swift in Sources */,
 				81CB8BF02746B92400A64785 /* Budget.swift in Sources */,
 				8195E8BC27A41BD200D58297 /* InlineErrorView.swift in Sources */,

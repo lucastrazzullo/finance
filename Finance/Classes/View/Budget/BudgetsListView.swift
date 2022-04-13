@@ -7,23 +7,24 @@
 
 import SwiftUI
 
-struct BudgetsListView<Destination: View, ViewModel: BudgetsListViewModel>: View {
+struct BudgetsListView<ViewModel: BudgetsListViewModel>: View {
 
-    @ViewBuilder var destination: (Budget) -> Destination
-    @ObservedObject var viewModel: ViewModel
+    @ObservedObject private var viewModel: ViewModel
 
     @State private var deleteBudgetError: DomainError?
     @State private var addNewBudgetError: DomainError?
     @State private var addNewBudgetIsPresented: Bool = false
+
+    private let storageProvider: StorageProvider
 
     var body: some View {
         NavigationView {
             List {
                 Section(header: Text("Budgets")) {
                     ForEach(viewModel.listBudgets) { budget in
-                        NavigationLink(destination: destination(budget)) {
+                        NavigationLink(destination: { BudgetView(budget: budget, storageProvider: storageProvider) }) {
+                            let viewModel = BudgetViewModel(budget: budget)
                             HStack {
-                                let viewModel = BudgetViewModel(budget: budget)
                                 Label(viewModel.name, systemImage: viewModel.iconSystemName)
                                     .symbolRenderingMode(.hierarchical)
                                     .font(.body.bold())
@@ -81,17 +82,20 @@ struct BudgetsListView<Destination: View, ViewModel: BudgetsListViewModel>: View
             }
         }
     }
+
+    // MARK: Object life cycle
+
+    init(viewModel: ViewModel, storageProvider: StorageProvider) {
+        self.viewModel = viewModel
+        self.storageProvider = storageProvider
+    }
 }
 
 // MARK: - Previews
 
 struct BudgetsListView_Previews: PreviewProvider {
-    static let storageProvider = try! MockStorageProvider()
     static var previews: some View {
-        BudgetsListView(
-            destination: { budget in BudgetView(budget: budget, storageProvider: storageProvider) },
-            viewModel: MockBudgetsListViewModel(year: Mocks.year)
-        )
+        BudgetsListView(viewModel: MockBudgetsListViewModel(year: Mocks.year), storageProvider: try! MockStorageProvider())
     }
 }
 

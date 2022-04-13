@@ -11,35 +11,39 @@ import SwiftUI
 struct FinanceApp: App {
 
     @State private var overview: YearlyBudgetOverview?
+    @State private var loadError: DomainError?
 
-    private let year: Int
-    private let storageProvider: StorageProvider
+    private let storageProvider: StorageProvider = {
+        if CommandLine.arguments.contains("testing") {
+            return try! MockStorageProvider()
+        } else {
+            return CoreDataStorageProvider()
+        }
+    }()
 
     var body: some Scene {
         WindowGroup {
             if let overview = overview {
                 DashboardView(overview: overview, storageProvider: storageProvider)
+            } else if let error = loadError {
+                ErrorView(error: error, retryAction: load)
             } else {
-                Text("Loading overview ...")
-                    .onAppear {
-                        Task {
-                            overview = try? await storageProvider.fetchYearlyOverview(year: year)
-                        }
-                    }
+                ProgressView("Loading").onAppear(perform: load)
             }
         }
     }
 
-    // MARK: Object life cycle
+    // MARK: Private helper methods
 
-    init() {
-        self.year = 2022
-        self.storageProvider = {
-            if CommandLine.arguments.contains("testing") {
-                return try! MockStorageProvider()
-            } else {
-                return CoreDataStorageProvider()
+    private func load() {
+        Task {
+            do {
+                let repository: Repository = Repository(storageProvider: storageProvider)
+                overview = try await repository.fetchYearlyOverview(year: 2022)
+                loadError = nil
+            } catch {
+                loadError = error as? DomainError
             }
-        }()
+        }
     }
 }
