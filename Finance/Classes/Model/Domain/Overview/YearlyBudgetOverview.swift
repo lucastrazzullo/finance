@@ -51,12 +51,15 @@ struct YearlyBudgetOverview: Identifiable {
             return nil
         }
 
+        let transactionsForBudget = transactions
+            .filter { transaction in return budget.slices.contains(where: { $0.id == transaction.budgetSliceId }) }
+
         let budgetAvailabilityUpToSelectedMonth = budget.availability(upTo: month)
-        let totalAmountSpentUpToSelectedMonth = transactions
+        let totalAmountSpentUpToSelectedMonth = transactionsForBudget
             .filter { transaction in return transaction.month < month }
             .totalAmount
 
-        let totalAmountSpentWithinSelectedMonth = transactions
+        let totalAmountSpentWithinSelectedMonth = transactionsForBudget
             .filter { transaction in return transaction.month == month }
             .totalAmount
 

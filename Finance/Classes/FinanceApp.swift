@@ -10,15 +10,36 @@ import SwiftUI
 @main
 struct FinanceApp: App {
 
-    private let year: Int = 2022
+    @State private var overview: YearlyBudgetOverview?
+
+    private let year: Int
+    private let storageProvider: StorageProvider
 
     var body: some Scene {
         WindowGroup {
-            if CommandLine.arguments.contains("testing") {
-                DashboardView(overviewYear: year, storageProvider: try! MockStorageProvider(year: year))
+            if let overview = overview {
+                DashboardView(overview: overview, storageProvider: storageProvider)
             } else {
-                DashboardView(overviewYear: year, storageProvider: CoreDataStorageProvider())
+                Text("Loading overview ...")
+                    .onAppear {
+                        Task {
+                            overview = try? await storageProvider.fetchYearlyOverview(year: year)
+                        }
+                    }
             }
         }
+    }
+
+    // MARK: Object life cycle
+
+    init() {
+        self.year = 2022
+        self.storageProvider = {
+            if CommandLine.arguments.contains("testing") {
+                return try! MockStorageProvider()
+            } else {
+                return CoreDataStorageProvider()
+            }
+        }()
     }
 }

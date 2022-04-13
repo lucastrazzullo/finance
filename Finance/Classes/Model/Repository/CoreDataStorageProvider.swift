@@ -8,7 +8,7 @@
 import CoreData
 import CoreText
 
-final class CoreDataStorageProvider: ObservableObject, StorageProvider {
+final class CoreDataStorageProvider: StorageProvider {
 
     private static let storageContainerName = "Finance"
 

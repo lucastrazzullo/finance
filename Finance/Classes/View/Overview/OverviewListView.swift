@@ -7,38 +7,50 @@
 
 import SwiftUI
 
-struct OverviewListView: View {
+protocol OverviewListViewModel: ObservableObject {
+    var overviewTitle: String { get }
+    var overviewSubtitle: String { get }
+    var overviewBudgets: [Budget] { get }
 
-    private var overviewsWithLowestAvailability: [MonthlyBudgetOverview] {
-        overviews
+    func fetch() async throws
+    func add(transaction: Transaction) async throws
+
+    func overviews(for month: Int) -> [MonthlyBudgetOverview]
+}
+
+extension OverviewListViewModel {
+
+    func overviewsWithLowestAvailability(for month: Int) -> [MonthlyBudgetOverview] {
+        overviews(for: month)
             .filter({ $0.remainingAmount <= .value(100) })
             .sorted(by: { $0.remainingAmount < $1.remainingAmount })
     }
+}
 
-    @Binding var month: Int
+struct OverviewListView<ViewModel: OverviewListViewModel>: View {
 
-    let title: String
-    let subtitle: String
-    let overviews: [MonthlyBudgetOverview]
+    @ObservedObject var viewModel: ViewModel
 
-    let onAppear: () async -> Void
-    let onAdd: () -> Void
+    @State private var month: Int = Calendar.current.component(.month, from: .now)
+
+    @State private var addNewTransactionError: DomainError?
+    @State private var addNewTransactionIsPresented: Bool = false
 
     var body: some View {
         NavigationView {
             List {
-                if overviews.count > 0 {
+                if viewModel.overviews(for: month).count > 0 {
                     Section(header: Text("All Overviews")) {
-                        ForEach(overviews, id: \.self) { overview in
+                        ForEach(viewModel.overviews(for: month), id: \.self) { overview in
                             MonthlyBudgetOverviewItem(overview: overview)
                                 .listRowSeparator(.hidden)
                         }
                     }
                 }
 
-                if overviewsWithLowestAvailability.count > 0 {
+                if viewModel.overviewsWithLowestAvailability(for: month).count > 0 {
                     Section(header: Text("Lowest budgets this month")) {
-                        ForEach(overviewsWithLowestAvailability, id: \.self) { overview in
+                        ForEach(viewModel.overviewsWithLowestAvailability(for: month), id: \.self) { overview in
                             MonthlyBudgetOverviewItem(overview: overview)
                                 .listRowSeparator(.hidden)
                         }
@@ -55,18 +67,31 @@ struct OverviewListView: View {
 
                 ToolbarItem(placement: .principal) {
                     DefaultToolbar(
-                        title: title,
-                        subtitle: subtitle
+                        title: viewModel.overviewTitle,
+                        subtitle: viewModel.overviewSubtitle
                     )
                 }
 
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: onAdd) {
+                    Button(action: { addNewTransactionIsPresented = true }) {
                         Label("New transaction", systemImage: "plus")
                     }
                 }
             })
-            .onAppear(perform: { Task { await onAppear() }})
+            .onAppear(perform: { Task { try? await viewModel.fetch() }})
+            .sheet(isPresented: $addNewTransactionIsPresented) {
+                NewTransactionView(budgets: viewModel.overviewBudgets) { transaction in
+                    Task {
+                        do {
+                            try await viewModel.add(transaction: transaction)
+                            addNewTransactionIsPresented = false
+                            addNewTransactionError = nil
+                        } catch {
+                            addNewTransactionError = error as? DomainError
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -74,13 +99,33 @@ struct OverviewListView: View {
 struct OverviewView_Previews: PreviewProvider {
     let overview = Mocks.overview
     static var previews: some View {
-        OverviewListView(
-            month: .constant(1),
-            title: "Amsterdam",
-            subtitle: "2022",
-            overviews: Mocks.overview.monthlyOverviews(month: 1),
-            onAppear: {},
-            onAdd: {}
-        )
+        OverviewListView(viewModel: MockOverviewListViewModel())
+    }
+}
+
+private final class MockOverviewListViewModel: OverviewListViewModel {
+
+    private var overview: YearlyBudgetOverview?
+
+    var overviewTitle: String {
+        overview?.name ?? "No Overview"
+    }
+    var overviewSubtitle: String {
+        String(overview?.year ?? 0)
+    }
+    var overviewBudgets: [Budget] {
+        overview?.budgets ?? []
+    }
+
+    func fetch() async throws {
+        overview = Mocks.overview
+    }
+
+    func add(transaction: Transaction) async throws {
+        overview?.append(transaction: transaction)
+    }
+
+    func overviews(for month: Int) -> [MonthlyBudgetOverview] {
+        overview?.monthlyOverviews(month: month) ?? []
     }
 }

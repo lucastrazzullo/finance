@@ -79,7 +79,7 @@ enum Mocks {
     }()
 }
 
-final class MockStorageProvider: StorageProvider, ObservableObject {
+final class MockStorageProvider: StorageProvider {
 
     private enum Error: Swift.Error {
         case mock
@@ -89,7 +89,8 @@ final class MockStorageProvider: StorageProvider, ObservableObject {
 
     // MARK: Object life cycle
 
-    init(year: Int, budgets: [Budget] = [], transactions: [Transaction] = []) throws {
+    init(budgets: [Budget] = [], transactions: [Transaction] = []) throws {
+        let year = budgets.first?.year ?? Mocks.year
         self.overview = try YearlyBudgetOverview(
             name: "Mock Overview",
             year: year,
