@@ -13,18 +13,12 @@ struct FinanceApp: App {
     @State private var overview: YearlyBudgetOverview?
     @State private var loadError: DomainError?
 
-    private let storageProvider: StorageProvider = {
-        if CommandLine.arguments.contains("testing") {
-            return try! MockStorageProvider()
-        } else {
-            return CoreDataStorageProvider()
-        }
-    }()
+    private let repository: Repository
 
     var body: some Scene {
         WindowGroup {
             if let overview = overview {
-                DashboardView(overview: overview, storageProvider: storageProvider)
+                DashboardView(overview: overview, repository: repository)
             } else if let error = loadError {
                 ErrorView(error: error, retryAction: load)
             } else {
@@ -38,12 +32,25 @@ struct FinanceApp: App {
     private func load() {
         Task {
             do {
-                let repository: Repository = Repository(storageProvider: storageProvider)
                 overview = try await repository.fetchYearlyOverview(year: 2022)
                 loadError = nil
             } catch {
                 loadError = error as? DomainError
             }
         }
+    }
+
+    // MARK: Object life cycle
+
+    init() {
+        let storageProvider: StorageProvider = {
+            if CommandLine.arguments.contains("testing") {
+                return try! MockStorageProvider()
+            } else {
+                return CoreDataStorageProvider()
+            }
+        }()
+
+        self.repository = Repository(storageProvider: storageProvider)
     }
 }

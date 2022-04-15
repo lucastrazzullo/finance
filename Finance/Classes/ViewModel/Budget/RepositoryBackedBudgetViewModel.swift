@@ -1,5 +1,5 @@
 //
-//  StorageBudgetViewModel.swift
+//  RepositoryBackedBudgetViewModel.swift
 //  Finance
 //
 //  Created by Luca Strazzullo on 25/01/2022.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-final class StorageBudgetViewModel: ObservableObject {
+final class RepositoryBackedBudgetViewModel: ObservableObject {
 
     @Published private(set) var budget: Budget
 
@@ -15,13 +15,13 @@ final class StorageBudgetViewModel: ObservableObject {
 
     // MARK: Object life cycle
 
-    init(budget: Budget, storageProvider: StorageProvider) {
+    init(budget: Budget, repository: Repository) {
         self.budget = budget
-        self.repository = Repository(storageProvider: storageProvider)
+        self.repository = repository
     }
 }
 
-extension StorageBudgetViewModel: BudgetViewModel {
+extension RepositoryBackedBudgetViewModel: BudgetViewModel {
 
     var name: String {
         return budget.name

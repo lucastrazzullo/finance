@@ -83,7 +83,7 @@ struct OverviewView_Previews: PreviewProvider {
     }
 }
 
-private final class MockOverviewListViewModel: OverviewListViewModel {
+final class MockOverviewListViewModel: OverviewListViewModel {
 
     private var overview: YearlyBudgetOverview?
 

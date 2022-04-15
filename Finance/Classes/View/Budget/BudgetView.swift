@@ -175,7 +175,7 @@ struct BudgetView_Previews: PreviewProvider {
     }
 }
 
-private final class MockBudgetViewModel: BudgetViewModel {
+final class MockBudgetViewModel: BudgetViewModel {
     var name: String = "Budget name"
     var iconSystemName: String = SystemIcon.car.rawValue
     var slices: [BudgetSlice] = Mocks.slices

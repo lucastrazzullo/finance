@@ -1,5 +1,5 @@
 //
-//  StorageOverviewListViewModel.swift
+//  RepositoryBackedOverviewListViewModel.swift
 //  Finance
 //
 //  Created by Luca Strazzullo on 25/01/2022.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class StorageOverviewListViewModel: ObservableObject {
+final class RepositoryBackedOverviewListViewModel: ObservableObject {
 
     @Published private(set) var overview: YearlyBudgetOverview
 
@@ -15,13 +15,13 @@ final class StorageOverviewListViewModel: ObservableObject {
 
     // MARK: Object life cycle
 
-    init(overview: YearlyBudgetOverview, storageProvider: StorageProvider) {
+    init(overview: YearlyBudgetOverview, repository: Repository) {
         self.overview = overview
-        self.repository = Repository(storageProvider: storageProvider)
+        self.repository = repository
     }
 }
 
-extension StorageOverviewListViewModel: OverviewListViewModel {
+extension RepositoryBackedOverviewListViewModel: OverviewListViewModel {
 
     var title: String {
         overview.name

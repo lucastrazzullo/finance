@@ -7,22 +7,22 @@
 
 import SwiftUI
 
-struct BudgetsListView<ViewModel: BudgetsListViewModel>: View {
+struct BudgetsListView<ViewModelType: BudgetsListViewModel, BudgetViewModelType: BudgetViewModel>: View {
 
-    @ObservedObject private var viewModel: ViewModel
+    @ObservedObject private var viewModel: ViewModelType
 
     @State private var deleteBudgetError: DomainError?
     @State private var addNewBudgetError: DomainError?
     @State private var addNewBudgetIsPresented: Bool = false
 
-    private let storageProvider: StorageProvider
+    let budgetViewModel: (Budget) -> BudgetViewModelType
 
     var body: some View {
         NavigationView {
             List {
                 Section(header: Text("Budgets")) {
                     ForEach(viewModel.budgets) { budget in
-                        let viewModel = StorageBudgetViewModel(budget: budget, storageProvider: storageProvider)
+                        let viewModel = budgetViewModel(budget)
                         NavigationLink(destination: { BudgetView(viewModel: viewModel) }) {
                             HStack {
                                 Label(viewModel.name, systemImage: viewModel.iconSystemName)
@@ -85,9 +85,9 @@ struct BudgetsListView<ViewModel: BudgetsListViewModel>: View {
 
     // MARK: Object life cycle
 
-    init(viewModel: ViewModel, storageProvider: StorageProvider) {
+    init(viewModel: ViewModelType, budgetViewModel: @escaping (Budget) -> BudgetViewModelType) {
         self.viewModel = viewModel
-        self.storageProvider = storageProvider
+        self.budgetViewModel = budgetViewModel
     }
 }
 
@@ -95,11 +95,13 @@ struct BudgetsListView<ViewModel: BudgetsListViewModel>: View {
 
 struct BudgetsListView_Previews: PreviewProvider {
     static var previews: some View {
-        BudgetsListView(viewModel: MockBudgetsListViewModel(year: Mocks.year), storageProvider: try! MockStorageProvider())
+        BudgetsListView(viewModel: MockBudgetsListViewModel(year: Mocks.year)) { _ in
+            return MockBudgetViewModel()
+        }
     }
 }
 
-private final class MockBudgetsListViewModel: BudgetsListViewModel {
+final class MockBudgetsListViewModel: BudgetsListViewModel {
     let year: Int
     let title: String = "Title"
     let subtitle: String = "Subtitle"
