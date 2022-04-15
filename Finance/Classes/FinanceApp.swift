@@ -10,15 +10,15 @@ import SwiftUI
 @main
 struct FinanceApp: App {
 
+    @Environment(\.repository) private var repository
+
     @State private var overview: YearlyBudgetOverview?
     @State private var loadError: DomainError?
-
-    private let repository: Repository
 
     var body: some Scene {
         WindowGroup {
             if let overview = overview {
-                DashboardView(overview: overview, repository: repository)
+                DashboardView(overview: overview)
             } else if let error = loadError {
                 ErrorView(error: error, retryAction: load)
             } else {
@@ -39,10 +39,11 @@ struct FinanceApp: App {
             }
         }
     }
+}
 
-    // MARK: Object life cycle
+struct ReporitoryKey: EnvironmentKey {
 
-    init() {
+    static let defaultValue: Repository = {
         let storageProvider: StorageProvider = {
             if CommandLine.arguments.contains("testing") {
                 return try! MockStorageProvider()
@@ -51,6 +52,18 @@ struct FinanceApp: App {
             }
         }()
 
-        self.repository = Repository(storageProvider: storageProvider)
+        return Repository(storageProvider: storageProvider)
+    }()
+}
+
+extension EnvironmentValues {
+
+    var repository: Repository {
+        get {
+            return self[ReporitoryKey.self]
+        }
+        set {
+            self[ReporitoryKey.self] = newValue
+        }
     }
 }

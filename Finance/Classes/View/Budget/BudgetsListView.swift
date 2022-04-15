@@ -7,22 +7,22 @@
 
 import SwiftUI
 
-struct BudgetsListView<ViewModelType: BudgetsListViewModel, BudgetViewModelType: BudgetViewModel>: View {
+struct BudgetsListView<ViewModel: BudgetsListViewModel>: View {
 
-    @ObservedObject private var viewModel: ViewModelType
+    @Environment(\.repository) private var repository
+
+    @ObservedObject private var viewModel: ViewModel
 
     @State private var deleteBudgetError: DomainError?
     @State private var addNewBudgetError: DomainError?
     @State private var addNewBudgetIsPresented: Bool = false
-
-    let budgetViewModel: (Budget) -> BudgetViewModelType
 
     var body: some View {
         NavigationView {
             List {
                 Section(header: Text("Budgets")) {
                     ForEach(viewModel.budgets) { budget in
-                        let viewModel = budgetViewModel(budget)
+                        let viewModel = RepositoryBackedBudgetViewModel(budget: budget, repository: repository)
                         NavigationLink(destination: { BudgetView(viewModel: viewModel) }) {
                             HStack {
                                 Label(viewModel.name, systemImage: viewModel.iconSystemName)
@@ -85,9 +85,8 @@ struct BudgetsListView<ViewModelType: BudgetsListViewModel, BudgetViewModelType:
 
     // MARK: Object life cycle
 
-    init(viewModel: ViewModelType, budgetViewModel: @escaping (Budget) -> BudgetViewModelType) {
+    init(viewModel: ViewModel) {
         self.viewModel = viewModel
-        self.budgetViewModel = budgetViewModel
     }
 }
 
@@ -95,9 +94,7 @@ struct BudgetsListView<ViewModelType: BudgetsListViewModel, BudgetViewModelType:
 
 struct BudgetsListView_Previews: PreviewProvider {
     static var previews: some View {
-        BudgetsListView(viewModel: MockBudgetsListViewModel(year: Mocks.year)) { _ in
-            return MockBudgetViewModel()
-        }
+        BudgetsListView(viewModel: MockBudgetsListViewModel(year: Mocks.year))
     }
 }
 

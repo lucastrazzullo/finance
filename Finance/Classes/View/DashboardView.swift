@@ -9,8 +9,9 @@ import SwiftUI
 
 struct DashboardView: View {
 
+    @Environment(\.repository) private var repository
+
     let overview: YearlyBudgetOverview
-    let repository: Repository
 
     var body: some View {
         TabView {
@@ -21,9 +22,7 @@ struct DashboardView: View {
             }
 
             let budgetsListViewModel = RepositoryBackedBudgetsListViewModel(overview: overview, repository: repository)
-            BudgetsListView(viewModel: budgetsListViewModel) { budget in
-                RepositoryBackedBudgetViewModel(budget: budget, repository: repository)
-            }
+            BudgetsListView(viewModel: budgetsListViewModel)
             .tabItem {
                 Label("Budgets", systemImage: "list.dash")
                     .accessibilityIdentifier(AccessibilityIdentifier.DashboardView.budgetsTab)
@@ -34,6 +33,6 @@ struct DashboardView: View {
 
 struct DashboardView_Previews: PreviewProvider {
     static var previews: some View {
-        DashboardView(overview: Mocks.overview, repository: Repository(storageProvider: try! MockStorageProvider()))
+        DashboardView(overview: Mocks.overview)
     }
 }
