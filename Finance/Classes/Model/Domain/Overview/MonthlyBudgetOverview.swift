@@ -19,6 +19,9 @@ struct MonthlyBudgetOverview: Hashable {
     }
 
     var remainingAmountPercentage: Float {
-        Float(truncating: NSDecimalNumber(decimal: 1 - totalExpenses.value / startingAmount.value))
+        guard startingAmount.value > 0 else {
+            return 0
+        }
+        return Float(truncating: NSDecimalNumber(decimal: 1 - totalExpenses.value / startingAmount.value))
     }
 }

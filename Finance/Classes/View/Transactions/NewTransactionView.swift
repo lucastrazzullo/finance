@@ -57,7 +57,7 @@ struct NewTransactionView: View {
                         InlineErrorView(error: error)
                     }
 
-                    Button("Save", action: submit)
+                    Button("Add", action: submit)
                         .accessibilityIdentifier(AccessibilityIdentifier.NewBudgetView.saveButton)
                 }
             }
