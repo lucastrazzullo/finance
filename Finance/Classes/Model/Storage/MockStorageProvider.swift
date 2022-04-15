@@ -119,12 +119,26 @@ final class MockStorageProvider: StorageProvider {
         return overview
     }
 
+    func fetchBudgets(year: Int) async throws -> [Budget] {
+        guard overview.year == year else {
+            throw DomainError.storageProvider(error: .overviewEntityNotFound)
+        }
+        return overview.budgets
+    }
+
     func fetch(budgetWith identifier: Budget.ID) async throws -> Budget {
         let budgetList = BudgetList(budgets: overview.budgets)
         guard let budget = budgetList.budget(with: identifier) else {
             throw DomainError.storageProvider(error: .budgetEntityNotFound)
         }
         return budget
+    }
+
+    func fetchTransactions(year: Int) async throws -> [Transaction] {
+        guard overview.year == year else {
+            throw DomainError.storageProvider(error: .overviewEntityNotFound)
+        }
+        return overview.transactions
     }
 
     // MARK: Add
@@ -145,6 +159,10 @@ final class MockStorageProvider: StorageProvider {
 
         overview.delete(budgetsWithIdentifiers: [id])
         overview.append(budget: budget)
+    }
+
+    func add(transaction: Transaction) async throws {
+        overview.append(transactions: [transaction])
     }
 
     // MARK: Delete

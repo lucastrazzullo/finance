@@ -12,12 +12,15 @@ protocol StorageProvider: AnyObject {
     // MARK: Fetch
 
     func fetchYearlyOverview(year: Int) async throws -> YearlyBudgetOverview
+    func fetchBudgets(year: Int) async throws -> [Budget]
     func fetch(budgetWith identifier: Budget.ID) async throws -> Budget
+    func fetchTransactions(year: Int) async throws -> [Transaction]
 
     // MARK: Add
 
     func add(budget: Budget) async throws
     func add(slice: BudgetSlice, toBudgetWith id: Budget.ID) async throws
+    func add(transaction: Transaction) async throws
 
     // MARK: Delete
 

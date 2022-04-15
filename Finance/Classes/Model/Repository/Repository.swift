@@ -44,6 +44,12 @@ final actor Repository {
         try await storageProvider.add(budget: budget)
     }
 
+    func add(transactions: [Transaction]) async throws {
+        for transaction in transactions {
+            try await storageProvider.add(transaction: transaction)
+        }
+    }
+
     // MARK: Delete
 
     func delete(slicesWith identifiers: Set<BudgetSlice.ID>, inBudgetWith id: Budget.ID) async throws {

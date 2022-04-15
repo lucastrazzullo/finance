@@ -48,6 +48,10 @@ extension RepositoryBackedOverviewListViewModel: OverviewListViewModel {
     }
 
     func add(transactions: [Transaction]) async throws {
-        overview.append(transactions: transactions)
+        try await repository.add(transactions: transactions)
+
+        DispatchQueue.main.async { [weak self] in
+            self?.overview.append(transactions: transactions)
+        }
     }
 }

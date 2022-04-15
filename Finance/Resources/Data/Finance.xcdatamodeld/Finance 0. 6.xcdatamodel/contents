@@ -20,9 +20,16 @@
         <attribute name="month" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="slice" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="BudgetSliceEntity" inverseName="schedules" inverseEntity="BudgetSliceEntity"/>
     </entity>
+    <entity name="TransactionEntity" representedClassName="TransactionEntity" syncable="YES" codeGenerationType="class">
+        <attribute name="amount" attributeType="Decimal" defaultValueString="0.0"/>
+        <attribute name="budgetSliceIdentifier" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="contentDescription" optional="YES" attributeType="String"/>
+        <attribute name="date" attributeType="Date" usesScalarValueType="NO"/>
+    </entity>
     <elements>
         <element name="BudgetEntity" positionX="-209.69921875" positionY="-150.32421875" width="128" height="104"/>
         <element name="BudgetSliceEntity" positionX="-63" positionY="-18" width="128" height="119"/>
         <element name="BudgetSliceScheduledAmountEntity" positionX="-135" positionY="-45" width="128" height="74"/>
+        <element name="TransactionEntity" positionX="-135" positionY="-27" width="128" height="89"/>
     </elements>
 </model>

@@ -536,6 +536,8 @@
 			dependencies = (
 			);
 			name = Finance;
+			packageProductDependencies = (
+			);
 			productName = Finance;
 			productReference = 81947EA727327FCF001C2AC9 /* Finance.app */;
 			productType = "com.apple.product-type.application";
@@ -572,6 +574,8 @@
 				Base,
 			);
 			mainGroup = 81947E9E27327FCE001C2AC9;
+			packageReferences = (
+			);
 			productRefGroup = 81947EA827327FCF001C2AC9 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";

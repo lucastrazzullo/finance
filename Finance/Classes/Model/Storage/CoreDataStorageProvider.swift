@@ -26,15 +26,26 @@ final class CoreDataStorageProvider: StorageProvider {
     // MARK: Fetch
 
     func fetchYearlyOverview(year: Int) async throws -> YearlyBudgetOverview {
-        let budgetEntities = try fetchBudgetEntities(year: year)
-        let budgets = budgetEntities.compactMap { return try? Budget.with(budgetEntity: $0) }
-        let overview = try YearlyBudgetOverview(name: "Default Overview", year: year, budgets: budgets, transactions: [])
+        let budgets = try await fetchBudgets(year: year)
+        let transactions = try await fetchTransactions(year: year)
+
+        let overview = try YearlyBudgetOverview(name: "Default Overview", year: year, budgets: budgets, transactions: transactions)
         return overview
+    }
+
+    func fetchBudgets(year: Int) async throws -> [Budget] {
+        let budgetEntities = try fetchBudgetEntities(year: year)
+        return budgetEntities.compactMap { return try? Budget.with(budgetEntity: $0) }
     }
 
     func fetch(budgetWith identifier: Budget.ID) async throws -> Budget {
         let budgetEntity = try fetchBudgetEntity(with: identifier)
         return try Budget.with(budgetEntity: budgetEntity)
+    }
+
+    func fetchTransactions(year: Int) async throws -> [Transaction] {
+        let entities = try fetchTransactionEntities(year: year)
+        return entities.compactMap { Transaction.with(transactionEntity: $0) }
     }
 
     // MARK: Add
@@ -52,6 +63,16 @@ final class CoreDataStorageProvider: StorageProvider {
         let sliceEntity = BudgetSliceEntity(context: self.persistentContainer.viewContext)
         sliceEntity.budget = budgetEntity
         setupSliceEntity(sliceEntity, with: slice)
+
+        try saveOrRollback()
+    }
+
+    func add(transaction: Transaction) async throws {
+        let transactionEntity = TransactionEntity(context: self.persistentContainer.viewContext)
+        transactionEntity.amount = NSDecimalNumber(decimal: transaction.amount.value)
+        transactionEntity.date = transaction.date
+        transactionEntity.budgetSliceIdentifier = transaction.budgetSliceId
+        transactionEntity.contentDescription = transaction.description
 
         try saveOrRollback()
     }
@@ -134,8 +155,7 @@ final class CoreDataStorageProvider: StorageProvider {
         fetchBudgetSlicesRequest.predicate = predicate
 
         do {
-            let entities = try persistentContainer.viewContext.fetch(fetchBudgetSlicesRequest)
-            return entities
+            return try persistentContainer.viewContext.fetch(fetchBudgetSlicesRequest)
         } catch {
             throw DomainError.storageProvider(error: .underlying(error: error))
         }
@@ -152,6 +172,34 @@ final class CoreDataStorageProvider: StorageProvider {
                 throw DomainError.storageProvider(error: .budgetEntityNotFound)
             }
             return budgetSliceEntity
+        } catch {
+            throw DomainError.storageProvider(error: .underlying(error: error))
+        }
+    }
+
+    private func fetchTransactionEntities(year: Int? = nil) throws -> [TransactionEntity] {
+        let request: NSFetchRequest<TransactionEntity> = TransactionEntity.fetchRequest()
+
+        if let year = year {
+            var startDateComponents = DateComponents()
+            startDateComponents.year = Int(year)
+            startDateComponents.month = Int(1)
+            startDateComponents.day = Int(1)
+
+            var endDateComponents = DateComponents()
+            endDateComponents.year = Int(year)
+            endDateComponents.month = Int(12)
+            endDateComponents.day = Int(31)
+
+            if let startDate = Calendar.current.date(from: startDateComponents),
+               let endDate = Calendar.current.date(from: endDateComponents) {
+                let predicate = NSPredicate(format: "date >= %@ && date <= %@", startDate as NSDate, endDate as NSDate)
+                request.predicate = predicate
+            }
+        }
+
+        do {
+            return try persistentContainer.viewContext.fetch(request)
         } catch {
             throw DomainError.storageProvider(error: .underlying(error: error))
         }
@@ -298,5 +346,27 @@ private extension BudgetSlice.Schedule {
         }
         let month = Int(schedule.month)
         return try .init(amount: .value(amount.decimalValue), month: month)
+    }
+}
+
+private extension Transaction {
+
+    static func with(transactionEntity: NSSet.Element) -> Self? {
+        guard let transaction = transactionEntity as? TransactionEntity,
+              let amountValue = transaction.amount as? Decimal,
+              let date = transaction.date,
+              let sliceId = transaction.budgetSliceIdentifier else {
+            return nil
+        }
+
+        let description = transaction.contentDescription
+        let amount = MoneyValue.value(amountValue)
+
+        return .init(
+            description: description,
+            amount: amount,
+            date: date,
+            budgetSliceId: sliceId
+        )
     }
 }
