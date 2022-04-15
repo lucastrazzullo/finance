@@ -20,44 +20,48 @@ struct NewBudgetView: View {
     let onSubmit: (Budget) async throws -> Void
 
     var body: some View {
-        Form {
-            Section {
-                HStack {
-                    TextField("Name", text: $budgetName)
-                        .accessibilityIdentifier(AccessibilityIdentifier.NewBudgetView.nameInputField)
+        NavigationView {
+            Form {
+                Section {
+                    HStack {
+                        TextField("Name", text: $budgetName)
+                            .accessibilityIdentifier(AccessibilityIdentifier.NewBudgetView.nameInputField)
 
-                    SystemIconPicker(selection: $budgetSystemIcon, label: "Icon")
-                }
-            }
-
-            Section(header: Text("Slices")) {
-                HStack {
-                    Text("Total")
-                    AmountView(amount: budgetSlices.totalAmount)
-                }
-                .font(.headline.bold())
-                .cornerRadius(12, antialiased: true)
-
-                SlicesList(slices: $budgetSlices, onAdd: {
-                    isInsertNewBudgetSlicePresented = true
-                })
-            }
-
-            Section {
-                if let error = submitError {
-                    InlineErrorView(error: error)
+                        SystemIconPicker(selection: $budgetSystemIcon, label: "Icon")
+                    }
                 }
 
-                Button("Save", action: submit)
-                    .accessibilityIdentifier(AccessibilityIdentifier.NewBudgetView.saveButton)
+                Section(header: Text("Slices")) {
+                    HStack {
+                        Text("Total")
+                        AmountView(amount: budgetSlices.totalAmount)
+                    }
+                    .font(.headline.bold())
+                    .cornerRadius(12, antialiased: true)
+
+                    SlicesList(slices: $budgetSlices, onAdd: {
+                        isInsertNewBudgetSlicePresented = true
+                    })
+                }
+
+                Section {
+                    if let error = submitError {
+                        InlineErrorView(error: error)
+                    }
+
+                    Button("Save", action: submit)
+                        .accessibilityIdentifier(AccessibilityIdentifier.NewBudgetView.saveButton)
+                }
             }
-        }
-        .sheet(isPresented: $isInsertNewBudgetSlicePresented) {
-            NewBudgetSliceView { newSlice in
-                try Budget.willAdd(slice: newSlice, to: budgetSlices)
-                budgetSlices.append(newSlice)
-                isInsertNewBudgetSlicePresented = false
+            .sheet(isPresented: $isInsertNewBudgetSlicePresented) {
+                NewBudgetSliceView { newSlice in
+                    try Budget.willAdd(slice: newSlice, to: budgetSlices)
+                    budgetSlices.append(newSlice)
+                    isInsertNewBudgetSlicePresented = false
+                }
             }
+            .navigationTitle("New schedule")
+            .navigationBarTitleDisplayMode(.inline)
         }
     }
 

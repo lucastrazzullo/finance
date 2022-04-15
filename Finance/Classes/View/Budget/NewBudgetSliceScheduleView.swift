@@ -16,21 +16,25 @@ struct NewBudgetSliceScheduleView: View {
     let onSubmit: (BudgetSlice.Schedule) throws -> Void
 
     var body: some View {
-        Form {
-            Section(header: Text("New Slice Schedule")) {
-                AmountTextField(amountValue: $newScheduleAmount, title: "Amount")
-                MonthPickerView(month: $newScheduleMonth)
-                    .pickerStyle(.wheel)
-            }
-
-            Section {
-                if let error = submitError {
-                    InlineErrorView(error: error)
+        NavigationView {
+            Form {
+                Section(header: Text("Info")) {
+                    AmountTextField(amountValue: $newScheduleAmount, title: "Amount")
+                    MonthPickerView(month: $newScheduleMonth)
+                        .pickerStyle(.wheel)
                 }
 
-                Button("Save", action: submit)
-                    .accessibilityIdentifier(AccessibilityIdentifier.NewSliceView.saveButton)
+                Section {
+                    if let error = submitError {
+                        InlineErrorView(error: error)
+                    }
+
+                    Button("Save", action: submit)
+                        .accessibilityIdentifier(AccessibilityIdentifier.NewSliceView.saveButton)
+                }
             }
+            .navigationTitle("New schedule")
+            .navigationBarTitleDisplayMode(.inline)
         }
     }
 

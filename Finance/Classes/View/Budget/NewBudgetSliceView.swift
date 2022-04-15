@@ -28,48 +28,52 @@ struct NewBudgetSliceView: View {
     let onSubmit: (BudgetSlice) async throws -> Void
 
     var body: some View {
-        Form {
-            Section(header: Text("New Budget Slice")) {
-                TextField("Name", text: $sliceName)
-                    .accessibilityIdentifier(AccessibilityIdentifier.NewSliceView.nameInputField)
-            }
+        NavigationView {
+            Form {
+                Section(header: Text("Info")) {
+                    TextField("Name", text: $sliceName)
+                        .accessibilityIdentifier(AccessibilityIdentifier.NewSliceView.nameInputField)
+                }
 
-            Section(header: Text("Amount")) {
-                Picker("Schedule", selection: $sliceConfigurationType) {
-                    ForEach(Schedule.allCases, id: \.self) { type in
-                        Text(type.rawValue)
+                Section(header: Text("Amount")) {
+                    Picker("Schedule", selection: $sliceConfigurationType) {
+                        ForEach(Schedule.allCases, id: \.self) { type in
+                            Text(type.rawValue)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                    .padding(.vertical)
+
+                    switch sliceConfigurationType {
+                    case .monthly:
+                        AmountTextField(amountValue: $sliceMonthlyAmount, title: "Monthly Amount")
+                            .accessibilityIdentifier(AccessibilityIdentifier.NewSliceView.amountInputField)
+                    case .scheduled:
+                        SchedulesList(schedules: $sliceSchedules)
+                        Button(action: { isInsertNewSchedulePresented = true }) {
+                            Label("Add", systemImage: "plus")
+                        }
                     }
                 }
-                .pickerStyle(.segmented)
-                .padding(.vertical)
 
-                switch sliceConfigurationType {
-                case .monthly:
-                    AmountTextField(amountValue: $sliceMonthlyAmount, title: "Monthly Amount")
-                        .accessibilityIdentifier(AccessibilityIdentifier.NewSliceView.amountInputField)
-                case .scheduled:
-                    SchedulesList(schedules: $sliceSchedules)
-                    Button(action: { isInsertNewSchedulePresented = true }) {
-                        Label("Add", systemImage: "plus")
+                Section {
+                    if let error = submitError {
+                        InlineErrorView(error: error)
                     }
+
+                    Button("Save", action: submit)
+                        .accessibilityIdentifier(AccessibilityIdentifier.NewSliceView.saveButton)
                 }
             }
-
-            Section {
-                if let error = submitError {
-                    InlineErrorView(error: error)
+            .sheet(isPresented: $isInsertNewSchedulePresented) {
+                NewBudgetSliceScheduleView { newSchedule in
+                    try BudgetSlice.willAdd(schedule: newSchedule, to: sliceSchedules)
+                    sliceSchedules.append(newSchedule)
+                    isInsertNewSchedulePresented = false
                 }
-
-                Button("Save", action: submit)
-                    .accessibilityIdentifier(AccessibilityIdentifier.NewSliceView.saveButton)
             }
-        }
-        .sheet(isPresented: $isInsertNewSchedulePresented) {
-            NewBudgetSliceScheduleView { newSchedule in
-                try BudgetSlice.willAdd(schedule: newSchedule, to: sliceSchedules)
-                sliceSchedules.append(newSchedule)
-                isInsertNewSchedulePresented = false
-            }
+            .navigationTitle("New slice")
+            .navigationBarTitleDisplayMode(.inline)
         }
     }
 
