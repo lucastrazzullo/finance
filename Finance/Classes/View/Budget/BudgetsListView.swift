@@ -21,9 +21,9 @@ struct BudgetsListView<ViewModel: BudgetsListViewModel>: View {
         NavigationView {
             List {
                 Section(header: Text("Budgets")) {
-                    ForEach(viewModel.listBudgets) { budget in
-                        NavigationLink(destination: { BudgetView(budget: budget, storageProvider: storageProvider) }) {
-                            let viewModel = BudgetViewModel(budget: budget)
+                    ForEach(viewModel.budgets) { budget in
+                        let viewModel = StorageBudgetViewModel(budget: budget, storageProvider: storageProvider)
+                        NavigationLink(destination: { BudgetView(viewModel: viewModel) }) {
                             HStack {
                                 Label(viewModel.name, systemImage: viewModel.iconSystemName)
                                     .symbolRenderingMode(.hierarchical)
@@ -63,14 +63,14 @@ struct BudgetsListView<ViewModel: BudgetsListViewModel>: View {
             .toolbar(content: {
                 ToolbarItem(placement: .principal) {
                     DefaultToolbar(
-                        title: viewModel.listTitle,
-                        subtitle: viewModel.listSubtitle
+                        title: viewModel.title,
+                        subtitle: viewModel.subtitle
                     )
                 }
             })
             .onAppear(perform: { Task { try? await viewModel.fetch() }})
             .sheet(isPresented: $addNewBudgetIsPresented) {
-                NewBudgetView(year: viewModel.listYear) { budget in
+                NewBudgetView(year: viewModel.year) { budget in
                     do {
                         try await viewModel.add(budget: budget)
                         addNewBudgetError = nil
@@ -100,24 +100,24 @@ struct BudgetsListView_Previews: PreviewProvider {
 }
 
 private final class MockBudgetsListViewModel: BudgetsListViewModel {
-    let listYear: Int
-    let listTitle: String = "Title"
-    let listSubtitle: String = "Subtitle"
-    var listBudgets: [Budget] = []
+    let year: Int
+    let title: String = "Title"
+    let subtitle: String = "Subtitle"
+    var budgets: [Budget] = []
 
     init(year: Int) {
-        listYear = year
+        self.year = year
     }
 
     func fetch() async {
-        listBudgets = Mocks.budgets
+        budgets = Mocks.budgets
     }
 
     func add(budget: Budget) async throws {
-        listBudgets.append(budget)
+        budgets.append(budget)
     }
 
     func delete(budgetsAt indices: IndexSet) async throws {
-        listBudgets.remove(atOffsets: indices)
+        budgets.remove(atOffsets: indices)
     }
 }

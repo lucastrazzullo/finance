@@ -47,8 +47,8 @@ struct OverviewListView<ViewModel: OverviewListViewModel>: View {
 
                 ToolbarItem(placement: .principal) {
                     DefaultToolbar(
-                        title: viewModel.overviewTitle,
-                        subtitle: viewModel.overviewSubtitle
+                        title: viewModel.title,
+                        subtitle: viewModel.subtitle
                     )
                 }
 
@@ -60,7 +60,7 @@ struct OverviewListView<ViewModel: OverviewListViewModel>: View {
             })
             .onAppear(perform: { Task { try? await viewModel.fetch() }})
             .sheet(isPresented: $addNewTransactionIsPresented) {
-                NewTransactionView(budgets: viewModel.overviewBudgets) { transaction in
+                NewTransactionView(budgets: viewModel.budgets) { transaction in
                     Task {
                         do {
                             try await viewModel.add(transaction: transaction)
@@ -87,13 +87,13 @@ private final class MockOverviewListViewModel: OverviewListViewModel {
 
     private var overview: YearlyBudgetOverview?
 
-    var overviewTitle: String {
+    var title: String {
         overview?.name ?? "No Overview"
     }
-    var overviewSubtitle: String {
+    var subtitle: String {
         String(overview?.year ?? 0)
     }
-    var overviewBudgets: [Budget] {
+    var budgets: [Budget] {
         overview?.budgets ?? []
     }
 

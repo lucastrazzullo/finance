@@ -15,7 +15,7 @@ struct BudgetIconPicker: View {
 
     var body: some View {
         Picker(label, selection: $selection) {
-            ForEach(BudgetViewModel.SystemIcon.allCases, id: \.rawValue) { name in
+            ForEach(SystemIcon.allCases, id: \.rawValue) { name in
                 Image(systemName: name.rawValue)
             }
         }
@@ -27,6 +27,6 @@ struct BudgetIconPicker: View {
 
 struct BudgetIconPicker_Previews: PreviewProvider {
     static var previews: some View {
-        BudgetIconPicker(selection: .constant(BudgetViewModel.SystemIcon.default.rawValue), label: "Icon")
+        BudgetIconPicker(selection: .constant(SystemIcon.default.rawValue), label: "Icon")
     }
 }

@@ -9,35 +9,24 @@ import SwiftUI
 
 struct DashboardView: View {
 
-    @ObservedObject private var overviewController: OverviewController
-
-    private let storageProvider: StorageProvider
+    let overview: YearlyBudgetOverview
+    let storageProvider: StorageProvider
 
     var body: some View {
         TabView {
-            OverviewListView(viewModel: overviewController)
+            let overviewListViewModel = StorageOverviewListViewModel(overview: overview, storageProvider: storageProvider)
+            OverviewListView(viewModel: overviewListViewModel)
             .tabItem {
                 Label("Overview", systemImage: "list.bullet.below.rectangle")
             }
 
-            BudgetsListView(viewModel: overviewController, storageProvider: storageProvider)
+            let budgetsListViewModel = StorageBudgetsListViewModel(overview: overview, storageProvider: storageProvider)
+            BudgetsListView(viewModel: budgetsListViewModel, storageProvider: storageProvider)
             .tabItem {
                 Label("Budgets", systemImage: "list.dash")
                     .accessibilityIdentifier(AccessibilityIdentifier.DashboardView.budgetsTab)
             }
         }
-        .onAppear {
-            Task {
-                try? await overviewController.fetch()
-            }
-        }
-    }
-
-    // MARK: Object life cycle
-
-    init(overview: YearlyBudgetOverview, storageProvider: StorageProvider) {
-        self.overviewController = OverviewController(overview: overview, storageProvider: storageProvider)
-        self.storageProvider = storageProvider
     }
 }
 

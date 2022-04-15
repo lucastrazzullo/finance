@@ -1,5 +1,5 @@
 //
-//  BudgetController.swift
+//  StorageBudgetViewModel.swift
 //  Finance
 //
 //  Created by Luca Strazzullo on 25/01/2022.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-final class BudgetController: ObservableObject {
+final class StorageBudgetViewModel: ObservableObject {
 
     @Published private(set) var budget: Budget
 
@@ -19,8 +19,30 @@ final class BudgetController: ObservableObject {
         self.budget = budget
         self.repository = Repository(storageProvider: storageProvider)
     }
+}
 
-    // MARK: Public methods
+extension StorageBudgetViewModel: BudgetViewModel {
+
+    var name: String {
+        return budget.name
+    }
+
+    var iconSystemName: String {
+        switch budget.icon {
+        case .system(let name):
+            return name
+        case .none:
+            return SystemIcon.default.rawValue
+        }
+    }
+
+    var amount: MoneyValue {
+        return budget.amount
+    }
+
+    var slices: [BudgetSlice] {
+        return budget.slices
+    }
 
     func fetch() async throws {
         let budget = try await repository.fetch(budgetWith: budget.id)

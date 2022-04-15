@@ -7,11 +7,11 @@
 
 import SwiftUI
 
-struct BudgetView: View {
+struct BudgetView<ViewModel: BudgetViewModel>: View {
 
     @Environment(\.editMode) private var editMode
 
-    @ObservedObject var controller: BudgetController
+    @ObservedObject var viewModel: ViewModel
 
     @State private var updatingBudgetName: String
     @State private var updatingBudgetIcon: String
@@ -20,8 +20,6 @@ struct BudgetView: View {
     @State private var isInsertNewSlicePresented: Bool = false
     @State private var deleteSlicesError: DomainError?
 
-    private let viewModel: BudgetViewModel
-
     private var isEditing: Bool {
         editMode?.wrappedValue.isEditing == true
     }
@@ -29,7 +27,7 @@ struct BudgetView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             VStack {
-                AmountView(amount: controller.budget.amount)
+                AmountView(amount: viewModel.amount)
             }
             .font(.headline)
             .frame(maxWidth: .infinity)
@@ -44,7 +42,7 @@ struct BudgetView: View {
                     }
                 }
 
-                SlicesListSection(slices: controller.budget.slices,onDelete: isEditing ? deleteSlices(at:) : nil) {
+                SlicesListSection(slices: viewModel.slices, onDelete: isEditing ? deleteSlices(at:) : nil) {
                     if isEditing {
                         VStack {
                             Label("Add", systemImage: "plus")
@@ -61,7 +59,7 @@ struct BudgetView: View {
         }
         .sheet(isPresented: $isInsertNewSlicePresented) {
             NewBudgetSliceView { newSlice in
-                try await controller.add(slice: newSlice)
+                try await viewModel.add(slice: newSlice)
                 isInsertNewSlicePresented = false
             }
         }
@@ -69,7 +67,6 @@ struct BudgetView: View {
         .toolbar {
             ToolbarItem(placement: .principal) {
                 HStack {
-                    let viewModel = BudgetViewModel(budget: controller.budget)
                     Text(isEditing ? updatingBudgetName : viewModel.name)
                     Image(systemName: isEditing ? updatingBudgetIcon : viewModel.iconSystemName)
                         .symbolRenderingMode(.hierarchical)
@@ -80,30 +77,23 @@ struct BudgetView: View {
                 EditButton()
             }
         }
-        .onAppear { fetch() }
+        .onAppear(perform: { Task { try? await viewModel.fetch() }})
     }
 
     // MARK: Object life cycle
 
-    init(budget: Budget, storageProvider: StorageProvider) {
-        self.controller = BudgetController(budget: budget, storageProvider: storageProvider)
-        self.viewModel = BudgetViewModel(budget: budget)
+    init(viewModel: ViewModel) {
+        self.viewModel = viewModel
         self._updatingBudgetName = State<String>(wrappedValue: viewModel.name)
         self._updatingBudgetIcon = State<String>(wrappedValue: viewModel.iconSystemName)
     }
 
     // MARK: Private helper methods
 
-    private func fetch() {
-        Task {
-            try? await controller.fetch()
-        }
-    }
-
     private func saveUpdatedValues() {
         Task {
             do {
-                try await controller.update(budgetName: updatingBudgetName, iconSystemName: updatingBudgetIcon)
+                try await viewModel.update(budgetName: updatingBudgetName, iconSystemName: updatingBudgetIcon)
                 updateBudgetInfoError = nil
             } catch {
                 updateBudgetInfoError = error as? DomainError
@@ -114,7 +104,7 @@ struct BudgetView: View {
     private func deleteSlices(at indices: IndexSet) {
         Task {
             do {
-                try await controller.delete(slicesAt: indices)
+                try await viewModel.delete(slicesAt: indices)
                 deleteSlicesError = nil
             } catch {
                 deleteSlicesError = error as? DomainError
@@ -180,7 +170,37 @@ private struct SlicesListSection<Footer: View>: View {
 struct BudgetView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
-            BudgetView(budget: Mocks.budgets[0], storageProvider: try! MockStorageProvider())
+            BudgetView(viewModel: MockBudgetViewModel())
         }
+    }
+}
+
+private final class MockBudgetViewModel: BudgetViewModel {
+    var name: String = "Budget name"
+    var iconSystemName: String = SystemIcon.car.rawValue
+    var slices: [BudgetSlice] = Mocks.slices
+
+    var amount: MoneyValue {
+        slices.totalAmount
+    }
+
+    func fetch() async throws {
+    }
+
+    func update(budgetName name: String, iconSystemName: String) async throws {
+        self.name = name
+        self.iconSystemName = iconSystemName
+    }
+
+    func add(slice: BudgetSlice) async throws {
+        let budget = try Budget(year: 2000, name: name, icon: .system(name: iconSystemName), slices: slices)
+        try budget.willAdd(slice: slice)
+        slices.append(slice)
+    }
+
+    func delete(slicesAt indices: IndexSet) async throws {
+        let budget = try Budget(year: 2000, name: name, icon: .system(name: iconSystemName), slices: slices)
+        try budget.willDelete(slicesWith: budget.sliceIdentifiers(at: indices))
+        slices.remove(atOffsets: indices)
     }
 }

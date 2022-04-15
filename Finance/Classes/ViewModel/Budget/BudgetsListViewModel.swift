@@ -8,10 +8,10 @@
 import Foundation
 
 protocol BudgetsListViewModel: ObservableObject {
-    var listYear: Int { get }
-    var listTitle: String { get }
-    var listSubtitle: String { get }
-    var listBudgets: [Budget] { get }
+    var year: Int { get }
+    var title: String { get }
+    var subtitle: String { get }
+    var budgets: [Budget] { get }
 
     func fetch() async throws
     func add(budget: Budget) async throws

@@ -10,7 +10,7 @@ import SwiftUI
 struct NewBudgetView: View {
 
     @State private var budgetName: String = ""
-    @State private var budgetIcon: String = BudgetViewModel.SystemIcon.default.rawValue
+    @State private var budgetIcon: String = SystemIcon.default.rawValue
     @State private var budgetSlices: [BudgetSlice] = []
 
     @State private var isInsertNewBudgetSlicePresented: Bool = false

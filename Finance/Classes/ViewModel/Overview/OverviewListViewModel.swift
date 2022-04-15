@@ -8,13 +8,12 @@
 import Foundation
 
 protocol OverviewListViewModel: ObservableObject {
-    var overviewTitle: String { get }
-    var overviewSubtitle: String { get }
-    var overviewBudgets: [Budget] { get }
+    var title: String { get }
+    var subtitle: String { get }
+    var budgets: [Budget] { get }
 
     func fetch() async throws
     func add(transaction: Transaction) async throws
-
     func overviews(for month: Int) -> [MonthlyBudgetOverview]
 }
 
