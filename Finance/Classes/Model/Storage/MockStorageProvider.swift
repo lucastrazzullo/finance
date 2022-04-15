@@ -40,25 +40,30 @@ enum Mocks {
 
     static let budgets: [Budget] = {
         [
-            try! .init(id: UUID(), year: year, name: "House", icon: .system(name: "house"), slices: Mocks.slices),
-            try! .init(id: UUID(), year: year, name: "Groceries", icon: .system(name: "fork.knife"), monthlyAmount: .value(200.01)),
-            try! .init(id: UUID(), year: year, name: "Health", icon: .system(name: "leaf"), monthlyAmount: .value(200.01)),
-            try! .init(id: UUID(), year: year, name: "Luca", icon: .system(name: "face.smiling.fill"), monthlyAmount: .value(250.01)),
-            try! .init(id: UUID(), year: year, name: "Travel", icon: .system(name: "airplane"), monthlyAmount: .value(1000.00)),
-            try! .init(id: UUID(), year: year, name: "Ilenia", icon: .system(name: "face.dashed.fill"), monthlyAmount: .value(1000.00)),
-            try! .init(id: UUID(), year: year, name: "Groceries", icon: .system(name: "fork.knife"), monthlyAmount: .value(1000.00)),
-            try! .init(id: UUID(), year: year, name: "Car", icon: .system(name: "bolt.car"), monthlyAmount: .value(1000.00)),
-            try! .init(id: UUID(), year: year, name: "Health", icon: .system(name: "leaf"), monthlyAmount: .value(1000.00))
+            try! .init(id: UUID(), year: year, name: "House", icon: .system(icon: .house), slices: Mocks.houseSlices),
+            try! .init(id: UUID(), year: year, name: "Groceries", icon: .system(icon: .food), slices: Mocks.groceriesSlices),
+            try! .init(id: UUID(), year: year, name: "Health", icon: .system(icon: .health), monthlyAmount: .value(200.01)),
+            try! .init(id: UUID(), year: year, name: "Luca", icon: .system(icon: .face2), monthlyAmount: .value(250.01)),
+            try! .init(id: UUID(), year: year, name: "Travel", icon: .system(icon: .travel), monthlyAmount: .value(1000.00)),
+            try! .init(id: UUID(), year: year, name: "Ilenia", icon: .system(icon: .face), monthlyAmount: .value(1000.00)),
+            try! .init(id: UUID(), year: year, name: "Car", icon: .system(icon: .car), monthlyAmount: .value(1000.00)),
         ]
     }()
 
     // MARK: Slice
 
-    static let slices: [BudgetSlice] = {
+    static let houseSlices: [BudgetSlice] = {
         [
             try! .init(id: .init(), name: "Mortgage", configuration: .monthly(amount: .value(120.23))),
             try! .init(id: .init(), name: "Furnitures", configuration: .monthly(amount: .value(120.23))),
             try! .init(id: .init(), name: "Works", configuration: .scheduled(schedules: sliceScheduledAmounts))
+        ]
+    }()
+
+    static let groceriesSlices: [BudgetSlice] = {
+        [
+            try! .init(id: .init(), name: "Food", configuration: .monthly(amount: .value(120.23))),
+            try! .init(id: .init(), name: "Home", configuration: .monthly(amount: .value(120.23))),
         ]
     }()
 
@@ -72,9 +77,11 @@ enum Mocks {
 
     static let transactions: [Transaction] = {
         [
-            Transaction(description: nil, amount: .value(100), date: .now, budgetSliceId: slices[0].id),
-            Transaction(description: nil, amount: .value(100), date: .now, budgetSliceId: slices[1].id),
-            Transaction(description: nil, amount: .value(1000), date: .now, budgetSliceId: slices[2].id)
+            Transaction(description: nil, amount: .value(100), date: .now, budgetSliceId: houseSlices[0].id),
+            Transaction(description: nil, amount: .value(100), date: .now, budgetSliceId: houseSlices[1].id),
+            Transaction(description: nil, amount: .value(100), date: .now, budgetSliceId: houseSlices[2].id),
+            Transaction(description: nil, amount: .value(1000), date: .now, budgetSliceId: groceriesSlices[0].id),
+            Transaction(description: nil, amount: .value(1000), date: .now, budgetSliceId: groceriesSlices[1].id)
         ]
     }()
 }
@@ -173,8 +180,8 @@ final class MockStorageProvider: StorageProvider {
 
         try budget.update(name: name)
 
-        if let iconSystemName = iconSystemName {
-            try budget.update(iconSystemName: iconSystemName)
+        if let iconSystemName = iconSystemName, let icon = SystemIcon(rawValue: iconSystemName) {
+            try budget.update(icon: .system(icon: icon))
         }
 
         overview.delete(budgetsWithIdentifiers: [id])

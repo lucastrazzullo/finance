@@ -7,6 +7,11 @@
 
 import Foundation
 
+enum Icon: Hashable {
+    case system(icon: SystemIcon)
+    case none
+}
+
 enum SystemIcon: String, CaseIterable {
     case face = "face.dashed.fill"
     case face2 = "face.smiling.fill"

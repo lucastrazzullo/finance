@@ -11,11 +11,6 @@ struct Budget: Identifiable, Hashable, AmountHolder {
 
     typealias ID = UUID
 
-    enum Icon: Hashable {
-        case system(name: String)
-        case none
-    }
-
     private static let defaultSliceName: String = "Default"
 
     let id: ID
@@ -41,13 +36,6 @@ struct Budget: Identifiable, Hashable, AmountHolder {
         try Self.canUse(name: name)
         try Self.canUse(slices: slices)
 
-        switch icon {
-        case .system(let name):
-            try Self.canUse(iconSystemName: name)
-        case .none:
-            break
-        }
-
         self.id = id
         self.year = year
         self.icon = icon
@@ -70,9 +58,8 @@ struct Budget: Identifiable, Hashable, AmountHolder {
     /// Parameters:
     ///     - iconSystemName: The system name of an SFSymbol
     ///
-    mutating func update(iconSystemName: String) throws {
-        try willUpdate(iconSystemName: iconSystemName)
-        self.icon = .system(name: iconSystemName)
+    mutating func update(icon: Icon) throws {
+        self.icon = icon
     }
 
     /// Appends a slice to the list
@@ -128,10 +115,6 @@ struct Budget: Identifiable, Hashable, AmountHolder {
         try Self.canUse(name: name)
     }
 
-    func willUpdate(iconSystemName: String) throws {
-        try Self.canUse(iconSystemName: iconSystemName)
-    }
-
     func willAdd(slice: BudgetSlice) throws {
         try Self.willAdd(slice: slice, to: slices)
     }
@@ -151,12 +134,6 @@ struct Budget: Identifiable, Hashable, AmountHolder {
     private static func canUse(name: String) throws {
         guard !name.isEmpty else {
             throw DomainError.budget(error: .nameNotValid)
-        }
-    }
-
-    private static func canUse(iconSystemName: String) throws {
-        guard !iconSystemName.isEmpty else {
-            throw DomainError.budget(error: .iconSystemNameNotValid)
         }
     }
 

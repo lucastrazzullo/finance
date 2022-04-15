@@ -16,8 +16,8 @@ struct MonthlyBudgetOverviewItem: View {
             VStack(alignment: .leading, spacing: 4) {
                 HStack(alignment: .firstTextBaseline) {
                     switch overview.icon {
-                    case .system(let name):
-                        Image(systemName: name).symbolRenderingMode(.hierarchical)
+                    case .system(let systemIcon):
+                        Image(systemName: systemIcon.rawValue).symbolRenderingMode(.hierarchical)
                     case .none:
                         EmptyView()
                     }
@@ -92,7 +92,7 @@ struct MonthlyBudgetOverviewItem_Previews: PreviewProvider {
         MonthlyBudgetOverviewItem(
             overview: MonthlyBudgetOverview(
                 name: "Test Overview",
-                icon: .system(name: "leaf"),
+                icon: .system(icon: .health),
                 startingAmount: .value(1000),
                 totalExpenses: .value(100)
             )

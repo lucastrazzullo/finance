@@ -31,7 +31,6 @@ struct NewTransactionView: View {
                             Text(budget.name)
                         }
                     }
-                    .pickerStyle(DefaultPickerStyle())
 
                     Picker("Select Slice", selection: $budgetSliceIndex) {
                         ForEach(0..<budgets[budgetIndex].slices.count, id:\.self) { sliceIndex in
@@ -39,7 +38,6 @@ struct NewTransactionView: View {
                             Text(slice.name)
                         }
                     }
-                    .pickerStyle(DefaultPickerStyle())
                 }
 
                 Section(header: Text("Info")) {
@@ -47,8 +45,10 @@ struct NewTransactionView: View {
                         .accessibilityIdentifier(AccessibilityIdentifier.NewTransactionView.descriptionInputField)
 
                     DatePicker("Date", selection: $transactionDate, displayedComponents: .date)
-                        .datePickerStyle(.graphical)
+                        .datePickerStyle(.compact)
+                }
 
+                Section(header: Text("Amount")) {
                     AmountTextField(amountValue: $transactionAmount, title: "Amount")
                 }
 

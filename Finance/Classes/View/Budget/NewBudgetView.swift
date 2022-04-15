@@ -10,7 +10,7 @@ import SwiftUI
 struct NewBudgetView: View {
 
     @State private var budgetName: String = ""
-    @State private var budgetIcon: String = SystemIcon.default.rawValue
+    @State private var budgetSystemIcon: SystemIcon = .default
     @State private var budgetSlices: [BudgetSlice] = []
 
     @State private var isInsertNewBudgetSlicePresented: Bool = false
@@ -26,7 +26,7 @@ struct NewBudgetView: View {
                     TextField("Name", text: $budgetName)
                         .accessibilityIdentifier(AccessibilityIdentifier.NewBudgetView.nameInputField)
 
-                    BudgetIconPicker(selection: $budgetIcon, label: "Icon")
+                    SystemIconPicker(selection: $budgetSystemIcon, label: "Icon")
                 }
             }
 
@@ -69,7 +69,7 @@ struct NewBudgetView: View {
                 let budget = try Budget(
                     year: year,
                     name: budgetName,
-                    icon: .system(name: budgetIcon),
+                    icon: .system(icon: budgetSystemIcon),
                     slices: budgetSlices
                 )
 

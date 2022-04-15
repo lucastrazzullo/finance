@@ -12,8 +12,6 @@ struct OverviewListView<ViewModel: OverviewListViewModel>: View {
     @ObservedObject var viewModel: ViewModel
 
     @State private var month: Int = Calendar.current.component(.month, from: .now)
-
-    @State private var addNewTransactionError: DomainError?
     @State private var addNewTransactionIsPresented: Bool = false
 
     var body: some View {
@@ -62,13 +60,8 @@ struct OverviewListView<ViewModel: OverviewListViewModel>: View {
             .sheet(isPresented: $addNewTransactionIsPresented) {
                 NewTransactionView(budgets: viewModel.budgets) { transaction in
                     Task {
-                        do {
-                            try await viewModel.add(transaction: transaction)
-                            addNewTransactionIsPresented = false
-                            addNewTransactionError = nil
-                        } catch {
-                            addNewTransactionError = error as? DomainError
-                        }
+                        try await viewModel.add(transaction: transaction)
+                        addNewTransactionIsPresented = false
                     }
                 }
             }

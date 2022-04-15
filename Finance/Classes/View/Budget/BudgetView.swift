@@ -14,7 +14,7 @@ struct BudgetView<ViewModel: BudgetViewModel>: View {
     @ObservedObject var viewModel: ViewModel
 
     @State private var updatingBudgetName: String
-    @State private var updatingBudgetIcon: String
+    @State private var updatingBudgetIcon: SystemIcon
     @State private var updateBudgetInfoError: DomainError?
 
     @State private var isInsertNewSlicePresented: Bool = false
@@ -68,7 +68,7 @@ struct BudgetView<ViewModel: BudgetViewModel>: View {
             ToolbarItem(placement: .principal) {
                 HStack {
                     Text(isEditing ? updatingBudgetName : viewModel.name)
-                    Image(systemName: isEditing ? updatingBudgetIcon : viewModel.iconSystemName)
+                    Image(systemName: isEditing ? updatingBudgetIcon.rawValue : viewModel.systemIcon.rawValue)
                         .symbolRenderingMode(.hierarchical)
                 }
                 .frame(maxWidth: .infinity)
@@ -85,7 +85,7 @@ struct BudgetView<ViewModel: BudgetViewModel>: View {
     init(viewModel: ViewModel) {
         self.viewModel = viewModel
         self._updatingBudgetName = State<String>(wrappedValue: viewModel.name)
-        self._updatingBudgetIcon = State<String>(wrappedValue: viewModel.iconSystemName)
+        self._updatingBudgetIcon = State<SystemIcon>(wrappedValue: viewModel.systemIcon)
     }
 
     // MARK: Private helper methods
@@ -93,7 +93,7 @@ struct BudgetView<ViewModel: BudgetViewModel>: View {
     private func saveUpdatedValues() {
         Task {
             do {
-                try await viewModel.update(budgetName: updatingBudgetName, iconSystemName: updatingBudgetIcon)
+                try await viewModel.update(budgetName: updatingBudgetName, systemIcon: updatingBudgetIcon)
                 updateBudgetInfoError = nil
             } catch {
                 updateBudgetInfoError = error as? DomainError
@@ -118,7 +118,7 @@ private struct InfoSection<Footer: View>: View {
     let saveAction: () -> Void
 
     @Binding var name: String
-    @Binding var icon: String
+    @Binding var icon: SystemIcon
 
     @ViewBuilder var footer: () -> Footer
 
@@ -128,7 +128,7 @@ private struct InfoSection<Footer: View>: View {
                 HStack(spacing: 24) {
                     TextField("Budget Name", text: $name)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
-                    BudgetIconPicker(selection: $icon, label: "Icon")
+                    SystemIconPicker(selection: $icon, label: "Icon")
                         .padding(4)
                         .background(.quaternary)
                         .cornerRadius(6)
@@ -176,9 +176,9 @@ struct BudgetView_Previews: PreviewProvider {
 }
 
 final class MockBudgetViewModel: BudgetViewModel {
-    var name: String = "Budget name"
-    var iconSystemName: String = SystemIcon.car.rawValue
-    var slices: [BudgetSlice] = Mocks.slices
+    var name: String = "Car"
+    var icon: Icon = .system(icon: .car)
+    var slices: [BudgetSlice] = Mocks.houseSlices
 
     var amount: MoneyValue {
         slices.totalAmount
@@ -187,19 +187,19 @@ final class MockBudgetViewModel: BudgetViewModel {
     func fetch() async throws {
     }
 
-    func update(budgetName name: String, iconSystemName: String) async throws {
+    func update(budgetName name: String, systemIcon: SystemIcon) async throws {
         self.name = name
-        self.iconSystemName = iconSystemName
+        self.icon = .system(icon: systemIcon)
     }
 
     func add(slice: BudgetSlice) async throws {
-        let budget = try Budget(year: 2000, name: name, icon: .system(name: iconSystemName), slices: slices)
+        let budget = try Budget(year: 2000, name: name, icon: icon, slices: slices)
         try budget.willAdd(slice: slice)
         slices.append(slice)
     }
 
     func delete(slicesAt indices: IndexSet) async throws {
-        let budget = try Budget(year: 2000, name: name, icon: .system(name: iconSystemName), slices: slices)
+        let budget = try Budget(year: 2000, name: name, icon: icon, slices: slices)
         try budget.willDelete(slicesWith: budget.sliceIdentifiers(at: indices))
         slices.remove(atOffsets: indices)
     }

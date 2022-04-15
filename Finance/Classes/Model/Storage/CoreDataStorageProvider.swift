@@ -165,8 +165,8 @@ final class CoreDataStorageProvider: StorageProvider {
         budgetEntity.name = budget.name
 
         switch budget.icon {
-        case .system(let name):
-            budgetEntity.systemIconName = name
+        case .system(let systemIcon):
+            budgetEntity.systemIconName = systemIcon.rawValue
         case .none:
             break
         }
@@ -229,9 +229,10 @@ private extension Budget {
         }
 
         let year = Int(budgetEntity.year)
-        let icon: Budget.Icon = {
-            if let systemIconName = budgetEntity.systemIconName {
-                return .system(name: systemIconName)
+        let icon: Icon = {
+            if let systemIconName = budgetEntity.systemIconName,
+               let systemIcon = SystemIcon(rawValue: systemIconName) {
+                return .system(icon: systemIcon)
             } else {
                 return .none
             }

@@ -14,7 +14,6 @@ struct BudgetsListView<ViewModel: BudgetsListViewModel>: View {
     @ObservedObject private var viewModel: ViewModel
 
     @State private var deleteBudgetError: DomainError?
-    @State private var addNewBudgetError: DomainError?
     @State private var addNewBudgetIsPresented: Bool = false
 
     var body: some View {
@@ -25,7 +24,7 @@ struct BudgetsListView<ViewModel: BudgetsListViewModel>: View {
                         let viewModel = RepositoryBackedBudgetViewModel(budget: budget, repository: repository)
                         NavigationLink(destination: { BudgetView(viewModel: viewModel) }) {
                             HStack {
-                                Label(viewModel.name, systemImage: viewModel.iconSystemName)
+                                Label(viewModel.name, systemImage: viewModel.systemIcon.rawValue)
                                     .symbolRenderingMode(.hierarchical)
                                     .font(.body.bold())
                                     .accentColor(.secondary)
@@ -45,10 +44,6 @@ struct BudgetsListView<ViewModel: BudgetsListViewModel>: View {
                                 deleteBudgetError = error as? DomainError
                             }
                         }
-                    }
-
-                    if let error = deleteBudgetError ?? addNewBudgetError {
-                        InlineErrorView(error: error)
                     }
 
                     Button(action: { addNewBudgetIsPresented = true }) {
@@ -71,13 +66,8 @@ struct BudgetsListView<ViewModel: BudgetsListViewModel>: View {
             .onAppear(perform: { Task { try? await viewModel.fetch() }})
             .sheet(isPresented: $addNewBudgetIsPresented) {
                 NewBudgetView(year: viewModel.year) { budget in
-                    do {
-                        try await viewModel.add(budget: budget)
-                        addNewBudgetError = nil
-                        addNewBudgetIsPresented = false
-                    } catch {
-                        addNewBudgetError = error as? DomainError
-                    }
+                    try await viewModel.add(budget: budget)
+                    addNewBudgetIsPresented = false
                 }
             }
         }

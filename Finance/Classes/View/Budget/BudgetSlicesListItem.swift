@@ -86,8 +86,8 @@ struct BudgetSlicesListItem_Previews: PreviewProvider {
     static var previews: some View {
         List {
             Section(header: Text("Slices")) {
-                ForEach(Mocks.slices, id: \.id) { slice in
-                    BudgetSlicesListItem(slice: slice, totalBudgetAmount: Mocks.slices.totalAmount)
+                ForEach(Mocks.houseSlices, id: \.id) { slice in
+                    BudgetSlicesListItem(slice: slice, totalBudgetAmount: Mocks.houseSlices.totalAmount)
                 }
             }
         }

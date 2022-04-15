@@ -64,10 +64,6 @@ final actor Repository {
         let budget = try await fetch(budgetWith: id)
         try budget.willUpdate(name: name)
 
-        if let iconSystemName = iconSystemName {
-            try budget.willUpdate(iconSystemName: iconSystemName)
-        }
-
         let overview = try await fetchYearlyOverview(year: budget.year)
         let budgetList = BudgetList(budgets: overview.budgets)
         try budgetList.willUpdate(budgetName: name, forBudgetWith: id)

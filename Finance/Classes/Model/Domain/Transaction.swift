@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Transaction: AmountHolder {
+struct Transaction: Hashable, AmountHolder {
 
     let description: String?
     let amount: MoneyValue
