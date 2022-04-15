@@ -58,9 +58,9 @@ struct OverviewListView<ViewModel: OverviewListViewModel>: View {
             })
             .onAppear(perform: { Task { try? await viewModel.fetch() }})
             .sheet(isPresented: $addNewTransactionIsPresented) {
-                NewTransactionView(budgets: viewModel.budgets) { transaction in
+                AddTransactionsView(budgets: viewModel.overview.budgets) { transactions in
                     Task {
-                        try await viewModel.add(transaction: transaction)
+                        try await viewModel.add(transactions: transactions)
                         addNewTransactionIsPresented = false
                     }
                 }
@@ -70,35 +70,36 @@ struct OverviewListView<ViewModel: OverviewListViewModel>: View {
 }
 
 struct OverviewView_Previews: PreviewProvider {
-    let overview = Mocks.overview
     static var previews: some View {
-        OverviewListView(viewModel: MockOverviewListViewModel())
+        OverviewListView(viewModel: MockOverviewListViewModel(overview: Mocks.overview))
     }
 }
 
 final class MockOverviewListViewModel: OverviewListViewModel {
 
-    private var overview: YearlyBudgetOverview?
+    private(set) var overview: YearlyBudgetOverview
+
+    init(overview: YearlyBudgetOverview) {
+        self.overview = overview
+    }
 
     var title: String {
-        overview?.name ?? "No Overview"
+        overview.name
     }
+
     var subtitle: String {
-        String(overview?.year ?? 0)
-    }
-    var budgets: [Budget] {
-        overview?.budgets ?? []
+        String(overview.year)
     }
 
     func fetch() async throws {
         overview = Mocks.overview
     }
 
-    func add(transaction: Transaction) async throws {
-        overview?.append(transaction: transaction)
+    func add(transactions: [Transaction]) async throws {
+        overview.append(transactions: transactions)
     }
 
     func overviews(for month: Int) -> [MonthlyBudgetOverview] {
-        overview?.monthlyOverviews(month: month) ?? []
+        overview.monthlyOverviews(month: month)
     }
 }

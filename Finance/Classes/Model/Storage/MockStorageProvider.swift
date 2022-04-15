@@ -52,6 +52,10 @@ enum Mocks {
 
     // MARK: Slice
 
+    static let allSlices: [BudgetSlice] = {
+        groceriesSlices + houseSlices
+    }()
+
     static let houseSlices: [BudgetSlice] = {
         [
             try! .init(id: .init(), name: "Mortgage", configuration: .monthly(amount: .value(120.23))),

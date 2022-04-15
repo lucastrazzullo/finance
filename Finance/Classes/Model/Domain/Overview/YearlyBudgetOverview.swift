@@ -81,7 +81,7 @@ struct YearlyBudgetOverview: Identifiable {
         self.budgets.removeAll(where: { identifiers.contains($0.id) })
     }
 
-    mutating func append(transaction: Transaction) {
-        self.transactions.append(transaction)
+    mutating func append(transactions: [Transaction]) {
+        self.transactions.append(contentsOf: transactions)
     }
 }

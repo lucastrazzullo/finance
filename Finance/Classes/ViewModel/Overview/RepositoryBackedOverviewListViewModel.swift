@@ -47,7 +47,7 @@ extension RepositoryBackedOverviewListViewModel: OverviewListViewModel {
         overview.monthlyOverviews(month: month)
     }
 
-    func add(transaction: Transaction) async throws {
-        overview.append(transaction: transaction)
+    func add(transactions: [Transaction]) async throws {
+        overview.append(transactions: transactions)
     }
 }

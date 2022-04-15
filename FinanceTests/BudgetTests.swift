@@ -16,7 +16,7 @@ final class BudgetTests: XCTestCase {
         return try BudgetSlice(name: name, configuration: configuration)
     }
 
-    private func makeBudget(year: Int = 2000, name: String = "Name", icon: Budget.Icon = .none, slices: [BudgetSlice]? = nil) throws -> Budget {
+    private func makeBudget(year: Int = 2000, name: String = "Name", icon: Icon = .none, slices: [BudgetSlice]? = nil) throws -> Budget {
         let budgetSlices: [BudgetSlice]
         if let slices = slices {
             budgetSlices = slices
@@ -32,7 +32,7 @@ final class BudgetTests: XCTestCase {
     // MARK: Instantiating
 
     func testInstantiateBudget_withValidData() {
-        XCTAssertNoThrow(try Budget(year: 2000, name: "Name", icon: .system(name: "some"), monthlyAmount: .value(100)))
+        XCTAssertNoThrow(try Budget(year: 2000, name: "Name", icon: .system(icon: .cat), monthlyAmount: .value(100)))
         XCTAssertNoThrow(try Budget(year: 2000, name: "Name", icon: .none, monthlyAmount: .value(100)))
         XCTAssertNoThrow(try Budget(year: 2000, name: "Name", icon: .none, slices: [
             try makeSlice(name: "Name"),
@@ -45,7 +45,6 @@ final class BudgetTests: XCTestCase {
 
     func testInstantiateBudget_withInvalidData() {
         XCTAssertThrowsError(try Budget(year: 2000, name: "", icon: .none, monthlyAmount: .value(100)))
-        XCTAssertThrowsError(try Budget(year: 2000, name: "Name", icon: .system(name: ""), monthlyAmount: .value(100)))
         XCTAssertThrowsError(try Budget(year: 2000, name: "Name", icon: .none, monthlyAmount: .zero))
         XCTAssertThrowsError(try Budget(year: 2000, name: "Name", icon: .none, slices: []))
         XCTAssertThrowsError(try makeBudget(slices: [
@@ -82,13 +81,6 @@ final class BudgetTests: XCTestCase {
 
         XCTAssertNoThrow(try budget.willUpdate(name: "Any other name"))
         XCTAssertNoThrow(try budget.update(name: "Any other name"))
-    }
-
-    func testUpdateBudgetIcon() throws {
-        var budget = try makeBudget()
-
-        XCTAssertThrowsError(try budget.update(iconSystemName: ""))
-        XCTAssertNoThrow(try budget.update(iconSystemName: "some"))
     }
 
     func testUpdateBudget_appensSlice() throws {

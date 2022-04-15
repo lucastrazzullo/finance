@@ -9,9 +9,13 @@ import SwiftUI
 
 struct AddTransactionsView: View {
 
-    private let transactions: [Transaction] = Mocks.transactions
-    private let slices: [BudgetSlice] = Mocks.houseSlices + Mocks.groceriesSlices
-    private let budgets: [Budget] = Mocks.budgets
+    @State private var transactions: [Transaction] = []
+    @State private var addNewTransactionPresented: Bool = false
+
+    @State private var submitError: DomainError?
+
+    let budgetList: BudgetList
+    let onSubmit: ([Transaction]) async throws -> Void
 
     var body: some View {
         NavigationView {
@@ -19,17 +23,31 @@ struct AddTransactionsView: View {
                 ForEach(budgets(for: transactions), id: \.self) { budget in
                     let headerViewModel = SectionHeader.ViewModel(budget: budget)
                     Section(header: SectionHeader(viewModel: headerViewModel)) {
-                        ForEach(transactions(for: budget.id), id: \.self) { transaction in
-                            let sliceName = sliceName(for: transaction.budgetSliceId) ?? "--"
+                        ForEach(transactions(forBudgetWith: budget.id), id: \.self) { transaction in
+                            let sliceName = sliceName(for: transaction.budgetSliceId, inBudgetWith: budget.id) ?? "--"
                             let viewModel = TransactionItem.ViewModel(sliceName: sliceName, date: transaction.date, amount: transaction.amount)
                             TransactionItem(viewModel: viewModel)
+                        }
+                        .onDelete { indices in
+                            transactions.remove(atOffsets: indices)
                         }
                     }
                 }
 
-                Section(header: SectionHeader(viewModel: .init(icon: .none, label: "Total", amount: .value(2000)))) {
+                Section {
+                    Button(action: { addNewTransactionPresented = true }) {
+                        Label("Add", systemImage: "plus")
+                    }
+                    .listRowSeparator(.hidden)
+                    .padding(.vertical)
+                }
 
-                    Button(action: {}) {
+                Section(header: SectionHeader(viewModel: .init(icon: .none, label: "Total", amount: transactions.totalAmount))) {
+                    if let error = submitError {
+                        InlineErrorView(error: error)
+                    }
+
+                    Button(action: submit) {
                         Text("Save")
                     }
                     .buttonStyle(.borderedProminent)
@@ -41,31 +59,59 @@ struct AddTransactionsView: View {
             .listStyle(.inset)
             .navigationTitle("Add transactions")
             .navigationBarTitleDisplayMode(.inline)
+            .sheet(isPresented: $addNewTransactionPresented) {
+                NewTransactionView(budgets: budgetList.budgets) { transaction in
+                    transactions.append(transaction)
+                    addNewTransactionPresented = false
+                }
+            }
         }
+    }
+
+    // MARK: Object life cycle
+
+    init(budgets: [Budget], onSubmit: @escaping ([Transaction]) async throws -> Void) {
+        self.budgetList = BudgetList(budgets: budgets)
+        self.onSubmit = onSubmit
     }
 
     // MARK: Private helper methods
 
+    private func submit() {
+        Task {
+            do {
+                try await onSubmit(transactions)
+                submitError = nil
+            } catch {
+                submitError = error as? DomainError
+            }
+        }
+    }
+
     private func budgets(for transactions: [Transaction]) -> [Budget] {
         let transactionSliceIdentifiers = Set(transactions.map(\.budgetSliceId))
-        return budgets
+        return budgetList.budgets
             .filter { budget in
                 let budgetSliceIdentifiers = Set(budget.slices.map(\.id))
                 return !transactionSliceIdentifiers.intersection(budgetSliceIdentifiers).isEmpty
             }
     }
 
-    private func transactions(for budgetId: Budget.ID) -> [Transaction] {
+    private func transactions(forBudgetWith id: Budget.ID) -> [Transaction] {
         return transactions.filter { transaction in
-            guard let budget = budgets.first(where: { $0.id == budgetId }) else {
+            guard let budget = budgetList.budget(with: id) else {
                 return false
             }
             return budget.slices.map(\.id).contains(transaction.budgetSliceId)
         }
     }
 
-    private func sliceName(for sliceId: BudgetSlice.ID) -> String? {
-        return slices.first(where: { $0.id == sliceId })?.name
+    private func sliceName(for sliceId: BudgetSlice.ID, inBudgetWith id: Budget.ID) -> String? {
+        return budgetList
+            .budget(with: id)?
+            .slices
+            .first(where: { $0.id == sliceId })?
+            .name
     }
 }
 
@@ -115,7 +161,7 @@ private struct TransactionItem: View {
 
     var body: some View {
         HStack {
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text(viewModel.sliceName).font(.headline)
                 Text(viewModel.date, style: .date).font(.caption)
             }
@@ -124,11 +170,12 @@ private struct TransactionItem: View {
 
             AmountView(amount: viewModel.amount)
         }
+        .padding(.vertical, 8)
     }
 }
 
 struct AddTransactionsView_Previews: PreviewProvider {
     static var previews: some View {
-        AddTransactionsView()
+        AddTransactionsView(budgets: Mocks.budgets) { _ in }
     }
 }
