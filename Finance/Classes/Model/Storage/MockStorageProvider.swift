@@ -127,8 +127,7 @@ final class MockStorageProvider: StorageProvider {
     }
 
     func fetch(budgetWith identifier: Budget.ID) async throws -> Budget {
-        let budgetList = BudgetList(budgets: overview.budgets)
-        guard let budget = budgetList.budget(with: identifier) else {
+        guard let budget = overview.budgets.with(identifier: identifier) else {
             throw DomainError.storageProvider(error: .budgetEntityNotFound)
         }
         return budget
@@ -144,21 +143,18 @@ final class MockStorageProvider: StorageProvider {
     // MARK: Add
 
     func add(budget: Budget) async throws {
-        let budgetList = BudgetList(budgets: overview.budgets)
-        try budgetList.willAdd(budget: budget)
-        overview.append(budget: budget)
+        try overview.append(budget: budget)
     }
 
     func add(slice: BudgetSlice, toBudgetWith id: Budget.ID) async throws {
-        let budgetList = BudgetList(budgets: overview.budgets)
-        guard var budget = budgetList.budget(with: id) else {
+        guard var budget = overview.budgets.with(identifier: id) else {
             throw DomainError.storageProvider(error: .budgetEntityNotFound)
         }
 
         try budget.append(slice: slice)
 
         overview.delete(budgetsWithIdentifiers: [id])
-        overview.append(budget: budget)
+        try overview.append(budget: budget)
     }
 
     func add(transaction: Transaction) async throws {
@@ -168,8 +164,7 @@ final class MockStorageProvider: StorageProvider {
     // MARK: Delete
 
     func delete(budgetsWith identifiers: Set<Budget.ID>) async throws -> Set<Budget.ID> {
-        let budgetList = BudgetList(budgets: overview.budgets)
-        let budgets = budgetList.budgets(with: identifiers)
+        let budgets = overview.budgets.with(identifiers: identifiers)
 
         guard !budgets.isEmpty else {
             throw DomainError.storageProvider(error: .budgetEntityNotFound)
@@ -180,8 +175,7 @@ final class MockStorageProvider: StorageProvider {
     }
 
     func delete(slicesWith identifiers: Set<BudgetSlice.ID>, inBudgetWith id: Budget.ID) async throws {
-        let budgetList = BudgetList(budgets: overview.budgets)
-        guard var budget = budgetList.budget(with: id) else {
+        guard var budget = overview.budgets.with(identifier: id) else {
             throw DomainError.storageProvider(error: .budgetEntityNotFound)
         }
 
@@ -189,14 +183,13 @@ final class MockStorageProvider: StorageProvider {
         try budget.delete(slicesAt: indices)
 
         overview.delete(budgetsWithIdentifiers: [id])
-        overview.append(budget: budget)
+        try overview.append(budget: budget)
     }
 
     // MARK: Update
 
     func update(name: String, iconSystemName: String?, inBudgetWith id: Budget.ID) async throws {
-        let budgetList = BudgetList(budgets: overview.budgets)
-        guard var budget = budgetList.budget(with: id) else {
+        guard var budget = overview.budgets.with(identifier: id) else {
             throw DomainError.storageProvider(error: .budgetEntityNotFound)
         }
 
@@ -207,6 +200,6 @@ final class MockStorageProvider: StorageProvider {
         }
 
         overview.delete(budgetsWithIdentifiers: [id])
-        overview.append(budget: budget)
+        try overview.append(budget: budget)
     }
 }

@@ -94,4 +94,8 @@ extension Array where Element == BudgetSlice {
         let uniqueNames = Set(allNames)
         return allNames.count > uniqueNames.count
     }
+
+    func with(identifier: BudgetSlice.ID) -> BudgetSlice? {
+        self.first(where: { $0.id == identifier })
+    }
 }

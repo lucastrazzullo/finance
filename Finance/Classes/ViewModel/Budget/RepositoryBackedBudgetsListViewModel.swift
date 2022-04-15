@@ -53,14 +53,13 @@ extension RepositoryBackedBudgetsListViewModel: BudgetsListViewModel {
         try await repository.add(budget: budget)
 
         DispatchQueue.main.async { [weak self] in
-            self?.overview.append(budget: budget)
+            try? self?.overview.append(budget: budget)
         }
     }
 
     func delete(budgetsAt indices: IndexSet) async throws {
-        let budgetList = BudgetList(budgets: overview.budgets)
-        let budgetsIdentifiersToDelete = budgetList.budgetIdentifiers(at: indices)
-        let deletedIdentifiers = try await repository.delete(budgetsWith: budgetsIdentifiersToDelete)
+        let budgetsIdentifiersToDelete = overview.budgets.at(offsets: indices).map(\.id)
+        let deletedIdentifiers = try await repository.delete(budgetsWith: Set(budgetsIdentifiersToDelete))
 
         DispatchQueue.main.async { [weak self] in
             self?.overview.delete(budgetsWithIdentifiers: deletedIdentifiers)

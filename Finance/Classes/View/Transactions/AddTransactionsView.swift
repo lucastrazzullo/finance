@@ -14,7 +14,7 @@ struct AddTransactionsView: View {
 
     @State private var submitError: DomainError?
 
-    let budgetList: BudgetList
+    let budgets: [Budget]
     let onSubmit: ([Transaction]) async throws -> Void
 
     var body: some View {
@@ -60,7 +60,7 @@ struct AddTransactionsView: View {
             .navigationTitle("Add transactions")
             .navigationBarTitleDisplayMode(.inline)
             .sheet(isPresented: $addNewTransactionPresented) {
-                NewTransactionView(budgets: budgetList.budgets) { transaction in
+                NewTransactionView(budgets: budgets) { transaction in
                     transactions.append(transaction)
                     addNewTransactionPresented = false
                 }
@@ -71,7 +71,7 @@ struct AddTransactionsView: View {
     // MARK: Object life cycle
 
     init(budgets: [Budget], onSubmit: @escaping ([Transaction]) async throws -> Void) {
-        self.budgetList = BudgetList(budgets: budgets)
+        self.budgets = budgets
         self.onSubmit = onSubmit
     }
 
@@ -90,7 +90,7 @@ struct AddTransactionsView: View {
 
     private func budgets(for transactions: [Transaction]) -> [Budget] {
         let transactionSliceIdentifiers = Set(transactions.map(\.budgetSliceId))
-        return budgetList.budgets
+        return budgets
             .filter { budget in
                 let budgetSliceIdentifiers = Set(budget.slices.map(\.id))
                 return !transactionSliceIdentifiers.intersection(budgetSliceIdentifiers).isEmpty
@@ -99,7 +99,7 @@ struct AddTransactionsView: View {
 
     private func transactions(forBudgetWith id: Budget.ID) -> [Transaction] {
         return transactions.filter { transaction in
-            guard let budget = budgetList.budget(with: id) else {
+            guard let budget = budgets.with(identifier: id) else {
                 return false
             }
             return budget.slices.map(\.id).contains(transaction.budgetSliceId)
@@ -107,10 +107,10 @@ struct AddTransactionsView: View {
     }
 
     private func sliceName(for sliceId: BudgetSlice.ID, inBudgetWith id: Budget.ID) -> String? {
-        return budgetList
-            .budget(with: id)?
+        return budgets
+            .with(identifier: id)?
             .slices
-            .first(where: { $0.id == sliceId })?
+            .with(identifier: sliceId)?
             .name
     }
 }

@@ -43,6 +43,31 @@ struct Budget: Identifiable, Hashable, AmountHolder {
         self.slices = slices
     }
 
+    // MARK: Getters
+
+    func availability(upTo month: Int) -> MoneyValue {
+        slices
+            .reduce(MoneyValue.zero) { accumulatedAmount, slice in
+                switch slice.configuration {
+                case .monthly(let amount):
+                    return accumulatedAmount + (amount * .value(Decimal(month)))
+                case .scheduled(let schedules):
+                    return accumulatedAmount + schedules.filter({ $0.month <= month }).totalAmount
+                }
+            }
+    }
+
+    func sliceIdentifiers(at indices: IndexSet) -> Set<BudgetSlice.ID> {
+        return Set(slices(at: indices).map(\.id))
+    }
+
+    func slices(at indices: IndexSet) -> [BudgetSlice] {
+        return slices
+            .enumerated()
+            .filter({ index, slice in indices.contains(index) })
+            .map(\.element)
+    }
+
     // MARK: Mutating methods
 
     /// Updates name in budget
@@ -84,31 +109,6 @@ struct Budget: Identifiable, Hashable, AmountHolder {
         slices = updatedSlices
     }
 
-    // MARK: Getters
-
-    func availability(upTo month: Int) -> MoneyValue {
-        slices
-            .reduce(MoneyValue.zero) { accumulatedAmount, slice in
-                switch slice.configuration {
-                case .monthly(let amount):
-                    return accumulatedAmount + (amount * .value(Decimal(month)))
-                case .scheduled(let schedules):
-                    return accumulatedAmount + schedules.filter({ $0.month <= month }).totalAmount
-                }
-            }
-    }
-
-    func sliceIdentifiers(at indices: IndexSet) -> Set<BudgetSlice.ID> {
-        return Set(slices(at: indices).map(\.id))
-    }
-
-    func slices(at indices: IndexSet) -> [BudgetSlice] {
-        return slices
-            .enumerated()
-            .filter({ index, slice in indices.contains(index) })
-            .map(\.element)
-    }
-
     // MARK: Helpers
 
     func willUpdate(name: String) throws {
@@ -144,5 +144,38 @@ struct Budget: Identifiable, Hashable, AmountHolder {
         guard !slices.containsDuplicates() else {
             throw DomainError.budget(error: .multipleSlicesWithSameName)
         }
+    }
+}
+
+extension Array where Element == Budget {
+
+    func with(identifiers: Set<Budget.ID>) -> [Budget] {
+        return self.filter({ identifiers.contains($0.id) })
+    }
+
+    func with(identifier: Budget.ID) -> Budget? {
+        return self.first(where: { $0.id == identifier })
+    }
+
+    func at(offsets: IndexSet) -> [Budget] {
+        return self
+            .enumerated()
+            .filter { index, budget -> Bool in indices.contains(index) }
+            .map(\.element)
+    }
+
+    func at(index: Int) -> Budget? {
+        guard self.indices.contains(index) else {
+            return nil
+        }
+        return self[index]
+    }
+
+    mutating func delete(withIdentifier identifier: Budget.ID) {
+        self.removeAll(where: { $0.id == identifier })
+    }
+
+    mutating func delete(withIdentifiers identifiers: Set<Budget.ID>) {
+        self.removeAll(where: { identifiers.contains($0.id) })
     }
 }

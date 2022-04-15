@@ -12,7 +12,6 @@
 		810F86A427FF91CB00A1CDD4 /* MonthlyBudgetOverview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 810F86A327FF91CA00A1CDD4 /* MonthlyBudgetOverview.swift */; };
 		810F86A628002CD700A1CDD4 /* MonthlyBudgetOverviewItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 810F86A528002CD700A1CDD4 /* MonthlyBudgetOverviewItem.swift */; };
 		811F7BD3278C2A3500F1B8C9 /* BudgetSlice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 811F7BD2278C2A3500F1B8C9 /* BudgetSlice.swift */; };
-		8126BA7D2805FE7A00C06C93 /* BudgetList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8126BA7C2805FE7A00C06C93 /* BudgetList.swift */; };
 		8126BA7F2806E98A00C06C93 /* StorageProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8126BA7E2806E98A00C06C93 /* StorageProvider.swift */; };
 		8126BA832807314100C06C93 /* BudgetsListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8126BA822807314100C06C93 /* BudgetsListViewModel.swift */; };
 		8126BA852807318F00C06C93 /* OverviewListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8126BA842807318F00C06C93 /* OverviewListViewModel.swift */; };
@@ -100,7 +99,6 @@
 		810F86A327FF91CA00A1CDD4 /* MonthlyBudgetOverview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthlyBudgetOverview.swift; sourceTree = "<group>"; };
 		810F86A528002CD700A1CDD4 /* MonthlyBudgetOverviewItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthlyBudgetOverviewItem.swift; sourceTree = "<group>"; };
 		811F7BD2278C2A3500F1B8C9 /* BudgetSlice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetSlice.swift; sourceTree = "<group>"; };
-		8126BA7C2805FE7A00C06C93 /* BudgetList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetList.swift; sourceTree = "<group>"; };
 		8126BA7E2806E98A00C06C93 /* StorageProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageProvider.swift; sourceTree = "<group>"; };
 		8126BA802806F69A00C06C93 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8126BA822807314100C06C93 /* BudgetsListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetsListViewModel.swift; sourceTree = "<group>"; };
@@ -395,7 +393,6 @@
 		81A6FB702800538D00D71BE6 /* Budget */ = {
 			isa = PBXGroup;
 			children = (
-				8126BA7C2805FE7A00C06C93 /* BudgetList.swift */,
 				81CB8BEF2746B92400A64785 /* Budget.swift */,
 				811F7BD2278C2A3500F1B8C9 /* BudgetSlice.swift */,
 			);
@@ -670,7 +667,6 @@
 				819993D72752FAA300FA3E03 /* AmountTextField.swift in Sources */,
 				81F3B9132804949A00A1B89F /* NewTransactionView.swift in Sources */,
 				811F7BD3278C2A3500F1B8C9 /* BudgetSlice.swift in Sources */,
-				8126BA7D2805FE7A00C06C93 /* BudgetList.swift in Sources */,
 				81B284E827A0035700EE51EB /* NewBudgetSliceView.swift in Sources */,
 				817A119127EF355700058C11 /* MonthPickerView.swift in Sources */,
 				81CB8BFE2746DA8F00A64785 /* AmountHolder.swift in Sources */,
