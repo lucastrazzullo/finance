@@ -7,63 +7,35 @@
 
 import SwiftUI
 
-@main
-struct FinanceApp: App {
+@main struct FinanceApp: App {
 
-    @Environment(\.repository) private var repository
-
-    @State private var overview: YearlyBudgetOverview?
-    @State private var loadError: DomainError?
+    @ObservedObject private var session: FinanceSession
 
     var body: some Scene {
         WindowGroup {
-            if let overview = overview {
-                DashboardView(overview: overview)
-            } else if let error = loadError {
-                ErrorView(error: error, retryAction: load)
-            } else {
-                ProgressView("Loading").onAppear(perform: load)
+            DashboardView(
+                overview: session.overview,
+                addTransactions: session.add(transactions:),
+                addBudget: session.add(budget:),
+                deleteBudgets: session.delete(budgetsWith:),
+                addSliceToBudget: session.add(slice:toBudgetWith:),
+                deleteSlices: session.delete(slicesWith:inBudgetWith:),
+                updateNameAndIcon: session.update(name:icon:inBudgetWith:)
+            )
+            .task {
+                try? await session.load()
+            }
+            .refreshable {
+                try? await session.load()
             }
         }
     }
 
-    // MARK: Private helper methods
-
-    private func load() {
-        Task {
-            do {
-                overview = try await repository.fetchYearlyOverview(year: 2022)
-                loadError = nil
-            } catch {
-                loadError = error as? DomainError
-            }
-        }
-    }
-}
-
-struct ReporitoryKey: EnvironmentKey {
-
-    static let defaultValue: Repository = {
-        let storageProvider: StorageProvider = {
-            if CommandLine.arguments.contains("testing") {
-                return try! MockStorageProvider()
-            } else {
-                return CoreDataStorageProvider()
-            }
-        }()
-
-        return Repository(storageProvider: storageProvider)
-    }()
-}
-
-extension EnvironmentValues {
-
-    var repository: Repository {
-        get {
-            return self[ReporitoryKey.self]
-        }
-        set {
-            self[ReporitoryKey.self] = newValue
+    init() {
+        if CommandLine.arguments.contains("testing") {
+            session = FinanceSession(storageProvider: MockStorageProvider())
+        } else {
+            session = FinanceSession(storageProvider: CoreDataStorageProvider())
         }
     }
 }

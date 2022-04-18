@@ -16,7 +16,7 @@ final class BudgetTests: XCTestCase {
         return try BudgetSlice(name: name, configuration: configuration)
     }
 
-    private func makeBudget(year: Int = 2000, name: String = "Name", icon: Icon = .none, slices: [BudgetSlice]? = nil) throws -> Budget {
+    private func makeBudget(year: Int = 2000, name: String = "Name", icon: SystemIcon = .default, slices: [BudgetSlice]? = nil) throws -> Budget {
         let budgetSlices: [BudgetSlice]
         if let slices = slices {
             budgetSlices = slices
@@ -32,21 +32,21 @@ final class BudgetTests: XCTestCase {
     // MARK: Instantiating
 
     func testInstantiateBudget_withValidData() {
-        XCTAssertNoThrow(try Budget(year: 2000, name: "Name", icon: .system(icon: .cat), monthlyAmount: .value(100)))
-        XCTAssertNoThrow(try Budget(year: 2000, name: "Name", icon: .none, monthlyAmount: .value(100)))
-        XCTAssertNoThrow(try Budget(year: 2000, name: "Name", icon: .none, slices: [
+        XCTAssertNoThrow(try Budget(year: 2000, name: "Name", icon: .cat, monthlyAmount: .value(100)))
+        XCTAssertNoThrow(try Budget(year: 2000, name: "Name", icon: .default, monthlyAmount: .value(100)))
+        XCTAssertNoThrow(try Budget(year: 2000, name: "Name", icon: .default, slices: [
             try makeSlice(name: "Name"),
         ]))
-        XCTAssertNoThrow(try Budget(year: 2000, name: "Name", icon: .none, slices: [
+        XCTAssertNoThrow(try Budget(year: 2000, name: "Name", icon: .default, slices: [
             try makeSlice(name: "Name 1"),
             try makeSlice(name: "Name 2")
         ]))
     }
 
     func testInstantiateBudget_withInvalidData() {
-        XCTAssertThrowsError(try Budget(year: 2000, name: "", icon: .none, monthlyAmount: .value(100)))
-        XCTAssertThrowsError(try Budget(year: 2000, name: "Name", icon: .none, monthlyAmount: .zero))
-        XCTAssertThrowsError(try Budget(year: 2000, name: "Name", icon: .none, slices: []))
+        XCTAssertThrowsError(try Budget(year: 2000, name: "", icon: .default, monthlyAmount: .value(100)))
+        XCTAssertThrowsError(try Budget(year: 2000, name: "Name", icon: .default, monthlyAmount: .zero))
+        XCTAssertThrowsError(try Budget(year: 2000, name: "Name", icon: .default, slices: []))
         XCTAssertThrowsError(try makeBudget(slices: [
             try makeSlice(name: "Name"),
             try makeSlice(name: "Name")
@@ -54,7 +54,7 @@ final class BudgetTests: XCTestCase {
     }
 
     func testInstantiateBudget_totalAmount_withSlices() throws {
-        let budget = try Budget(year: 2000, name: "Name", icon: .none, slices: [
+        let budget = try Budget(year: 2000, name: "Name", icon: .default, slices: [
             BudgetSlice(name: "Name 1", configuration: .monthly(amount: .value(100))),
             BudgetSlice(name: "Name 2", configuration: .monthly(amount: .value(100))),
             BudgetSlice(name: "Name 3", configuration: .scheduled(schedules: [
@@ -108,20 +108,21 @@ final class BudgetTests: XCTestCase {
 
         // When: deleting all slices
         // Then: throw an error, becasue there can't be a budget without slices
-        var deletingIndexSet = IndexSet(integersIn: budget.slices.indices)
-        XCTAssertThrowsError(try budget.willDelete(slicesWith: [slice1.id, slice2.id]))
-        XCTAssertThrowsError(try budget.delete(slicesAt: deletingIndexSet))
+        var deletingIdentifiers = Set([slice1.id, slice2.id])
+        XCTAssertThrowsError(try budget.willDelete(slicesWith: deletingIdentifiers))
+        XCTAssertThrowsError(try budget.delete(slicesWith: deletingIdentifiers))
 
         // When: deleting only one slice
         // Then: no errors are thrown
-        deletingIndexSet = IndexSet(integer: 0)
-        XCTAssertNoThrow(try budget.willDelete(slicesWith: [slice1.id]))
-        XCTAssertNoThrow(try budget.delete(slicesAt: deletingIndexSet))
+        deletingIdentifiers = [slice1.id]
+        XCTAssertNoThrow(try budget.willDelete(slicesWith: deletingIdentifiers))
+        XCTAssertNoThrow(try budget.delete(slicesWith: deletingIdentifiers))
 
         // When: deleting the only one left slice
         // Then: throw an error, becasue there can't be a budget without slices
+        deletingIdentifiers = [slice2.id]
         XCTAssertEqual(budget.slices.count, 1)
-        XCTAssertThrowsError(try budget.delete(slicesAt: IndexSet(integer: 0)))
+        XCTAssertThrowsError(try budget.delete(slicesWith: deletingIdentifiers))
     }
 
     // MARK: Getting

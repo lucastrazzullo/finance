@@ -7,28 +7,31 @@
 
 import SwiftUI
 
-struct OverviewListView<ViewModel: OverviewListViewModel>: View {
-
-    @ObservedObject var viewModel: ViewModel
+struct OverviewListView: View {
 
     @State private var month: Int = Calendar.current.component(.month, from: .now)
     @State private var addNewTransactionIsPresented: Bool = false
 
+    let overview: YearlyBudgetOverview
+    let addTransactions: ([Transaction]) async throws -> Void
+
     var body: some View {
         NavigationView {
             List {
-                if viewModel.overviews(for: month).count > 0 {
+                let montlhyOverviews = overview.monthlyOverviews(month: month)
+                if montlhyOverviews.count > 0 {
                     Section(header: Text("All Overviews")) {
-                        ForEach(viewModel.overviews(for: month), id: \.self) { overview in
+                        ForEach(montlhyOverviews, id: \.self) { overview in
                             MonthlyBudgetOverviewItem(overview: overview)
                                 .listRowSeparator(.hidden)
                         }
                     }
                 }
 
-                if viewModel.overviewsWithLowestAvailability(for: month).count > 0 {
+                let monthlyOverviewsWithLowestAvailability = overview.monthlyOverviewsWithLowestAvailability(month: month)
+                if monthlyOverviewsWithLowestAvailability.count > 0 {
                     Section(header: Text("Lowest budgets this month")) {
-                        ForEach(viewModel.overviewsWithLowestAvailability(for: month), id: \.self) { overview in
+                        ForEach(monthlyOverviewsWithLowestAvailability, id: \.self) { overview in
                             MonthlyBudgetOverviewItem(overview: overview)
                                 .listRowSeparator(.hidden)
                         }
@@ -45,8 +48,8 @@ struct OverviewListView<ViewModel: OverviewListViewModel>: View {
 
                 ToolbarItem(placement: .principal) {
                     DefaultToolbar(
-                        title: viewModel.title,
-                        subtitle: viewModel.subtitle
+                        title: String(overview.year),
+                        subtitle: overview.name
                     )
                 }
 
@@ -56,50 +59,22 @@ struct OverviewListView<ViewModel: OverviewListViewModel>: View {
                     }
                 }
             })
-            .onAppear(perform: { Task { try? await viewModel.fetch() }})
             .sheet(isPresented: $addNewTransactionIsPresented) {
-                AddTransactionsView(budgets: viewModel.overview.budgets) { transactions in
-                    Task {
-                        try await viewModel.add(transactions: transactions)
-                        addNewTransactionIsPresented = false
-                    }
-                }
+                AddTransactionsView(budgets: overview.budgets, onSubmit: add(transactions:))
             }
         }
+    }
+
+    // MARK: Private helper methods
+
+    private func add(transactions: [Transaction]) async throws {
+        try await addTransactions(transactions)
+        addNewTransactionIsPresented = false
     }
 }
 
 struct OverviewView_Previews: PreviewProvider {
     static var previews: some View {
-        OverviewListView(viewModel: MockOverviewListViewModel(overview: Mocks.overview))
-    }
-}
-
-final class MockOverviewListViewModel: OverviewListViewModel {
-
-    private(set) var overview: YearlyBudgetOverview
-
-    init(overview: YearlyBudgetOverview) {
-        self.overview = overview
-    }
-
-    var title: String {
-        overview.name
-    }
-
-    var subtitle: String {
-        String(overview.year)
-    }
-
-    func fetch() async throws {
-        overview = Mocks.overview
-    }
-
-    func add(transactions: [Transaction]) async throws {
-        overview.append(transactions: transactions)
-    }
-
-    func overviews(for month: Int) -> [MonthlyBudgetOverview] {
-        overview.monthlyOverviews(month: month)
+        OverviewListView(overview: Mocks.overview, addTransactions: { _ in })
     }
 }

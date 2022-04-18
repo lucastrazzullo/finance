@@ -96,6 +96,10 @@ extension Array where Element == BudgetSlice {
     }
 
     func with(identifier: BudgetSlice.ID) -> BudgetSlice? {
-        self.first(where: { $0.id == identifier })
+        return self.first(where: { $0.id == identifier })
+    }
+
+    func at(offsets: IndexSet) -> [BudgetSlice] {
+        return NSArray(array: self).objects(at: offsets) as? [BudgetSlice] ?? []
     }
 }

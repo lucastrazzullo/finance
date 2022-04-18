@@ -21,9 +21,10 @@ struct AddTransactionsView: View {
         NavigationView {
             List {
                 ForEach(budgets(for: transactions), id: \.self) { budget in
-                    let headerViewModel = SectionHeader.ViewModel(budget: budget)
+                    let budgetTransactions = transactions(forBudgetWith: budget.id)
+                    let headerViewModel = SectionHeader.ViewModel(budget: budget, amount: budgetTransactions.totalAmount)
                     Section(header: SectionHeader(viewModel: headerViewModel)) {
-                        ForEach(transactions(forBudgetWith: budget.id), id: \.self) { transaction in
+                        ForEach(budgetTransactions, id: \.self) { transaction in
                             let sliceName = sliceName(for: transaction.budgetSliceId, inBudgetWith: budget.id) ?? "--"
                             let viewModel = TransactionItem.ViewModel(sliceName: sliceName, date: transaction.date, amount: transaction.amount)
                             TransactionItem(viewModel: viewModel)
@@ -47,7 +48,7 @@ struct AddTransactionsView: View {
                         InlineErrorView(error: error)
                     }
 
-                    Button(action: submit) {
+                    Button(action: save) {
                         Text("Save")
                     }
                     .buttonStyle(.borderedProminent)
@@ -60,24 +61,19 @@ struct AddTransactionsView: View {
             .navigationTitle("Add transactions")
             .navigationBarTitleDisplayMode(.inline)
             .sheet(isPresented: $addNewTransactionPresented) {
-                NewTransactionView(budgets: budgets) { transaction in
-                    transactions.append(transaction)
-                    addNewTransactionPresented = false
-                }
+                NewTransactionView(budgets: budgets, onSubmit: add(transaction:))
             }
         }
     }
 
-    // MARK: Object life cycle
-
-    init(budgets: [Budget], onSubmit: @escaping ([Transaction]) async throws -> Void) {
-        self.budgets = budgets
-        self.onSubmit = onSubmit
-    }
-
     // MARK: Private helper methods
 
-    private func submit() {
+    private func add(transaction: Transaction) async throws {
+        transactions.append(transaction)
+        addNewTransactionPresented = false
+    }
+
+    private func save() {
         Task {
             do {
                 try await onSubmit(transactions)
@@ -118,20 +114,20 @@ struct AddTransactionsView: View {
 private struct SectionHeader: View {
 
     struct ViewModel: Hashable {
-        let icon: Icon
+        let icon: SystemIcon?
         let label: String
         let amount: MoneyValue
 
-        init(icon: Icon, label: String, amount: MoneyValue) {
+        init(icon: SystemIcon?, label: String, amount: MoneyValue) {
             self.icon = icon
             self.label = label
             self.amount = amount
         }
 
-        init(budget: Budget) {
+        init(budget: Budget, amount: MoneyValue) {
             self.icon = budget.icon
             self.label = budget.name
-            self.amount = budget.amount
+            self.amount = amount
         }
     }
 
@@ -139,7 +135,7 @@ private struct SectionHeader: View {
 
     var body: some View {
         HStack {
-            if case .system(let systemIcon) = viewModel.icon {
+            if let systemIcon = viewModel.icon {
                 Image(systemName: systemIcon.rawValue)
             }
             Text(viewModel.label)

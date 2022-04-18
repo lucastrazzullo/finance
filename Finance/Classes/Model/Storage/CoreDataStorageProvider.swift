@@ -11,6 +11,8 @@ import CoreText
 final class CoreDataStorageProvider: StorageProvider {
 
     private static let storageContainerName = "Finance"
+    private static let overviewIdentifier = UUID.init()
+    private static let overviewYear = 2022
 
     private let persistentContainer: NSPersistentContainer
 
@@ -25,12 +27,9 @@ final class CoreDataStorageProvider: StorageProvider {
 
     // MARK: Fetch
 
-    func fetchYearlyOverview(year: Int) async throws -> YearlyBudgetOverview {
-        let budgets = try await fetchBudgets(year: year)
-        let transactions = try await fetchTransactions(year: year)
-
-        let overview = try YearlyBudgetOverview(name: "Default Overview", year: year, budgets: budgets, transactions: transactions)
-        return overview
+    func fetchTransactions(year: Int) async throws -> [Transaction] {
+        let entities = try fetchTransactionEntities(year: year)
+        return entities.compactMap { Transaction.with(transactionEntity: $0) }
     }
 
     func fetchBudgets(year: Int) async throws -> [Budget] {
@@ -38,17 +37,17 @@ final class CoreDataStorageProvider: StorageProvider {
         return budgetEntities.compactMap { return try? Budget.with(budgetEntity: $0) }
     }
 
-    func fetch(budgetWith identifier: Budget.ID) async throws -> Budget {
-        let budgetEntity = try fetchBudgetEntity(with: identifier)
-        return try Budget.with(budgetEntity: budgetEntity)
-    }
-
-    func fetchTransactions(year: Int) async throws -> [Transaction] {
-        let entities = try fetchTransactionEntities(year: year)
-        return entities.compactMap { Transaction.with(transactionEntity: $0) }
-    }
-
     // MARK: Add
+
+    func add(transaction: Transaction) async throws {
+        let transactionEntity = TransactionEntity(context: self.persistentContainer.viewContext)
+        transactionEntity.amount = NSDecimalNumber(decimal: transaction.amount.value)
+        transactionEntity.date = transaction.date
+        transactionEntity.budgetSliceIdentifier = transaction.budgetSliceId
+        transactionEntity.contentDescription = transaction.description
+
+        try saveOrRollback()
+    }
 
     func add(budget: Budget) async throws {
         let budgetEntity = BudgetEntity(context: persistentContainer.viewContext)
@@ -67,30 +66,17 @@ final class CoreDataStorageProvider: StorageProvider {
         try saveOrRollback()
     }
 
-    func add(transaction: Transaction) async throws {
-        let transactionEntity = TransactionEntity(context: self.persistentContainer.viewContext)
-        transactionEntity.amount = NSDecimalNumber(decimal: transaction.amount.value)
-        transactionEntity.date = transaction.date
-        transactionEntity.budgetSliceIdentifier = transaction.budgetSliceId
-        transactionEntity.contentDescription = transaction.description
-
-        try saveOrRollback()
-    }
-
     // MARK: Delete
 
-    func delete(budgetsWith identifiers: Set<Budget.ID>) async throws -> Set<Budget.ID> {
-        var deletedBudgetIdentifiers: Set<Budget.ID> = []
+    func delete(budgetsWith identifiers: Set<Budget.ID>) async throws {
         let budgetsEntities = try fetchBudgetEntities()
         budgetsEntities.forEach { budgetEntity in
             if let identifier = budgetEntity.identifier, identifiers.contains(identifier) {
                 self.persistentContainer.viewContext.delete(budgetEntity)
-                deletedBudgetIdentifiers.insert(identifier)
             }
         }
 
         try saveOrRollback()
-        return deletedBudgetIdentifiers
     }
 
     func delete(slicesWith identifiers: Set<BudgetSlice.ID>, inBudgetWith id: Budget.ID) async throws {
@@ -106,7 +92,7 @@ final class CoreDataStorageProvider: StorageProvider {
 
     // MARK: Update
 
-    func update(name: String, iconSystemName: String?, inBudgetWith id: Budget.ID) async throws {
+    func update(name: String, iconSystemName: String, inBudgetWith id: Budget.ID) async throws {
         let budgetEntity = try fetchBudgetEntity(with: id)
         budgetEntity.name = name
         budgetEntity.systemIconName = iconSystemName
@@ -211,13 +197,7 @@ final class CoreDataStorageProvider: StorageProvider {
         budgetEntity.identifier = budget.id
         budgetEntity.year = Int64(budget.year)
         budgetEntity.name = budget.name
-
-        switch budget.icon {
-        case .system(let systemIcon):
-            budgetEntity.systemIconName = systemIcon.rawValue
-        case .none:
-            break
-        }
+        budgetEntity.systemIconName = budget.icon.rawValue
 
         budgetEntity.slices = NSSet(array: budget.slices.map { slice in
             let sliceEntity = BudgetSliceEntity(context: persistentContainer.viewContext)
@@ -272,19 +252,13 @@ private extension Budget {
     static func with(budgetEntity: BudgetEntity) throws -> Budget {
         guard let identifier = budgetEntity.identifier,
               let name = budgetEntity.name,
+              let systemIconName = budgetEntity.systemIconName,
+              let icon = SystemIcon(rawValue: systemIconName),
               let slices = budgetEntity.slices else {
                   throw DomainError.storageProvider(error: .cannotCreateBudgetWithEntity)
         }
 
         let year = Int(budgetEntity.year)
-        let icon: Icon = {
-            if let systemIconName = budgetEntity.systemIconName,
-               let systemIcon = SystemIcon(rawValue: systemIconName) {
-                return .system(icon: systemIcon)
-            } else {
-                return .none
-            }
-        }()
 
         let budgetSlices = try slices
             .compactMap { $0 as? BudgetSliceEntity }

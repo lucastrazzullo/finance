@@ -15,7 +15,7 @@ struct Budget: Identifiable, Hashable, AmountHolder {
 
     let id: ID
     let year: Int
-    private(set) var icon: Icon
+    private(set) var icon: SystemIcon
     private(set) var name: String
     private(set) var slices: [BudgetSlice]
 
@@ -25,14 +25,14 @@ struct Budget: Identifiable, Hashable, AmountHolder {
 
     // MARK: Object life cycle
 
-    init(id: ID = .init(), year: Int, name: String, icon: Icon, monthlyAmount: MoneyValue) throws {
+    init(id: ID = .init(), year: Int, name: String, icon: SystemIcon, monthlyAmount: MoneyValue) throws {
         let slices = [
             try BudgetSlice(id: .init(), name: Self.defaultSliceName, configuration: .monthly(amount: monthlyAmount))
         ]
         try self.init(id: id, year: year, name: name, icon: icon, slices: slices)
     }
 
-    init(id: ID = .init(), year: Int, name: String, icon: Icon, slices: [BudgetSlice]) throws {
+    init(id: ID = .init(), year: Int, name: String, icon: SystemIcon, slices: [BudgetSlice]) throws {
         try Self.canUse(name: name)
         try Self.canUse(slices: slices)
 
@@ -57,56 +57,36 @@ struct Budget: Identifiable, Hashable, AmountHolder {
             }
     }
 
-    func sliceIdentifiers(at indices: IndexSet) -> Set<BudgetSlice.ID> {
-        return Set(slices(at: indices).map(\.id))
+    func sliceIdentifiers(at offsets: IndexSet) -> Set<BudgetSlice.ID> {
+        return Set(slices(at: offsets).map(\.id))
     }
 
-    func slices(at indices: IndexSet) -> [BudgetSlice] {
+    func slices(at offsets: IndexSet) -> [BudgetSlice] {
         return slices
             .enumerated()
-            .filter({ index, slice in indices.contains(index) })
+            .filter({ index, slice in offsets.contains(index) })
             .map(\.element)
     }
 
     // MARK: Mutating methods
 
-    /// Updates name in budget
-    /// Parameters:
-    ///     - name: New name of the budget
-    ///
     mutating func update(name: String) throws {
         try willUpdate(name: name)
         self.name = name
     }
 
-    /// Updates the icon for the budget
-    /// Parameters:
-    ///     - iconSystemName: The system name of an SFSymbol
-    ///
-    mutating func update(icon: Icon) throws {
+    mutating func update(icon: SystemIcon) throws {
         self.icon = icon
     }
 
-    /// Appends a slice to the list
-    /// Parameters:
-    ///     - slice: Slice to append
-    ///     - throws: This method checks whether the slices can be added based on the business logic defined in Budget
-    ///
     mutating func append(slice: BudgetSlice) throws {
         try willAdd(slice: slice)
         slices.append(slice)
     }
 
-    /// Deletes slices at offsets
-    /// Parameters:
-    ///     - offsets: Offsets of slices to delete
-    ///     - throws: This method checks whether the slices can be removed based on the business logic defined in Budget
-    ///
-    mutating func delete(slicesAt indices: IndexSet) throws {
-        var updatedSlices = slices
-        updatedSlices.remove(atOffsets: indices)
-        try Self.canUse(slices: updatedSlices)
-        slices = updatedSlices
+    mutating func delete(slicesWith identifiers: Set<BudgetSlice.ID>) throws {
+        try willDelete(slicesWith: identifiers)
+        slices.removeAll(where: { identifiers.contains($0.id) })
     }
 
     // MARK: Helpers
@@ -158,10 +138,7 @@ extension Array where Element == Budget {
     }
 
     func at(offsets: IndexSet) -> [Budget] {
-        return self
-            .enumerated()
-            .filter { index, budget -> Bool in indices.contains(index) }
-            .map(\.element)
+        return NSArray(array: self).objects(at: offsets) as? [Budget] ?? []
     }
 
     func at(index: Int) -> Budget? {

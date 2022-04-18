@@ -9,12 +9,11 @@ import Foundation
 
 enum Mocks {
 
-    static let year: Int = 2022
-
     // MARK: - Overview
 
+    static let year: Int = YearlyBudgetOverview.defaultYear
     static let overview: YearlyBudgetOverview = {
-        try! YearlyBudgetOverview(name: "Amsterdam", year: year, budgets: Mocks.budgets, transactions: Mocks.transactions)
+        try! YearlyBudgetOverview(budgets: Mocks.budgets, transactions: Mocks.transactions)
     }()
 
     // MARK: - Budget
@@ -39,14 +38,14 @@ enum Mocks {
     }()
 
     static let budgets: [Budget] = {
-        [
-            try! .init(id: UUID(), year: year, name: "House", icon: .system(icon: .house), slices: Mocks.houseSlices),
-            try! .init(id: UUID(), year: year, name: "Groceries", icon: .system(icon: .food), slices: Mocks.groceriesSlices),
-            try! .init(id: UUID(), year: year, name: "Health", icon: .system(icon: .health), monthlyAmount: .value(200.01)),
-            try! .init(id: UUID(), year: year, name: "Luca", icon: .system(icon: .face2), monthlyAmount: .value(250.01)),
-            try! .init(id: UUID(), year: year, name: "Travel", icon: .system(icon: .travel), monthlyAmount: .value(1000.00)),
-            try! .init(id: UUID(), year: year, name: "Ilenia", icon: .system(icon: .face), monthlyAmount: .value(1000.00)),
-            try! .init(id: UUID(), year: year, name: "Car", icon: .system(icon: .car), monthlyAmount: .value(1000.00)),
+        return [
+            try! .init(id: UUID(), year: year, name: "House", icon: .house, slices: Mocks.houseSlices),
+            try! .init(id: UUID(), year: year, name: "Groceries", icon: .food, slices: Mocks.groceriesSlices),
+            try! .init(id: UUID(), year: year, name: "Health", icon: .health, monthlyAmount: .value(200.01)),
+            try! .init(id: UUID(), year: year, name: "Luca", icon: .face2, monthlyAmount: .value(250.01)),
+            try! .init(id: UUID(), year: year, name: "Travel", icon: .travel, monthlyAmount: .value(1000.00)),
+            try! .init(id: UUID(), year: year, name: "Ilenia", icon: .face, monthlyAmount: .value(1000.00)),
+            try! .init(id: UUID(), year: year, name: "Car", icon: .car, monthlyAmount: .value(1000.00)),
         ]
     }()
 
@@ -80,12 +79,15 @@ enum Mocks {
     }()
 
     static let transactions: [Transaction] = {
-        [
-            Transaction(description: nil, amount: .value(100), date: .now, budgetSliceId: houseSlices[0].id),
-            Transaction(description: nil, amount: .value(100), date: .now, budgetSliceId: houseSlices[1].id),
-            Transaction(description: nil, amount: .value(100), date: .now, budgetSliceId: houseSlices[2].id),
-            Transaction(description: nil, amount: .value(1000), date: .now, budgetSliceId: groceriesSlices[0].id),
-            Transaction(description: nil, amount: .value(1000), date: .now, budgetSliceId: groceriesSlices[1].id)
+        var components = DateComponents()
+        components.year = year
+        let date = Calendar.current.date(from: components)!
+        return [
+            Transaction(description: nil, amount: .value(100), date: date, budgetSliceId: houseSlices[0].id),
+            Transaction(description: nil, amount: .value(100), date: date, budgetSliceId: houseSlices[1].id),
+            Transaction(description: nil, amount: .value(100), date: date, budgetSliceId: houseSlices[2].id),
+            Transaction(description: nil, amount: .value(1000), date: date, budgetSliceId: groceriesSlices[0].id),
+            Transaction(description: nil, amount: .value(1000), date: date, budgetSliceId: groceriesSlices[1].id)
         ]
     }()
 }
@@ -100,37 +102,21 @@ final class MockStorageProvider: StorageProvider {
 
     // MARK: Object life cycle
 
-    init(budgets: [Budget] = [], transactions: [Transaction] = []) throws {
-        let year = budgets.first?.year ?? Mocks.year
-        self.overview = try YearlyBudgetOverview(
-            name: "Mock Overview",
-            year: year,
-            budgets: budgets,
-            transactions: transactions
-        )
+    init() {
+        self.overview = YearlyBudgetOverview.empty
+    }
+
+    init(budgets: [Budget], transactions: [Transaction]) throws {
+        self.overview = try YearlyBudgetOverview(budgets: budgets, transactions: transactions)
     }
 
     // MARK: Fetch
-
-    func fetchYearlyOverview(year: Int) async throws -> YearlyBudgetOverview {
-        guard overview.year == year else {
-            throw DomainError.storageProvider(error: .overviewEntityNotFound)
-        }
-        return overview
-    }
 
     func fetchBudgets(year: Int) async throws -> [Budget] {
         guard overview.year == year else {
             throw DomainError.storageProvider(error: .overviewEntityNotFound)
         }
         return overview.budgets
-    }
-
-    func fetch(budgetWith identifier: Budget.ID) async throws -> Budget {
-        guard let budget = overview.budgets.with(identifier: identifier) else {
-            throw DomainError.storageProvider(error: .budgetEntityNotFound)
-        }
-        return budget
     }
 
     func fetchTransactions(year: Int) async throws -> [Transaction] {
@@ -142,64 +128,34 @@ final class MockStorageProvider: StorageProvider {
 
     // MARK: Add
 
+    func add(transaction: Transaction) async throws {
+        try overview.append(transactions: [transaction])
+    }
+
     func add(budget: Budget) async throws {
         try overview.append(budget: budget)
     }
 
     func add(slice: BudgetSlice, toBudgetWith id: Budget.ID) async throws {
-        guard var budget = overview.budgets.with(identifier: id) else {
-            throw DomainError.storageProvider(error: .budgetEntityNotFound)
-        }
-
-        try budget.append(slice: slice)
-
-        overview.delete(budgetsWithIdentifiers: [id])
-        try overview.append(budget: budget)
-    }
-
-    func add(transaction: Transaction) async throws {
-        overview.append(transactions: [transaction])
+        try overview.append(slice: slice, toBudgetWith: id)
     }
 
     // MARK: Delete
 
-    func delete(budgetsWith identifiers: Set<Budget.ID>) async throws -> Set<Budget.ID> {
-        let budgets = overview.budgets.with(identifiers: identifiers)
-
-        guard !budgets.isEmpty else {
-            throw DomainError.storageProvider(error: .budgetEntityNotFound)
-        }
-
+    func delete(budgetsWith identifiers: Set<Budget.ID>) async throws {
         overview.delete(budgetsWithIdentifiers: identifiers)
-        return Set(budgets.map(\.id))
     }
 
-    func delete(slicesWith identifiers: Set<BudgetSlice.ID>, inBudgetWith id: Budget.ID) async throws {
-        guard var budget = overview.budgets.with(identifier: id) else {
-            throw DomainError.storageProvider(error: .budgetEntityNotFound)
-        }
-
-        let indices = IndexSet(budget.slices.compactMap({ budget.slices.firstIndex(of: $0) }))
-        try budget.delete(slicesAt: indices)
-
-        overview.delete(budgetsWithIdentifiers: [id])
-        try overview.append(budget: budget)
+    func delete(slicesWith identifiers: Set<BudgetSlice.ID>, inBudgetWith identifier: Budget.ID) async throws {
+        try overview.delete(slicesWith: identifiers, inBudgetWith: identifier)
     }
 
     // MARK: Update
 
-    func update(name: String, iconSystemName: String?, inBudgetWith id: Budget.ID) async throws {
-        guard var budget = overview.budgets.with(identifier: id) else {
-            throw DomainError.storageProvider(error: .budgetEntityNotFound)
+    func update(name: String, iconSystemName: String, inBudgetWith id: Budget.ID) async throws {
+        guard let icon = SystemIcon(rawValue: iconSystemName) else {
+            throw DomainError.storageProvider(error: .cannotCreateBudgetWithEntity)
         }
-
-        try budget.update(name: name)
-
-        if let iconSystemName = iconSystemName, let icon = SystemIcon(rawValue: iconSystemName) {
-            try budget.update(icon: .system(icon: icon))
-        }
-
-        overview.delete(budgetsWithIdentifiers: [id])
-        try overview.append(budget: budget)
+        try overview.update(name: name, icon: icon, forBudgetWith: id)
     }
 }

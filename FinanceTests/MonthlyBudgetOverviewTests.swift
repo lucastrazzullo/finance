@@ -37,7 +37,7 @@ final class MonthlyBudgetOverviewTests: XCTestCase {
     private func makeOverview(startingAmount: Decimal, expenses: Decimal) -> MonthlyBudgetOverview {
         MonthlyBudgetOverview(
             name: "Name",
-            icon: .none,
+            icon: .default,
             startingAmount: .value(startingAmount),
             totalExpenses: .value(expenses)
         )

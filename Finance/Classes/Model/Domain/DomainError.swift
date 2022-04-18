@@ -63,6 +63,7 @@ enum DomainError: Error, Identifiable {
 enum BudgetOverviewError: DomainUnderlyingError {
 
     case nameNotValid
+    case budgetNotFound
     case budgetsListNotValid
     case budgetAlreadyExistsWith(name: String)
     case cannotAddBudget
@@ -77,6 +78,8 @@ enum BudgetOverviewError: DomainUnderlyingError {
         switch self {
         case .nameNotValid:
             return "Name not valid!"
+        case .budgetNotFound:
+            return "Budget not fouond!"
         case .budgetsListNotValid:
             return "Budget list not valid!"
         case .budgetAlreadyExistsWith(let name):

@@ -9,20 +9,34 @@ import SwiftUI
 
 struct DashboardView: View {
 
-    @Environment(\.repository) private var repository
-
     let overview: YearlyBudgetOverview
+    let addTransactions: ([Transaction]) async throws -> Void
+    let addBudget: (Budget) async throws -> Void
+    let deleteBudgets: (Set<Budget.ID>) async throws -> Void
+    let addSliceToBudget: (BudgetSlice, Budget.ID) async throws -> Void
+    let deleteSlices: (Set<BudgetSlice.ID>, Budget.ID) async throws -> Void
+    let updateNameAndIcon: (String, SystemIcon, Budget.ID) async throws -> Void
 
     var body: some View {
         TabView {
-            let overviewListViewModel = RepositoryBackedOverviewListViewModel(overview: overview, repository: repository)
-            OverviewListView(viewModel: overviewListViewModel)
+            OverviewListView(
+                overview: overview,
+                addTransactions: addTransactions
+            )
             .tabItem {
                 Label("Overview", systemImage: "list.bullet.below.rectangle")
             }
 
-            let budgetsListViewModel = RepositoryBackedBudgetsListViewModel(overview: overview, repository: repository)
-            BudgetsListView(viewModel: budgetsListViewModel)
+            BudgetsListView(
+                year: overview.year,
+                name: overview.name,
+                budgets: overview.budgets,
+                addBudget: addBudget,
+                deleteBudgets: deleteBudgets,
+                addSliceToBudget: addSliceToBudget,
+                deleteSlices: deleteSlices,
+                updateNameAndIcon: updateNameAndIcon
+            )
             .tabItem {
                 Label("Budgets", systemImage: "list.dash")
                     .accessibilityIdentifier(AccessibilityIdentifier.DashboardView.budgetsTab)
@@ -33,6 +47,14 @@ struct DashboardView: View {
 
 struct DashboardView_Previews: PreviewProvider {
     static var previews: some View {
-        DashboardView(overview: Mocks.overview)
+        DashboardView(
+            overview: Mocks.overview,
+            addTransactions: { _ in },
+            addBudget: { _ in },
+            deleteBudgets: { _ in },
+            addSliceToBudget: { _, _ in },
+            deleteSlices: { _, _ in },
+            updateNameAndIcon: { _, _, _  in }
+        )
     }
 }

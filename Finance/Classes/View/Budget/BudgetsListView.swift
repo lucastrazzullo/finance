@@ -7,43 +7,48 @@
 
 import SwiftUI
 
-struct BudgetsListView<ViewModel: BudgetsListViewModel>: View {
-
-    @Environment(\.repository) private var repository
-
-    @ObservedObject private var viewModel: ViewModel
+struct BudgetsListView: View {
 
     @State private var deleteBudgetError: DomainError?
     @State private var addNewBudgetIsPresented: Bool = false
+
+    let year: Int
+    let name: String
+    let budgets: [Budget]
+
+    let addBudget: (Budget) async throws -> Void
+    let deleteBudgets: (Set<Budget.ID>) async throws -> Void
+    let addSliceToBudget: (BudgetSlice, Budget.ID) async throws -> Void
+    let deleteSlices: (Set<BudgetSlice.ID>, Budget.ID) async throws -> Void
+    let updateNameAndIcon: (String, SystemIcon, Budget.ID) async throws -> Void
 
     var body: some View {
         NavigationView {
             List {
                 Section(header: Text("Budgets")) {
-                    ForEach(viewModel.budgets) { budget in
-                        let viewModel = RepositoryBackedBudgetViewModel(budget: budget, repository: repository)
-                        NavigationLink(destination: { BudgetView(viewModel: viewModel) }) {
+                    ForEach(budgets) { budget in
+                        NavigationLink(destination: {
+                            BudgetView(
+                                budget: budget,
+                                addSliceToBudget: addSliceToBudget,
+                                deleteSlices: deleteSlices,
+                                updateNameAndIcon: updateNameAndIcon
+                            )
+                        }, label: {
                             HStack {
-                                Label(viewModel.name, systemImage: viewModel.systemIcon.rawValue)
+                                Label(budget.name, systemImage: budget.icon.rawValue)
                                     .symbolRenderingMode(.hierarchical)
                                     .font(.body.bold())
                                     .accentColor(.secondary)
                                 Spacer()
-                                AmountView(amount: viewModel.amount)
+                                AmountView(amount: budget.amount)
                             }
                             .padding(.vertical, 8)
-                        }
+                        })
                         .accessibilityIdentifier(AccessibilityIdentifier.BudgetsListView.budgetLink)
                     }
-                    .onDelete { indices in
-                        Task {
-                            do {
-                                try await viewModel.delete(budgetsAt: indices)
-                                deleteBudgetError = nil
-                            } catch {
-                                deleteBudgetError = error as? DomainError
-                            }
-                        }
+                    .onDelete { offsets in
+                        Task { await delete(offsets: offsets) }
                     }
 
                     Button(action: { addNewBudgetIsPresented = true }) {
@@ -58,55 +63,50 @@ struct BudgetsListView<ViewModel: BudgetsListViewModel>: View {
             .toolbar(content: {
                 ToolbarItem(placement: .principal) {
                     DefaultToolbar(
-                        title: viewModel.title,
-                        subtitle: viewModel.subtitle
+                        title: String(year),
+                        subtitle: name
                     )
                 }
             })
-            .onAppear(perform: { Task { try? await viewModel.fetch() }})
             .sheet(isPresented: $addNewBudgetIsPresented) {
-                NewBudgetView(year: viewModel.year) { budget in
-                    try await viewModel.add(budget: budget)
-                    addNewBudgetIsPresented = false
-                }
+                NewBudgetView(year: year, onSubmit: add(budget:))
             }
         }
     }
 
-    // MARK: Object life cycle
+    // MARK: Private helper methods
 
-    init(viewModel: ViewModel) {
-        self.viewModel = viewModel
+    private func add(budget: Budget) async throws {
+        try await addBudget(budget)
+        addNewBudgetIsPresented = false
+    }
+
+    private func delete(offsets: IndexSet) async {
+        do {
+            let identifiers = budgets.at(offsets: offsets).map(\.id)
+            let identifiersSet = Set(identifiers)
+            try await deleteBudgets(identifiersSet)
+            deleteBudgetError = nil
+        } catch {
+            deleteBudgetError = error as? DomainError
+        }
     }
 }
 
 // MARK: - Previews
 
 struct BudgetsListView_Previews: PreviewProvider {
+    static let overview = Mocks.overview
     static var previews: some View {
-        BudgetsListView(viewModel: MockBudgetsListViewModel(year: Mocks.year))
-    }
-}
-
-final class MockBudgetsListViewModel: BudgetsListViewModel {
-    let year: Int
-    let title: String = "Title"
-    let subtitle: String = "Subtitle"
-    var budgets: [Budget] = []
-
-    init(year: Int) {
-        self.year = year
-    }
-
-    func fetch() async {
-        budgets = Mocks.budgets
-    }
-
-    func add(budget: Budget) async throws {
-        budgets.append(budget)
-    }
-
-    func delete(budgetsAt indices: IndexSet) async throws {
-        budgets.remove(atOffsets: indices)
+        BudgetsListView(
+            year: overview.year,
+            name: overview.name,
+            budgets: overview.budgets,
+            addBudget: { _ in },
+            deleteBudgets: { _ in},
+            addSliceToBudget: { _, _ in },
+            deleteSlices: { _, _ in },
+            updateNameAndIcon: { _, _, _ in }
+        )
     }
 }

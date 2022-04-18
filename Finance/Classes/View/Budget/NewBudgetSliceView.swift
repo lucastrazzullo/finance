@@ -66,11 +66,7 @@ struct NewBudgetSliceView: View {
                 }
             }
             .sheet(isPresented: $isInsertNewSchedulePresented) {
-                NewBudgetSliceScheduleView { newSchedule in
-                    try BudgetSlice.willAdd(schedule: newSchedule, to: sliceSchedules)
-                    sliceSchedules.append(newSchedule)
-                    isInsertNewSchedulePresented = false
-                }
+                NewBudgetSliceScheduleView(onSubmit: add(schedule:))
             }
             .navigationTitle("New slice")
             .navigationBarTitleDisplayMode(.inline)
@@ -78,6 +74,12 @@ struct NewBudgetSliceView: View {
     }
 
     // MARK: Private helper methods
+
+    private func add(schedule: BudgetSlice.Schedule) throws {
+        try BudgetSlice.willAdd(schedule: schedule, to: sliceSchedules)
+        sliceSchedules.append(schedule)
+        isInsertNewSchedulePresented = false
+    }
 
     private func submit() {
         Task {

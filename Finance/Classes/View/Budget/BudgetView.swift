@@ -7,11 +7,9 @@
 
 import SwiftUI
 
-struct BudgetView<ViewModel: BudgetViewModel>: View {
+struct BudgetView: View {
 
     @Environment(\.editMode) private var editMode
-
-    @ObservedObject var viewModel: ViewModel
 
     @State private var updatingBudgetName: String
     @State private var updatingBudgetIcon: SystemIcon
@@ -24,10 +22,15 @@ struct BudgetView<ViewModel: BudgetViewModel>: View {
         editMode?.wrappedValue.isEditing == true
     }
 
+    let budget: Budget
+    let addSliceToBudget: (BudgetSlice, Budget.ID) async throws -> Void
+    let deleteSlices: (Set<BudgetSlice.ID>, Budget.ID) async throws -> Void
+    let updateNameAndIcon: (String, SystemIcon, Budget.ID) async throws -> Void
+
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             VStack {
-                AmountView(amount: viewModel.amount)
+                AmountView(amount: budget.amount)
             }
             .font(.headline)
             .frame(maxWidth: .infinity)
@@ -35,14 +38,14 @@ struct BudgetView<ViewModel: BudgetViewModel>: View {
 
             List {
                 if isEditing {
-                    InfoSection(saveAction: saveUpdatedValues, name: $updatingBudgetName, icon: $updatingBudgetIcon) {
+                    InfoSection(saveAction: saveUpdates, name: $updatingBudgetName, icon: $updatingBudgetIcon) {
                         if let error = updateBudgetInfoError, isEditing {
                             InlineErrorView(error: error)
                         }
                     }
                 }
 
-                SlicesListSection(slices: viewModel.slices, onDelete: isEditing ? deleteSlices(at:) : nil) {
+                SlicesListSection(slices: budget.slices, onDelete: isEditing ? delete : nil) {
                     if isEditing {
                         VStack {
                             Label("Add", systemImage: "plus")
@@ -58,17 +61,14 @@ struct BudgetView<ViewModel: BudgetViewModel>: View {
             .listStyle(.inset)
         }
         .sheet(isPresented: $isInsertNewSlicePresented) {
-            NewBudgetSliceView { newSlice in
-                try await viewModel.add(slice: newSlice)
-                isInsertNewSlicePresented = false
-            }
+            NewBudgetSliceView(onSubmit: add(slice:))
         }
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .principal) {
                 HStack {
-                    Text(isEditing ? updatingBudgetName : viewModel.name)
-                    Image(systemName: isEditing ? updatingBudgetIcon.rawValue : viewModel.systemIcon.rawValue)
+                    Text(isEditing ? updatingBudgetName : budget.name)
+                    Image(systemName: isEditing ? updatingBudgetIcon.rawValue : budget.icon.rawValue)
                         .symbolRenderingMode(.hierarchical)
                 }
                 .frame(maxWidth: .infinity)
@@ -77,45 +77,55 @@ struct BudgetView<ViewModel: BudgetViewModel>: View {
                 EditButton()
             }
         }
-        .onAppear(perform: { Task { try? await viewModel.fetch() }})
     }
 
     // MARK: Object life cycle
 
-    init(viewModel: ViewModel) {
-        self.viewModel = viewModel
-        self._updatingBudgetName = State<String>(wrappedValue: viewModel.name)
-        self._updatingBudgetIcon = State<SystemIcon>(wrappedValue: viewModel.systemIcon)
+    init(budget: Budget,
+         addSliceToBudget: @escaping (BudgetSlice, Budget.ID) async throws -> Void,
+         deleteSlices: @escaping (Set<BudgetSlice.ID>, Budget.ID) async throws -> Void,
+         updateNameAndIcon: @escaping (String, SystemIcon, Budget.ID) async throws -> Void) {
+
+        self.budget = budget
+        self.addSliceToBudget = addSliceToBudget
+        self.deleteSlices = deleteSlices
+        self.updateNameAndIcon = updateNameAndIcon
+
+        self._updatingBudgetName = State<String>(wrappedValue: budget.name)
+        self._updatingBudgetIcon = State<SystemIcon>(wrappedValue: budget.icon)
     }
 
     // MARK: Private helper methods
 
-    private func saveUpdatedValues() {
-        Task {
-            do {
-                try await viewModel.update(budgetName: updatingBudgetName, systemIcon: updatingBudgetIcon)
-                updateBudgetInfoError = nil
-            } catch {
-                updateBudgetInfoError = error as? DomainError
-            }
+    private func add(slice: BudgetSlice) async throws {
+        try await addSliceToBudget(slice, budget.id)
+        isInsertNewSlicePresented = false
+    }
+
+    private func delete(slicesAt offsets: IndexSet) async {
+        do {
+            let identifiers = budget.slices(at: offsets).map(\.id)
+            let identifiersSet = Set(identifiers)
+            try await deleteSlices(identifiersSet, budget.id)
+            deleteSlicesError = nil
+        } catch {
+            deleteSlicesError = error as? DomainError
         }
     }
 
-    private func deleteSlices(at indices: IndexSet) {
-        Task {
-            do {
-                try await viewModel.delete(slicesAt: indices)
-                deleteSlicesError = nil
-            } catch {
-                deleteSlicesError = error as? DomainError
-            }
+    private func saveUpdates() async {
+        do {
+            try await updateNameAndIcon(updatingBudgetName, updatingBudgetIcon, budget.id)
+            updateBudgetInfoError = nil
+        } catch {
+            updateBudgetInfoError = error as? DomainError
         }
     }
 }
 
 private struct InfoSection<Footer: View>: View {
 
-    let saveAction: () -> Void
+    let saveAction: () async -> Void
 
     @Binding var name: String
     @Binding var icon: SystemIcon
@@ -133,7 +143,7 @@ private struct InfoSection<Footer: View>: View {
                         .background(.quaternary)
                         .cornerRadius(6)
 
-                    Button(action: saveAction) {
+                    Button(action: { Task { await saveAction() } }) {
                         Text("Save")
                     }
                     .buttonStyle(BorderedButtonStyle())
@@ -149,7 +159,7 @@ private struct InfoSection<Footer: View>: View {
 private struct SlicesListSection<Footer: View>: View {
 
     let slices: [BudgetSlice]
-    let onDelete: ((IndexSet) -> Void)?
+    let onDelete: ((IndexSet) async -> Void)?
 
     @ViewBuilder var footer: () -> Footer
 
@@ -158,7 +168,7 @@ private struct SlicesListSection<Footer: View>: View {
             ForEach(slices, id: \.id) { slice in
                 BudgetSlicesListItem(slice: slice, totalBudgetAmount: slices.totalAmount)
             }
-            .onDelete(perform: onDelete)
+            .onDelete(perform: { indices in Task { await onDelete?(indices) }})
 
             footer()
         }
@@ -170,37 +180,12 @@ private struct SlicesListSection<Footer: View>: View {
 struct BudgetView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
-            BudgetView(viewModel: MockBudgetViewModel())
+            BudgetView(
+                budget: Mocks.budgets[0],
+                addSliceToBudget: { _, _ in },
+                deleteSlices: { _, _ in },
+                updateNameAndIcon: { _, _, _ in }
+            )
         }
-    }
-}
-
-final class MockBudgetViewModel: BudgetViewModel {
-    var name: String = "Car"
-    var icon: Icon = .system(icon: .car)
-    var slices: [BudgetSlice] = Mocks.houseSlices
-
-    var amount: MoneyValue {
-        slices.totalAmount
-    }
-
-    func fetch() async throws {
-    }
-
-    func update(budgetName name: String, systemIcon: SystemIcon) async throws {
-        self.name = name
-        self.icon = .system(icon: systemIcon)
-    }
-
-    func add(slice: BudgetSlice) async throws {
-        let budget = try Budget(year: 2000, name: name, icon: icon, slices: slices)
-        try budget.willAdd(slice: slice)
-        slices.append(slice)
-    }
-
-    func delete(slicesAt indices: IndexSet) async throws {
-        let budget = try Budget(year: 2000, name: name, icon: icon, slices: slices)
-        try budget.willDelete(slicesWith: budget.sliceIdentifiers(at: indices))
-        slices.remove(atOffsets: indices)
     }
 }

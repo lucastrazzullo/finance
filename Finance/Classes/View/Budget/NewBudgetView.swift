@@ -54,11 +54,7 @@ struct NewBudgetView: View {
                 }
             }
             .sheet(isPresented: $isInsertNewBudgetSlicePresented) {
-                NewBudgetSliceView { newSlice in
-                    try Budget.willAdd(slice: newSlice, to: budgetSlices)
-                    budgetSlices.append(newSlice)
-                    isInsertNewBudgetSlicePresented = false
-                }
+                NewBudgetSliceView(onSubmit: add(slice:))
             }
             .navigationTitle("New schedule")
             .navigationBarTitleDisplayMode(.inline)
@@ -67,13 +63,19 @@ struct NewBudgetView: View {
 
     // MARK: Private helper methods
 
+    private func add(slice: BudgetSlice) async throws {
+        try Budget.willAdd(slice: slice, to: budgetSlices)
+        budgetSlices.append(slice)
+        isInsertNewBudgetSlicePresented = false
+    }
+
     private func submit() {
         Task {
             do {
                 let budget = try Budget(
                     year: year,
                     name: budgetName,
-                    icon: .system(icon: budgetSystemIcon),
+                    icon: budgetSystemIcon,
                     slices: budgetSlices
                 )
 

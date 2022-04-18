@@ -10,7 +10,7 @@ import Foundation
 struct MonthlyBudgetOverview: Hashable {
 
     let name: String
-    let icon: Icon
+    let icon: SystemIcon
     let startingAmount: MoneyValue
     let totalExpenses: MoneyValue
 

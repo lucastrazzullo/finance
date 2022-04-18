@@ -15,12 +15,7 @@ struct MonthlyBudgetOverviewItem: View {
         HStack(alignment: .lastTextBaseline) {
             VStack(alignment: .leading, spacing: 4) {
                 HStack(alignment: .firstTextBaseline) {
-                    switch overview.icon {
-                    case .system(let systemIcon):
-                        Image(systemName: systemIcon.rawValue).symbolRenderingMode(.hierarchical)
-                    case .none:
-                        EmptyView()
-                    }
+                    Image(systemName: overview.icon.rawValue).symbolRenderingMode(.hierarchical)
                     Text(overview.name).font(.headline)
                 }
                 HStack(spacing: 2) {
@@ -92,7 +87,7 @@ struct MonthlyBudgetOverviewItem_Previews: PreviewProvider {
         MonthlyBudgetOverviewItem(
             overview: MonthlyBudgetOverview(
                 name: "Test Overview",
-                icon: .system(icon: .health),
+                icon: .health,
                 startingAmount: .value(1000),
                 totalExpenses: .value(100)
             )
