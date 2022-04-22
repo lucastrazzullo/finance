@@ -156,4 +156,16 @@ final class YearlyBudgetOverviewTests: XCTestCase {
         XCTAssertEqual(montlyOverview_month3.remainingAmount, .value(200))
     }
 
+    func testGetMonthlyOverview_withUnownedTransactions() throws {
+        let transaction1 = makeTransaction(year: 2000, month: 1, budgetSliceId: .init(), amount: .value(50))
+        let transaction2 = makeTransaction(year: 2000, month: 1, budgetSliceId: .init(), amount: .value(50))
+        let expenses = [transaction1, transaction2]
+        let yearlyOverview = YearlyBudgetOverview(name: "Name", year: 2000, budgets: [], expenses: expenses)
+
+        let overview = try XCTUnwrap(yearlyOverview.monthlyOverviews(month: 1).first)
+
+        XCTAssertEqual(overview.startingAmount, .zero)
+        XCTAssertEqual(overview.totalMonthExpenses, expenses.totalAmount)
+    }
+
 }

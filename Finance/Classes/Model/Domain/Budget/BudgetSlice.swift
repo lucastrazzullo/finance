@@ -56,10 +56,10 @@ struct BudgetSlice: Identifiable, Hashable, AmountHolder {
             throw DomainError.budgetSlice(error: .nameNotValid)
         }
         switch configuration {
-        case .monthly(let amount) where amount == .zero:
-            throw DomainError.budgetSlice(error: .amountNotValid)
         case .scheduled(let schedules) where schedules.isEmpty:
             throw DomainError.budgetSlice(error: .thereMustBeAtLeastOneSchedule)
+        case .monthly:
+            break
         default:
             break
         }

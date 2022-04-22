@@ -34,6 +34,7 @@ final class BudgetTests: XCTestCase {
     func testInstantiateBudget_withValidData() {
         XCTAssertNoThrow(try Budget(year: 2000, name: "Name", icon: .cat, monthlyAmount: .value(100)))
         XCTAssertNoThrow(try Budget(year: 2000, name: "Name", icon: .default, monthlyAmount: .value(100)))
+        XCTAssertNoThrow(try Budget(year: 2000, name: "Name", icon: .default, monthlyAmount: .zero))
         XCTAssertNoThrow(try Budget(year: 2000, name: "Name", icon: .default, slices: [
             try makeSlice(name: "Name"),
         ]))
@@ -45,7 +46,6 @@ final class BudgetTests: XCTestCase {
 
     func testInstantiateBudget_withInvalidData() {
         XCTAssertThrowsError(try Budget(year: 2000, name: "", icon: .default, monthlyAmount: .value(100)))
-        XCTAssertThrowsError(try Budget(year: 2000, name: "Name", icon: .default, monthlyAmount: .zero))
         XCTAssertThrowsError(try Budget(year: 2000, name: "Name", icon: .default, slices: []))
         XCTAssertThrowsError(try makeBudget(slices: [
             try makeSlice(name: "Name"),

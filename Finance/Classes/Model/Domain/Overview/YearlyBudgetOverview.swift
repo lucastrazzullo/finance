@@ -31,11 +31,20 @@ struct YearlyBudgetOverview: Identifiable {
     // MARK: Getters
 
     func monthlyOverviews(month: Int) -> [MonthlyBudgetOverview] {
-        budgets
+        var overviews = budgets
             .filter { $0.year == year }
             .compactMap { budget in
                 MonthlyBudgetOverview(month: month, budget: budget, expenses: expenses)
             }
+
+        let allSlicesIdentifiers = budgets.flatMap({ $0.slices.map(\.id) })
+        let unownedExpenses = expenses.filter { transaction in !allSlicesIdentifiers.contains(transaction.budgetSliceId) }
+        if unownedExpenses.count > 0, let unownedBudget = try? Budget(year: year, name: "Unowned", icon: .default, monthlyAmount: .zero) {
+            let unownedOverview = MonthlyBudgetOverview(month: month, budget: unownedBudget, expenses: unownedExpenses)
+            overviews.append(unownedOverview)
+        }
+
+        return overviews
     }
 
     func monthlyOverviewsWithLowestAvailability(month: Int) -> [MonthlyBudgetOverview] {
