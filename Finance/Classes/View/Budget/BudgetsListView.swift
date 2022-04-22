@@ -38,7 +38,7 @@ struct BudgetsListView<Header: ToolbarContent>: View {
                         .accessibilityIdentifier(AccessibilityIdentifier.BudgetsListView.budgetLink)
                     }
                     .onDelete { offsets in
-                        Task { await viewModel.delete(offsets: offsets) }
+                        Task { await viewModel.delete(budgetsAt: offsets) }
                     }
 
                     Button(action: { viewModel.addNewBudgetIsPresented = true }) {

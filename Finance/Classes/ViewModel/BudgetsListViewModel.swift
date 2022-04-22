@@ -50,7 +50,7 @@ protocol BudgetsListViewModelDelegate: AnyObject {
         addNewBudgetIsPresented = false
     }
 
-    func delete(offsets: IndexSet) async {
+    func delete(budgetsAt offsets: IndexSet) async {
         do {
             let identifiers = budgets.at(offsets: offsets).map(\.id)
             let identifiersSet = Set(identifiers)

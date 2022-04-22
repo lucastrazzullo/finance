@@ -37,6 +37,9 @@
 		818D0AE32812A9790007A6F6 /* BudgetValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 818D0AE22812A9790007A6F6 /* BudgetValidator.swift */; };
 		818D0AE52812AB1A0007A6F6 /* BudgetSliceValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 818D0AE42812AB1A0007A6F6 /* BudgetSliceValidator.swift */; };
 		818D0AE72812D0870007A6F6 /* DashboardViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 818D0AE62812D0870007A6F6 /* DashboardViewModelTests.swift */; };
+		818D0AEB2812E8860007A6F6 /* OverviewListViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 818D0AEA2812E8860007A6F6 /* OverviewListViewModelTests.swift */; };
+		818D0AED2812EB0A0007A6F6 /* BudgetsListViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 818D0AEC2812EB0A0007A6F6 /* BudgetsListViewModelTests.swift */; };
+		818D0AEF2812ED250007A6F6 /* BudgetViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 818D0AEE2812ED250007A6F6 /* BudgetViewModelTests.swift */; };
 		81947EAB27327FCF001C2AC9 /* FinanceApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81947EAA27327FCF001C2AC9 /* FinanceApp.swift */; };
 		81947EAF27327FD1001C2AC9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 81947EAE27327FD1001C2AC9 /* Assets.xcassets */; };
 		81947EB227327FD1001C2AC9 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 81947EB127327FD1001C2AC9 /* Preview Assets.xcassets */; };
@@ -128,6 +131,9 @@
 		818D0AE22812A9790007A6F6 /* BudgetValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetValidator.swift; sourceTree = "<group>"; };
 		818D0AE42812AB1A0007A6F6 /* BudgetSliceValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetSliceValidator.swift; sourceTree = "<group>"; };
 		818D0AE62812D0870007A6F6 /* DashboardViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardViewModelTests.swift; sourceTree = "<group>"; };
+		818D0AEA2812E8860007A6F6 /* OverviewListViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverviewListViewModelTests.swift; sourceTree = "<group>"; };
+		818D0AEC2812EB0A0007A6F6 /* BudgetsListViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetsListViewModelTests.swift; sourceTree = "<group>"; };
+		818D0AEE2812ED250007A6F6 /* BudgetViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetViewModelTests.swift; sourceTree = "<group>"; };
 		81947EA727327FCF001C2AC9 /* Finance.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Finance.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		81947EAA27327FCF001C2AC9 /* FinanceApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceApp.swift; sourceTree = "<group>"; };
 		81947EAE27327FD1001C2AC9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -287,11 +293,14 @@
 		817033EA27B25F9F001686FA /* FinanceTests */ = {
 			isa = PBXGroup;
 			children = (
-				818D0AE62812D0870007A6F6 /* DashboardViewModelTests.swift */,
 				816A24CB2801E02E00AAF8C0 /* BudgetTests.swift */,
 				81F3B90728041AB900A1B89F /* BudgetSliceTests.swift */,
 				81F3B90928041EAD00A1B89F /* YearlyBudgetOverviewTests.swift */,
 				81F3B90B28042F2100A1B89F /* MonthlyBudgetOverviewTests.swift */,
+				818D0AE62812D0870007A6F6 /* DashboardViewModelTests.swift */,
+				818D0AEA2812E8860007A6F6 /* OverviewListViewModelTests.swift */,
+				818D0AEC2812EB0A0007A6F6 /* BudgetsListViewModelTests.swift */,
+				818D0AEE2812ED250007A6F6 /* BudgetViewModelTests.swift */,
 			);
 			path = FinanceTests;
 			sourceTree = "<group>";
@@ -598,7 +607,10 @@
 				81F3B90C28042F2100A1B89F /* MonthlyBudgetOverviewTests.swift in Sources */,
 				81F3B90A28041EAD00A1B89F /* YearlyBudgetOverviewTests.swift in Sources */,
 				818D0AE72812D0870007A6F6 /* DashboardViewModelTests.swift in Sources */,
+				818D0AED2812EB0A0007A6F6 /* BudgetsListViewModelTests.swift in Sources */,
+				818D0AEB2812E8860007A6F6 /* OverviewListViewModelTests.swift in Sources */,
 				81F3B90828041AB900A1B89F /* BudgetSliceTests.swift in Sources */,
+				818D0AEF2812ED250007A6F6 /* BudgetViewModelTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
