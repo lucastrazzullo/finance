@@ -15,6 +15,7 @@ struct Budget: Identifiable, Hashable, AmountHolder {
 
     let id: ID
     let year: Int
+
     private(set) var icon: SystemIcon
     private(set) var name: String
     private(set) var slices: [BudgetSlice]
@@ -33,8 +34,8 @@ struct Budget: Identifiable, Hashable, AmountHolder {
     }
 
     init(id: ID = .init(), year: Int, name: String, icon: SystemIcon, slices: [BudgetSlice]) throws {
-        try Self.canUse(name: name)
-        try Self.canUse(slices: slices)
+        try BudgetValidator.canUse(name: name)
+        try BudgetValidator.canUse(slices: slices)
 
         self.id = id
         self.year = year
@@ -71,7 +72,7 @@ struct Budget: Identifiable, Hashable, AmountHolder {
     // MARK: Mutating methods
 
     mutating func update(name: String) throws {
-        try willUpdate(name: name)
+        try BudgetValidator.canUse(name: name)
         self.name = name
     }
 
@@ -80,50 +81,13 @@ struct Budget: Identifiable, Hashable, AmountHolder {
     }
 
     mutating func append(slice: BudgetSlice) throws {
-        try willAdd(slice: slice)
+        try BudgetValidator.willAdd(slice: slice, to: slices)
         slices.append(slice)
     }
 
     mutating func delete(slicesWith identifiers: Set<BudgetSlice.ID>) throws {
-        try willDelete(slicesWith: identifiers)
+        try BudgetValidator.willDelete(slicesWith: identifiers, from: slices)
         slices.removeAll(where: { identifiers.contains($0.id) })
-    }
-
-    // MARK: Helpers
-
-    func willUpdate(name: String) throws {
-        try Self.canUse(name: name)
-    }
-
-    func willAdd(slice: BudgetSlice) throws {
-        try Self.willAdd(slice: slice, to: slices)
-    }
-
-    func willDelete(slicesWith identifiers: Set<BudgetSlice.ID>) throws {
-        var updatedSlices = slices
-        updatedSlices.removeAll(where: { identifiers.contains($0.id) })
-        try Self.canUse(slices: updatedSlices)
-    }
-
-    static func willAdd(slice: BudgetSlice, to list: [BudgetSlice]) throws {
-        guard !list.contains(where: { $0.name == slice.name }) else {
-            throw DomainError.budget(error: .sliceAlreadyExistsWith(name: slice.name))
-        }
-    }
-
-    private static func canUse(name: String) throws {
-        guard !name.isEmpty else {
-            throw DomainError.budget(error: .nameNotValid)
-        }
-    }
-
-    private static func canUse(slices: [BudgetSlice]) throws {
-        guard !slices.isEmpty else {
-            throw DomainError.budget(error: .thereMustBeAtLeastOneSlice)
-        }
-        guard !slices.containsDuplicates() else {
-            throw DomainError.budget(error: .multipleSlicesWithSameName)
-        }
     }
 }
 

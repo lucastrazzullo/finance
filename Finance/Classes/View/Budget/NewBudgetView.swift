@@ -64,7 +64,7 @@ struct NewBudgetView: View {
     // MARK: Private helper methods
 
     private func add(slice: BudgetSlice) async throws {
-        try Budget.willAdd(slice: slice, to: budgetSlices)
+        try BudgetValidator.willAdd(slice: slice, to: budgetSlices)
         budgetSlices.append(slice)
         isInsertNewBudgetSlicePresented = false
     }

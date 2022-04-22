@@ -9,12 +9,9 @@ import Foundation
 
 enum Mocks {
 
-    // MARK: - Overview
+    // MARK: - Year
 
-    static let year: Int = YearlyBudgetOverview.defaultYear
-    static let overview: YearlyBudgetOverview = {
-        try! YearlyBudgetOverview(budgets: Mocks.budgets, transactions: Mocks.transactions)
-    }()
+    static let year: Int = 2022
 
     // MARK: - Budget
 
@@ -98,64 +95,69 @@ final class MockStorageProvider: StorageProvider {
         case mock
     }
 
-    private var overview: YearlyBudgetOverview
+    private var transactions: [Transaction]
+    private var budgets: [Budget]
 
     // MARK: Object life cycle
 
     init() {
-        self.overview = YearlyBudgetOverview.empty
+        self.transactions = []
+        self.budgets = []
     }
 
-    init(budgets: [Budget], transactions: [Transaction]) throws {
-        self.overview = try YearlyBudgetOverview(budgets: budgets, transactions: transactions)
+    init(budgets: [Budget], transactions: [Transaction]) {
+        self.transactions = transactions
+        self.budgets = budgets
     }
 
     // MARK: Fetch
 
     func fetchBudgets(year: Int) async throws -> [Budget] {
-        guard overview.year == year else {
-            throw DomainError.storageProvider(error: .overviewEntityNotFound)
+        return budgets.filter { budget in
+            budget.year == year
         }
-        return overview.budgets
     }
 
     func fetchTransactions(year: Int) async throws -> [Transaction] {
-        guard overview.year == year else {
-            throw DomainError.storageProvider(error: .overviewEntityNotFound)
+        return transactions.filter { transaction in
+            transaction.date.year == year
         }
-        return overview.transactions
     }
 
     // MARK: Add
 
     func add(transaction: Transaction) async throws {
-        try overview.append(transactions: [transaction])
+        self.transactions.append(transaction)
     }
 
     func add(budget: Budget) async throws {
-        try overview.append(budget: budget)
+        self.budgets.append(budget)
     }
 
-    func add(slice: BudgetSlice, toBudgetWith id: Budget.ID) async throws {
-        try overview.append(slice: slice, toBudgetWith: id)
+    func add(slice: BudgetSlice, toBudgetWith identifier: Budget.ID) async throws {
+        if let index = budgets.firstIndex(where: { $0.id == identifier }) {
+            try budgets[index].append(slice: slice)
+        }
     }
 
     // MARK: Delete
 
     func delete(budgetsWith identifiers: Set<Budget.ID>) async throws {
-        overview.delete(budgetsWithIdentifiers: identifiers)
+        budgets.removeAll(where: { identifiers.contains($0.id) })
     }
 
     func delete(slicesWith identifiers: Set<BudgetSlice.ID>, inBudgetWith identifier: Budget.ID) async throws {
-        try overview.delete(slicesWith: identifiers, inBudgetWith: identifier)
+        if let index = budgets.firstIndex(where: { $0.id == identifier }) {
+            try budgets[index].delete(slicesWith: identifiers)
+        }
     }
 
     // MARK: Update
 
-    func update(name: String, iconSystemName: String, inBudgetWith id: Budget.ID) async throws {
-        guard let icon = SystemIcon(rawValue: iconSystemName) else {
-            throw DomainError.storageProvider(error: .cannotCreateBudgetWithEntity)
+    func update(name: String, iconSystemName: String, inBudgetWith identifier: Budget.ID) async throws {
+        if let index = budgets.firstIndex(where: { $0.id == identifier }) {
+            try budgets[index].update(name: name)
+            try budgets[index].update(icon: SystemIcon(rawValue: iconSystemName)!)
         }
-        try overview.update(name: name, icon: icon, forBudgetWith: id)
     }
 }

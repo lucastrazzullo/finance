@@ -76,7 +76,7 @@ struct NewBudgetSliceView: View {
     // MARK: Private helper methods
 
     private func add(schedule: BudgetSlice.Schedule) throws {
-        try BudgetSlice.willAdd(schedule: schedule, to: sliceSchedules)
+        try BudgetSliceValidator.willAdd(schedule: schedule, to: sliceSchedules)
         sliceSchedules.append(schedule)
         isInsertNewSchedulePresented = false
     }

@@ -86,10 +86,9 @@ struct MonthlyBudgetOverviewItem_Previews: PreviewProvider {
     static var previews: some View {
         MonthlyBudgetOverviewItem(
             overview: MonthlyBudgetOverview(
-                name: "Test Overview",
-                icon: .health,
-                startingAmount: .value(1000),
-                totalExpenses: .value(100)
+                month: 1,
+                budget: Mocks.budgets[0],
+                expenses: Mocks.transactions
             )
         )
     }

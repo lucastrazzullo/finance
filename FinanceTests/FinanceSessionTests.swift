@@ -38,7 +38,7 @@ import Combine
         try await session.load()
 
         XCTAssertEqual(session.overview.budgets, budgets)
-        XCTAssertEqual(session.overview.transactions, transactions)
+        XCTAssertEqual(session.overview.expenses, transactions)
     }
 
     func testSessionNoStart() throws {
@@ -48,7 +48,7 @@ import Combine
         session = FinanceSession(storageProvider: storageProvider)
 
         XCTAssertNotEqual(session.overview.budgets, budgets)
-        XCTAssertNotEqual(session.overview.transactions, transactions)
+        XCTAssertNotEqual(session.overview.expenses, transactions)
     }
 
     // MARK: - Add

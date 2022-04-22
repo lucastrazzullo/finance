@@ -31,10 +31,10 @@ final class BudgetSliceTests: XCTestCase {
         let schedule1 = try BudgetSlice.Schedule(amount: .value(100), month: 1)
         let schedule2 = try BudgetSlice.Schedule(amount: .value(100), month: 2)
 
-        try BudgetSlice.willAdd(schedule: schedule1, to: [])
-        try BudgetSlice.willAdd(schedule: schedule2, to: [])
+        try BudgetSliceValidator.willAdd(schedule: schedule1, to: [])
+        try BudgetSliceValidator.willAdd(schedule: schedule2, to: [])
 
-        XCTAssertThrowsError(try BudgetSlice.willAdd(schedule: schedule1, to: [schedule1, schedule2]))
+        XCTAssertThrowsError(try BudgetSliceValidator.willAdd(schedule: schedule1, to: [schedule1, schedule2]))
     }
 
 }

@@ -76,15 +76,6 @@ struct BudgetSlice: Identifiable, Hashable, AmountHolder {
         hasher.combine(name)
         hasher.combine(amount.value)
     }
-
-    // MARK: Helpers
-
-    static func willAdd(schedule: Schedule, to list: [Schedule]) throws {
-        guard !list.contains(where: { $0.month == schedule.month }) else {
-            let monthName = Calendar.current.standaloneMonthSymbols[schedule.month - 1]
-            throw DomainError.budgetSlice(error: .scheduleAlreadyExistsFor(month: monthName))
-        }
-    }
 }
 
 extension Array where Element == BudgetSlice {

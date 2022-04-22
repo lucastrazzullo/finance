@@ -9,38 +9,61 @@ import SwiftUI
 
 struct DashboardView: View {
 
-    let overview: YearlyBudgetOverview
-    let addTransactions: ([Transaction]) async throws -> Void
-    let addBudget: (Budget) async throws -> Void
-    let deleteBudgets: (Set<Budget.ID>) async throws -> Void
-    let addSliceToBudget: (BudgetSlice, Budget.ID) async throws -> Void
-    let deleteSlices: (Set<BudgetSlice.ID>, Budget.ID) async throws -> Void
-    let updateNameAndIcon: (String, SystemIcon, Budget.ID) async throws -> Void
+    @ObservedObject var viewModel: DashboardViewModel
 
     var body: some View {
         TabView {
             OverviewListView(
-                overview: overview,
-                addTransactions: addTransactions
+                header: { DashboardHeader(
+                    title: viewModel.title,
+                    subtitle: viewModel.subtitle
+                )},
+                viewModel: .init(
+                    yearlyOverview: viewModel.yearlyOverview,
+                    handler: viewModel.handler
+                )
             )
             .tabItem {
                 Label("Overview", systemImage: "list.bullet.below.rectangle")
             }
 
             BudgetsListView(
-                year: overview.year,
-                name: overview.name,
-                budgets: overview.budgets,
-                addBudget: addBudget,
-                deleteBudgets: deleteBudgets,
-                addSliceToBudget: addSliceToBudget,
-                deleteSlices: deleteSlices,
-                updateNameAndIcon: updateNameAndIcon
+                header: { DashboardHeader(
+                    title: viewModel.title,
+                    subtitle: viewModel.subtitle
+                )},
+                viewModel: .init(
+                    year: viewModel.year,
+                    title: viewModel.title,
+                    budgets: viewModel.budgets,
+                    handler: viewModel.handler
+                )
             )
             .tabItem {
                 Label("Budgets", systemImage: "list.dash")
                     .accessibilityIdentifier(AccessibilityIdentifier.DashboardView.budgetsTab)
             }
+        }
+        .task {
+            try? await viewModel.load()
+        }
+        .refreshable {
+            try? await viewModel.load()
+        }
+    }
+}
+
+struct DashboardHeader: ToolbarContent {
+
+    var title: String
+    var subtitle: String
+
+    var body: some ToolbarContent {
+        ToolbarItem(placement: .principal) {
+            DefaultToolbar(
+                title: title,
+                subtitle: subtitle
+            )
         }
     }
 }
@@ -48,13 +71,15 @@ struct DashboardView: View {
 struct DashboardView_Previews: PreviewProvider {
     static var previews: some View {
         DashboardView(
-            overview: Mocks.overview,
-            addTransactions: { _ in },
-            addBudget: { _ in },
-            deleteBudgets: { _ in },
-            addSliceToBudget: { _, _ in },
-            deleteSlices: { _, _ in },
-            updateNameAndIcon: { _, _, _  in }
+            viewModel: .init(
+                yearlyOverview: .init(
+                    name: "Mock",
+                    year: Mocks.year,
+                    budgets: Mocks.budgets,
+                    expenses: Mocks.transactions
+                ),
+                handler: nil
+            )
         )
     }
 }

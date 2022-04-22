@@ -11,7 +11,7 @@ import Foundation
 
     // MARK: Instance properties
 
-    @Published var overview: YearlyBudgetOverview
+    @Published var yearlyOverview: YearlyBudgetOverview
 
     private let storageProvider: StorageProvider
 
@@ -19,59 +19,74 @@ import Foundation
 
     init(storageProvider: StorageProvider) {
         self.storageProvider = storageProvider
-        self.overview = YearlyBudgetOverview.empty
+        self.yearlyOverview = YearlyBudgetOverview(
+            name: "Default",
+            year: 2022,
+            budgets: [],
+            expenses: []
+        )
     }
+}
 
-    // MARK: Reload
+extension FinanceSession: DashboardHandler {
 
     func load() async throws {
-        let transactions = try await storageProvider.fetchTransactions(year: overview.year)
-        let budgets = try await storageProvider.fetchBudgets(year: overview.year)
-
-        try overview.set(transactions: transactions)
-        try overview.set(budgets: budgets)
+        yearlyOverview.budgets = try await storageProvider.fetchBudgets(year: yearlyOverview.year)
+        yearlyOverview.expenses = try await storageProvider.fetchTransactions(year: yearlyOverview.year)
     }
+}
 
-    // MARK: Add
+extension FinanceSession: BudgetHandler {
 
-    func add(transactions: [Transaction]) async throws {
-        for transaction in transactions {
-            try overview.willAdd(transactions: transactions)
-            try await storageProvider.add(transaction: transaction)
+    func add(slice: BudgetSlice, toBudgetWith identifier: Budget.ID) async throws {
+        try await storageProvider.add(slice: slice, toBudgetWith: identifier)
+        if let index = yearlyOverview.budgets.firstIndex(where: { $0.id == identifier }) {
+            try yearlyOverview.budgets[index].append(slice: slice)
         }
-        try overview.append(transactions: transactions)
-    }
-
-    func add(budget: Budget) async throws {
-        try overview.willAdd(budget: budget)
-        try await storageProvider.add(budget: budget)
-        try overview.append(budget: budget)
-    }
-
-    func add(slice: BudgetSlice, toBudgetWith id: Budget.ID) async throws {
-        try overview.willAdd(slice: slice, toBudgetWith: id)
-        try await storageProvider.add(slice: slice, toBudgetWith: id)
-        try overview.append(slice: slice, toBudgetWith: id)
-    }
-
-    // MARK: Delete
-
-    func delete(budgetsWith identifiers: Set<Budget.ID>) async throws {
-        try await storageProvider.delete(budgetsWith: identifiers)
-        overview.delete(budgetsWithIdentifiers: identifiers)
     }
 
     func delete(slicesWith identifiers: Set<BudgetSlice.ID>, inBudgetWith identifier: Budget.ID) async throws {
-        try overview.willDelete(slicesWith: identifiers, inBudgetWith: identifier)
         try await storageProvider.delete(slicesWith: identifiers, inBudgetWith: identifier)
-        try overview.delete(slicesWith: identifiers, inBudgetWith: identifier)
+        if let index = yearlyOverview.budgets.firstIndex(where: { $0.id == identifier }) {
+            try yearlyOverview.budgets[index].delete(slicesWith: identifiers)
+        }
     }
 
-    // MARK: Update
-
     func update(name: String, icon: SystemIcon, inBudgetWith identifier: Budget.ID) async throws {
-        try overview.willUpdate(name: name, forBudgetWith: identifier)
+        guard let budget = yearlyOverview.budgets.with(identifier: identifier) else {
+            throw DomainError.budget(error: .cannotFetchTheBudget(id: identifier))
+        }
+        try YearlyBudgetOverviewValidator.willUpdate(name: name, for: budget, in: yearlyOverview.budgets)
         try await storageProvider.update(name: name, iconSystemName: icon.rawValue, inBudgetWith: identifier)
-        try overview.update(name: name, icon: icon, forBudgetWith: identifier)
+        if let index = yearlyOverview.budgets.firstIndex(where: { $0.id == identifier }) {
+            try yearlyOverview.budgets[index].update(name: name)
+            try yearlyOverview.budgets[index].update(icon: icon)
+        }
+    }
+}
+
+extension FinanceSession: BudgetsListHandler {
+
+    func add(budget: Budget) async throws {
+        try YearlyBudgetOverviewValidator.willAdd(budget: budget, to: yearlyOverview.budgets)
+        try await storageProvider.add(budget: budget)
+        yearlyOverview.budgets.append(budget)
+    }
+
+    func delete(budgetsWith identifiers: Set<Budget.ID>) async throws {
+        try await storageProvider.delete(budgetsWith: identifiers)
+        yearlyOverview.budgets.delete(withIdentifiers: identifiers)
+    }
+}
+
+extension FinanceSession: OverviewListHandler {
+
+    func add(expenses: [Transaction]) async throws {
+        try YearlyBudgetOverviewValidator.willAdd(expenses: expenses, for: yearlyOverview.year)
+
+        for expense in expenses {
+            try await storageProvider.add(transaction: expense)
+        }
+        yearlyOverview.expenses.append(contentsOf: expenses)
     }
 }

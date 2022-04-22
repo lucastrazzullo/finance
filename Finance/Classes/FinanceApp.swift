@@ -13,21 +13,10 @@ import SwiftUI
 
     var body: some Scene {
         WindowGroup {
-            DashboardView(
-                overview: session.overview,
-                addTransactions: session.add(transactions:),
-                addBudget: session.add(budget:),
-                deleteBudgets: session.delete(budgetsWith:),
-                addSliceToBudget: session.add(slice:toBudgetWith:),
-                deleteSlices: session.delete(slicesWith:inBudgetWith:),
-                updateNameAndIcon: session.update(name:icon:inBudgetWith:)
-            )
-            .task {
-                try? await session.load()
-            }
-            .refreshable {
-                try? await session.load()
-            }
+            DashboardView(viewModel: .init(
+                yearlyOverview: session.yearlyOverview,
+                handler: session
+            ))
         }
     }
 
