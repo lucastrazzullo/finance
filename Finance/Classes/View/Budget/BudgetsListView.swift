@@ -9,8 +9,9 @@ import SwiftUI
 
 struct BudgetsListView<Header: ToolbarContent>: View {
 
-    @ToolbarContentBuilder var header: () -> Header
+    @Environment(\.storageProvider) private var storageProvider
     @ObservedObject var viewModel: BudgetsListViewModel
+    @ToolbarContentBuilder var header: () -> Header
 
     var body: some View {
         NavigationView {
@@ -18,7 +19,11 @@ struct BudgetsListView<Header: ToolbarContent>: View {
                 Section(header: Text("Budgets")) {
                     ForEach(viewModel.budgets) { budget in
                         NavigationLink(destination: {
-                            BudgetView(viewModel: BudgetViewModel(budget: budget, handler: viewModel.handler))
+                            BudgetView(viewModel: BudgetViewModel(
+                                budget: budget,
+                                storageProvider: storageProvider,
+                                delegate: viewModel.delegate
+                            ))
                         }, label: {
                             HStack {
                                 Label(budget.name, systemImage: budget.icon.rawValue)
@@ -56,19 +61,21 @@ struct BudgetsListView<Header: ToolbarContent>: View {
 // MARK: - Previews
 
 struct BudgetsListView_Previews: PreviewProvider {
+    static let storageProvider = MockStorageProvider()
     static var previews: some View {
         BudgetsListView(
-            header: {
-                ToolbarItem {
-                    Text("Header")
-                }
-            },
             viewModel: .init(
                 year: Mocks.year,
                 title: "Title",
                 budgets: Mocks.budgets,
-                handler: nil
-            )
+                storageProvider: MockStorageProvider(),
+                delegate: nil
+            ),
+            header: {
+                ToolbarItem {
+                    Text("Header")
+                }
+            }
         )
     }
 }

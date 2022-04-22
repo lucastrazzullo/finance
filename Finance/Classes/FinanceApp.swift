@@ -9,22 +9,30 @@ import SwiftUI
 
 @main struct FinanceApp: App {
 
-    @ObservedObject private var session: FinanceSession
+    @Environment(\.storageProvider) private var storageProvider
 
     var body: some Scene {
         WindowGroup {
-            DashboardView(viewModel: .init(
-                yearlyOverview: session.yearlyOverview,
-                handler: session
-            ))
+            DashboardView(viewModel: .init(storageProvider: storageProvider))
         }
     }
+}
 
-    init() {
+// MARK: - Environment
+
+private struct StorageProviderKey: EnvironmentKey {
+    static let defaultValue: StorageProvider = {
         if CommandLine.arguments.contains("testing") {
-            session = FinanceSession(storageProvider: MockStorageProvider())
+            return MockStorageProvider()
         } else {
-            session = FinanceSession(storageProvider: CoreDataStorageProvider())
+            return CoreDataStorageProvider()
         }
+    }()
+}
+
+extension EnvironmentValues {
+    var storageProvider: StorageProvider {
+        get { return self[StorageProviderKey.self] }
+        set { self[StorageProviderKey.self] = newValue }
     }
 }

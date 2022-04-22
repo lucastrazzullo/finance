@@ -7,14 +7,21 @@
 
 import Foundation
 
-protocol OverviewListHandler: AnyObject {
-    func add(expenses: [Transaction]) async throws
+protocol OverviewListViewDelegate: AnyObject {
+    func willAdd(expenses: [Transaction]) throws
+    func didAdd(expenses: [Transaction])
 }
 
 @MainActor final class OverviewListViewModel: ObservableObject {
 
+    typealias Delegate = OverviewListViewDelegate & BudgetViewModelDelegate
+
     @Published var month: Int = Calendar.current.component(.month, from: .now)
     @Published var addNewTransactionIsPresented: Bool = false
+
+    @Published var yearlyOverview: YearlyBudgetOverview
+
+    weak var delegate: Delegate?
 
     var monthlyOverviews: [MonthlyBudgetOverview] {
         return yearlyOverview.monthlyOverviews(month: month)
@@ -28,21 +35,28 @@ protocol OverviewListHandler: AnyObject {
         return yearlyOverview.budgets
     }
 
-    let yearlyOverview: YearlyBudgetOverview
-
-    private weak var handler: OverviewListHandler?
+    private let storageProvider: StorageProvider
 
     // MARK: Object life cycle
 
-    init(yearlyOverview: YearlyBudgetOverview, handler: OverviewListHandler?) {
+    init(yearlyOverview: YearlyBudgetOverview, storageProvider: StorageProvider, delegate: Delegate?) {
         self.yearlyOverview = yearlyOverview
-        self.handler = handler
+        self.storageProvider = storageProvider
+        self.delegate = delegate
     }
 
     // MARK: Internal methods
 
     func add(expenses: [Transaction]) async throws {
-        try await handler?.add(expenses: expenses)
+        try delegate?.willAdd(expenses: expenses)
+
+        for expense in expenses {
+            try await storageProvider.add(transaction: expense)
+            yearlyOverview.expenses.append(expense)
+        }
+
+        delegate?.didAdd(expenses: expenses)
+
         addNewTransactionIsPresented = false
     }
 }

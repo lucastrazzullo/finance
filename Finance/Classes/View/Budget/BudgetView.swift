@@ -130,7 +130,13 @@ private struct SlicesListSection<Footer: View>: View {
 struct BudgetView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
-            BudgetView(viewModel: BudgetViewModel(budget: Mocks.budgets[0], handler: nil))
+            BudgetView(
+                viewModel: BudgetViewModel(
+                    budget: Mocks.budgets[0],
+                    storageProvider: MockStorageProvider(),
+                    delegate: nil
+                )
+            )
         }
     }
 }

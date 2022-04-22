@@ -9,8 +9,8 @@ import SwiftUI
 
 struct OverviewListView<Header: ToolbarContent>: View {
 
-    @ToolbarContentBuilder var header: () -> Header
     @ObservedObject var viewModel: OverviewListViewModel
+    @ToolbarContentBuilder var header: () -> Header
 
     var body: some View {
         NavigationView {
@@ -61,11 +61,6 @@ struct OverviewListView<Header: ToolbarContent>: View {
 struct OverviewView_Previews: PreviewProvider {
     static var previews: some View {
         OverviewListView(
-            header: {
-                ToolbarItem {
-                    Text("Header")
-                }
-            },
             viewModel: .init(
                 yearlyOverview: .init(
                     name: "Mock",
@@ -73,8 +68,14 @@ struct OverviewView_Previews: PreviewProvider {
                     budgets: Mocks.budgets,
                     expenses: Mocks.transactions
                 ),
-                handler: nil
-            )
+                storageProvider: MockStorageProvider(),
+                delegate: nil
+            ),
+            header: {
+                ToolbarItem {
+                    Text("Header")
+                }
+            }
         )
     }
 }

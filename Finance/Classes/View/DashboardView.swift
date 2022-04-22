@@ -9,35 +9,38 @@ import SwiftUI
 
 struct DashboardView: View {
 
+    @Environment(\.storageProvider) private var storageProvider
     @ObservedObject var viewModel: DashboardViewModel
 
     var body: some View {
         TabView {
             OverviewListView(
+                viewModel: OverviewListViewModel(
+                    yearlyOverview: viewModel.yearlyOverview,
+                    storageProvider: storageProvider,
+                    delegate: viewModel
+                ),
                 header: { DashboardHeader(
                     title: viewModel.title,
                     subtitle: viewModel.subtitle
-                )},
-                viewModel: .init(
-                    yearlyOverview: viewModel.yearlyOverview,
-                    handler: viewModel.handler
-                )
+                )}
             )
             .tabItem {
                 Label("Overview", systemImage: "list.bullet.below.rectangle")
             }
 
             BudgetsListView(
-                header: { DashboardHeader(
-                    title: viewModel.title,
-                    subtitle: viewModel.subtitle
-                )},
-                viewModel: .init(
+                viewModel: BudgetsListViewModel(
                     year: viewModel.year,
                     title: viewModel.title,
                     budgets: viewModel.budgets,
-                    handler: viewModel.handler
-                )
+                    storageProvider: storageProvider,
+                    delegate: viewModel
+                ),
+                header: { DashboardHeader(
+                    title: viewModel.title,
+                    subtitle: viewModel.subtitle
+                )}
             )
             .tabItem {
                 Label("Budgets", systemImage: "list.dash")
@@ -69,17 +72,9 @@ struct DashboardHeader: ToolbarContent {
 }
 
 struct DashboardView_Previews: PreviewProvider {
+    static let storageProvider = MockStorageProvider()
     static var previews: some View {
-        DashboardView(
-            viewModel: .init(
-                yearlyOverview: .init(
-                    name: "Mock",
-                    year: Mocks.year,
-                    budgets: Mocks.budgets,
-                    expenses: Mocks.transactions
-                ),
-                handler: nil
-            )
-        )
+        DashboardView(viewModel: .init(storageProvider: storageProvider))
+            .environment(\.storageProvider, storageProvider)
     }
 }

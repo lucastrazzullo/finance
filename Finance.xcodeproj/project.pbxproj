@@ -61,7 +61,6 @@
 		81DF556528096D41004BB2C8 /* Icon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81DF556428096D41004BB2C8 /* Icon.swift */; };
 		81DF556B280980FA004BB2C8 /* AddTransactionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81DF556A280980FA004BB2C8 /* AddTransactionsView.swift */; };
 		81DF55702809EBBA004BB2C8 /* Date+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81DF556F2809EBBA004BB2C8 /* Date+Extensions.swift */; };
-		81DF5572280AEEDB004BB2C8 /* FinanceSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81DF5571280AEEDB004BB2C8 /* FinanceSession.swift */; };
 		81DF557A280E3456004BB2C8 /* BudgetViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81DF5579280E3456004BB2C8 /* BudgetViewModel.swift */; };
 		81DF557C280E3472004BB2C8 /* BudgetsListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81DF557B280E3472004BB2C8 /* BudgetsListViewModel.swift */; };
 		81DF557E280E3495004BB2C8 /* DashboardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81DF557D280E3495004BB2C8 /* DashboardViewModel.swift */; };
@@ -157,7 +156,6 @@
 		81DF556428096D41004BB2C8 /* Icon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Icon.swift; sourceTree = "<group>"; };
 		81DF556A280980FA004BB2C8 /* AddTransactionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTransactionsView.swift; sourceTree = "<group>"; };
 		81DF556F2809EBBA004BB2C8 /* Date+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Extensions.swift"; sourceTree = "<group>"; };
-		81DF5571280AEEDB004BB2C8 /* FinanceSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceSession.swift; sourceTree = "<group>"; };
 		81DF5579280E3456004BB2C8 /* BudgetViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetViewModel.swift; sourceTree = "<group>"; };
 		81DF557B280E3472004BB2C8 /* BudgetsListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetsListViewModel.swift; sourceTree = "<group>"; };
 		81DF557D280E3495004BB2C8 /* DashboardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardViewModel.swift; sourceTree = "<group>"; };
@@ -269,7 +267,6 @@
 			isa = PBXGroup;
 			children = (
 				81947EAA27327FCF001C2AC9 /* FinanceApp.swift */,
-				81DF5571280AEEDB004BB2C8 /* FinanceSession.swift */,
 				81CB8BEE2746B91900A64785 /* Model */,
 				81CB8BED2746B91100A64785 /* View */,
 				81DF5578280E3437004BB2C8 /* ViewModel */,
@@ -666,7 +663,6 @@
 				81DF556B280980FA004BB2C8 /* AddTransactionsView.swift in Sources */,
 				81CB8BF02746B92400A64785 /* Budget.swift in Sources */,
 				8195E8BC27A41BD200D58297 /* InlineErrorView.swift in Sources */,
-				81DF5572280AEEDB004BB2C8 /* FinanceSession.swift in Sources */,
 				8126BA7F2806E98A00C06C93 /* StorageProvider.swift in Sources */,
 				81F3B90E2804333600A1B89F /* Transaction.swift in Sources */,
 				81947EAB27327FCF001C2AC9 /* FinanceApp.swift in Sources */,

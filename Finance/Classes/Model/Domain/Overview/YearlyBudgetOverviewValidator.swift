@@ -22,8 +22,8 @@ enum YearlyBudgetOverviewValidator {
         guard budget.name != name else {
             return
         }
-        guard !list.contains(where: { $0.name == budget.name }) else {
-            throw DomainError.budgetOverview(error: .budgetAlreadyExistsWith(name: budget.name))
+        guard !list.contains(where: { $0.name == name }) else {
+            throw DomainError.budgetOverview(error: .budgetAlreadyExistsWith(name: name))
         }
     }
 
