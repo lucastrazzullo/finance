@@ -96,7 +96,10 @@ struct NewBudgetSliceView: View {
     private func makeSlice() throws -> BudgetSlice {
         switch sliceConfigurationType {
         case .monthly:
-            return try BudgetSlice(name: sliceName, configuration: .monthly(amount: .value(sliceMonthlyAmount ?? 0)))
+            guard let sliceMonthlyAmount = sliceMonthlyAmount else {
+                throw DomainError.budgetSlice(error: .amountNotValid)
+            }
+            return try BudgetSlice(name: sliceName, configuration: .monthly(amount: .value(sliceMonthlyAmount)))
         case .scheduled:
             return try BudgetSlice(name: sliceName, configuration: .scheduled(schedules: sliceSchedules))
         }
