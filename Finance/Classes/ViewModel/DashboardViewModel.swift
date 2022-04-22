@@ -35,11 +35,11 @@ import Foundation
 
     // MARK: Object life cycle
 
-    init(storageProvider: StorageProvider) {
+    init(year: Int, storageProvider: StorageProvider) {
         self.storageProvider = storageProvider
         self.yearlyOverview = YearlyBudgetOverview(
             name: "Default",
-            year: 2022,
+            year: year,
             budgets: [],
             expenses: []
         )
@@ -48,23 +48,22 @@ import Foundation
     // MARK: Internal methods
 
     func load() async throws {
-        yearlyOverview.budgets = try await storageProvider.fetchBudgets(year: yearlyOverview.year)
-        yearlyOverview.expenses = try await storageProvider.fetchTransactions(year: yearlyOverview.year)
+        let budgets = try await storageProvider.fetchBudgets(year: yearlyOverview.year)
+        let expenses = try await storageProvider.fetchTransactions(year: yearlyOverview.year)
+
+        yearlyOverview.set(budgets: budgets)
+        yearlyOverview.set(expenses: expenses)
     }
 }
 
 extension DashboardViewModel: BudgetViewModelDelegate {
 
     func didAdd(slice: BudgetSlice, toBudgetWith identifier: Budget.ID) throws {
-        if let index = yearlyOverview.budgets.firstIndex(where: { $0.id == identifier }) {
-            try yearlyOverview.budgets[index].append(slice: slice)
-        }
+        try yearlyOverview.append(slice: slice, toBudgetWith: identifier)
     }
 
     func didDelete(slicesWith identifiers: Set<BudgetSlice.ID>, inBudgetWith identifier: Budget.ID) throws {
-        if let index = yearlyOverview.budgets.firstIndex(where: { $0.id == identifier }) {
-            try yearlyOverview.budgets[index].delete(slicesWith: identifiers)
-        }
+        try yearlyOverview.delete(slicesWith: identifiers, toBudgetWith: identifier)
     }
 
     func willUpdate(name: String, in budget: Budget) throws {
@@ -72,25 +71,22 @@ extension DashboardViewModel: BudgetViewModelDelegate {
     }
 
     func didUpdate(name: String, icon: SystemIcon, inBudgetWith identifier: Budget.ID) throws {
-        if let index = yearlyOverview.budgets.firstIndex(where: { $0.id == identifier }) {
-            try yearlyOverview.budgets[index].update(name: name)
-            try yearlyOverview.budgets[index].update(icon: icon)
-        }
+        try yearlyOverview.update(name: name, icon: icon, inBudgetWith: identifier)
     }
 }
 
 extension DashboardViewModel: BudgetsListViewModelDelegate {
 
     func willAdd(budget: Budget) throws {
-        try YearlyBudgetOverviewValidator.willAdd(budget: budget, to: yearlyOverview.budgets)
+        try YearlyBudgetOverviewValidator.willAdd(budget: budget, to: yearlyOverview.budgets, year: year)
     }
 
-    func didAdd(budget: Budget) {
-        yearlyOverview.budgets.append(budget)
+    func didAdd(budget: Budget) throws {
+        try yearlyOverview.append(budget: budget)
     }
 
     func didDelete(budgetsWith identifiers: Set<Budget.ID>) {
-        yearlyOverview.budgets.removeAll(where: { identifiers.contains($0.id) })
+        yearlyOverview.delete(budgetsWith: identifiers)
     }
 }
 
@@ -100,7 +96,7 @@ extension DashboardViewModel: OverviewListViewDelegate {
         try YearlyBudgetOverviewValidator.willAdd(expenses: expenses, for: yearlyOverview.year)
     }
 
-    func didAdd(expenses: [Transaction]) {
-        yearlyOverview.expenses.append(contentsOf: expenses)
+    func didAdd(expenses: [Transaction]) throws {
+        try yearlyOverview.append(expenses: expenses)
     }
 }

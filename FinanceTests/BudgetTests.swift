@@ -73,13 +73,8 @@ final class BudgetTests: XCTestCase {
         let name = "Name"
         var budget = try makeBudget(name: name)
 
-        XCTAssertThrowsError(try budget.willUpdate(name: ""))
         XCTAssertThrowsError(try budget.update(name: ""))
-
-        XCTAssertNoThrow(try budget.willUpdate(name: name))
         XCTAssertNoThrow(try budget.update(name: name))
-
-        XCTAssertNoThrow(try budget.willUpdate(name: "Any other name"))
         XCTAssertNoThrow(try budget.update(name: "Any other name"))
     }
 
@@ -91,13 +86,11 @@ final class BudgetTests: XCTestCase {
         // When: appending a slice with a different name
         // Then: no error thrown
         let slice3 = try makeSlice(name: "Name 3")
-        XCTAssertNoThrow(try budget.willAdd(slice: slice3))
         XCTAssertNoThrow(try budget.append(slice: slice3))
 
         // When: appending a slice with the same name as others in the budget
         // Then: throw an error, becasue there can't be slices with the same name
         let slice4 = try makeSlice(name: slice3.name)
-        XCTAssertThrowsError(try budget.willAdd(slice: slice4))
         XCTAssertThrowsError(try budget.append(slice: slice4))
     }
 
@@ -109,13 +102,11 @@ final class BudgetTests: XCTestCase {
         // When: deleting all slices
         // Then: throw an error, becasue there can't be a budget without slices
         var deletingIdentifiers = Set([slice1.id, slice2.id])
-        XCTAssertThrowsError(try budget.willDelete(slicesWith: deletingIdentifiers))
         XCTAssertThrowsError(try budget.delete(slicesWith: deletingIdentifiers))
 
         // When: deleting only one slice
         // Then: no errors are thrown
         deletingIdentifiers = [slice1.id]
-        XCTAssertNoThrow(try budget.willDelete(slicesWith: deletingIdentifiers))
         XCTAssertNoThrow(try budget.delete(slicesWith: deletingIdentifiers))
 
         // When: deleting the only one left slice
@@ -127,7 +118,7 @@ final class BudgetTests: XCTestCase {
 
     // MARK: Getting
 
-    func testGetAvailabilityUpToMonth() throws {
+    func testGetAvailability() throws {
         let slice1 = try makeSlice(name: "Name 1", configuration: .monthly(amount: .value(100)))
         let slice2 = try makeSlice(name: "Name 2", configuration: .scheduled(schedules: [
             BudgetSlice.Schedule(amount: .value(100), month: 2),
@@ -136,20 +127,15 @@ final class BudgetTests: XCTestCase {
         ]))
         let budget = try makeBudget(slices: [slice1, slice2])
 
-        XCTAssertEqual(budget.availability(upTo: 1).value, 100)
-        XCTAssertEqual(budget.availability(upTo: 2).value, 300)
-        XCTAssertEqual(budget.availability(upTo: 3).value, 500)
-        XCTAssertEqual(budget.availability(upTo: 4).value, 700)
-    }
+        XCTAssertEqual(budget.availability(upTo: 1).value, 0)
+        XCTAssertEqual(budget.availability(upTo: 2).value, 100)
+        XCTAssertEqual(budget.availability(upTo: 3).value, 300)
+        XCTAssertEqual(budget.availability(upTo: 4).value, 500)
 
-    func testGetSliceIdentifiersAtIndices() throws {
-        let slice1 = try makeSlice(name: "Name 1")
-        let slice2 = try makeSlice(name: "Name 2")
-        let budget = try makeBudget(slices: [slice1, slice2])
-
-        XCTAssertTrue(budget.sliceIdentifiers(at: IndexSet(integer: 0)).contains(slice1.id))
-        XCTAssertTrue(budget.sliceIdentifiers(at: IndexSet(integer: 1)).contains(slice2.id))
-        XCTAssertTrue(budget.sliceIdentifiers(at: IndexSet(0...1)).isSuperset(of: [slice1.id, slice2.id]))
+        XCTAssertEqual(budget.availability(for: 1).value, 100)
+        XCTAssertEqual(budget.availability(for: 2).value, 200)
+        XCTAssertEqual(budget.availability(for: 3).value, 200)
+        XCTAssertEqual(budget.availability(for: 4).value, 200)
     }
 
     func testGetSlicesAtIndices() throws {

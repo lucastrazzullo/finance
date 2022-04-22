@@ -9,7 +9,10 @@ import Foundation
 
 enum YearlyBudgetOverviewValidator {
 
-    static func willAdd(budget: Budget, to list: [Budget]) throws {
+    static func willAdd(budget: Budget, to list: [Budget], year: Int) throws {
+        guard budget.year == year else {
+            throw DomainError.budgetOverview(error: .cannotAddBudget)
+        }
         guard list.allSatisfy({ $0.year == budget.year }) else {
             throw DomainError.budgetOverview(error: .cannotAddBudget)
         }

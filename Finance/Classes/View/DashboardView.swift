@@ -74,7 +74,7 @@ struct DashboardHeader: ToolbarContent {
 struct DashboardView_Previews: PreviewProvider {
     static let storageProvider = MockStorageProvider()
     static var previews: some View {
-        DashboardView(viewModel: .init(storageProvider: storageProvider))
+        DashboardView(viewModel: .init(year: Mocks.year, storageProvider: storageProvider))
             .environment(\.storageProvider, storageProvider)
     }
 }

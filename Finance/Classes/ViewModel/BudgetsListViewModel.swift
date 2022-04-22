@@ -9,7 +9,7 @@ import Foundation
 
 protocol BudgetsListViewModelDelegate: AnyObject {
     func willAdd(budget: Budget) throws
-    func didAdd(budget: Budget)
+    func didAdd(budget: Budget) throws
 
     func didDelete(budgetsWith identifiers: Set<Budget.ID>)
 }
@@ -45,7 +45,7 @@ protocol BudgetsListViewModelDelegate: AnyObject {
         try await storageProvider.add(budget: budget)
 
         budgets.append(budget)
-        delegate?.didAdd(budget: budget)
+        try delegate?.didAdd(budget: budget)
 
         addNewBudgetIsPresented = false
     }

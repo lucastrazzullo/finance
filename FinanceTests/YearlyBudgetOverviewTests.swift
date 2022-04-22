@@ -10,36 +10,119 @@ import XCTest
 
 final class YearlyBudgetOverviewTests: XCTestCase {
 
-    // MARK: Instantiating
+    // MARK: Factories
 
-    func testInstantiateOverview_withValidData() throws {
-        let slice = try BudgetSlice(name: "Name", configuration: .monthly(amount: .value(100)))
-        let budget = try Budget(year: YearlyBudgetOverview.defaultYear, name: "Name", icon: .default, slices: [slice])
-        let transaction = makeTransaction(year: YearlyBudgetOverview.defaultYear, month: 1, budgetSliceId: slice.id, amount: .value(100))
-        XCTAssertNoThrow(try YearlyBudgetOverview(budgets: [budget], transactions: [transaction]))
+    private func makeOverview(year: Int, budgets: [Budget], expenses: [Transaction]) throws -> YearlyBudgetOverview {
+        return YearlyBudgetOverview(name: "Name", year: year, budgets: budgets, expenses: expenses)
     }
 
-    func testInstantiateOverview_withInvalidData() throws {
-        // Throws when instantiating with budget that has a different year than the overview
-        let slice = try BudgetSlice(name: "Name", configuration: .monthly(amount: .value(100)))
-        let budget = try Budget(year: YearlyBudgetOverview.defaultYear - 1, name: "Name", icon: .default, slices: [slice])
-        XCTAssertThrowsError(try YearlyBudgetOverview(budgets: [budget], transactions: []))
+    private func makeBudget(year: Int, name: String = "Name", slices: [BudgetSlice]? = nil) throws -> Budget {
+        let slices = try (slices ?? [try makeSlice()])
+        return try Budget(year: year, name: name, icon: .default, slices: slices)
+    }
 
-        // Throws when instantiating with transaction thah has year different than overview
-        let transaction = makeTransaction(year: YearlyBudgetOverview.defaultYear, month: 1, budgetSliceId: slice.id, amount: .value(100))
-        XCTAssertThrowsError(try YearlyBudgetOverview(budgets: [budget], transactions: [transaction]))
+    private func makeSlice() throws -> BudgetSlice {
+        return try BudgetSlice(name: "Name", configuration: .monthly(amount: .value(100)))
+    }
+
+    private func makeTransaction(year: Int, month: Int = 1, budgetSliceId: BudgetSlice.ID = .init(), amount: MoneyValue = .value(100)) -> Transaction {
+        var components = DateComponents()
+        components.year = year
+        components.month = month
+        let date = Calendar.current.date(from: components)!
+        return Transaction(description: nil, amount: amount, date: date, budgetSliceId: budgetSliceId)
+    }
+
+    // MARK: Instantiating
+
+    func testInstantiateOverview() throws {
+        let slice = try makeSlice()
+        let budget = try makeBudget(year: 2000, slices: [slice])
+        let expense = makeTransaction(year: 2000, month: 1, budgetSliceId: slice.id)
+        let overview = try makeOverview(year: 2000, budgets: [budget], expenses: [expense])
+
+        XCTAssertEqual(overview.budgets, [budget])
+        XCTAssertEqual(overview.expenses, [expense])
+    }
+
+    func testInstantiateOverview_withDifferentYear() throws {
+        let slice = try makeSlice()
+        let budget = try makeBudget(year: 2000, slices: [slice])
+        let expense = makeTransaction(year: 2000, month: 1, budgetSliceId: slice.id)
+        let overview = try makeOverview(year: 1999, budgets: [budget], expenses: [expense])
+
+        XCTAssertTrue(overview.budgets.isEmpty)
+        XCTAssertTrue(overview.expenses.isEmpty)
+    }
+
+    // MARK: Mutating
+
+    func testSetBudgetsAndTransactions_withSameYear() throws {
+        var overview = try makeOverview(year: 2000, budgets: [], expenses: [])
+
+        let slice = try makeSlice()
+        let budget = try makeBudget(year: overview.year, slices: [slice])
+        let expense = makeTransaction(year: overview.year, month: 1, budgetSliceId: slice.id)
+
+        overview.set(budgets: [budget])
+        overview.set(expenses: [expense])
+
+        XCTAssertEqual(overview.budgets, [budget])
+        XCTAssertEqual(overview.expenses, [expense])
+    }
+
+    func testSetBudgetsAndTransactions_withDifferentYear() throws {
+        var overview = try makeOverview(year: 2000, budgets: [], expenses: [])
+
+        let slice = try makeSlice()
+        let budget = try makeBudget(year: 1999, slices: [slice])
+        let expense = makeTransaction(year: 1999, month: 1, budgetSliceId: slice.id)
+
+        overview.set(budgets: [budget])
+        overview.set(expenses: [expense])
+
+        XCTAssertEqual(overview.budgets, [])
+        XCTAssertEqual(overview.expenses, [])
+    }
+
+    func testAppendBudget() throws {
+        var overview = try makeOverview(year: 2000, budgets: [], expenses: [])
+
+        // Budget with same year
+        var budget = try makeBudget(year: overview.year, name: "Name")
+        XCTAssertNoThrow(try overview.append(budget: budget))
+
+        // Budget with same name
+        budget = try makeBudget(year: overview.year, name: "Name")
+        XCTAssertThrowsError(try overview.append(budget: budget))
+
+        // Budget with different year
+        budget = try makeBudget(year: 1999, name: "Different name")
+        XCTAssertThrowsError(try overview.append(budget: budget))
+    }
+
+    func testAppendTransaction() throws {
+        var overview = try makeOverview(year: 2000, budgets: [], expenses: [])
+
+        // Transaction with same year
+        var transaction = makeTransaction(year: overview.year)
+        XCTAssertNoThrow(try overview.append(expenses: [transaction]))
+
+        // Transaction with different year
+        transaction = makeTransaction(year: 1999)
+        XCTAssertThrowsError(try overview.append(expenses: [transaction]))
     }
 
     // MARK: Getting
 
     func testGetMonthlyOverview_forGivenBudget_andMonth() throws {
         let slice = try BudgetSlice(name: "Monthly", configuration: .monthly(amount: .value(100)))
-        let budget = try Budget(year: YearlyBudgetOverview.defaultYear, name: "Name", icon: .default, slices: [slice])
+        let budget = try Budget(year: 2000, name: "Name", icon: .default, slices: [slice])
 
-        let transaction1 = makeTransaction(year: YearlyBudgetOverview.defaultYear, month: 1, budgetSliceId: slice.id, amount: .value(50))
-        let transaction2 = makeTransaction(year: YearlyBudgetOverview.defaultYear, month: 2, budgetSliceId: slice.id, amount: .value(50))
+        let transaction1 = makeTransaction(year: 2000, month: 1, budgetSliceId: slice.id, amount: .value(50))
+        let transaction2 = makeTransaction(year: 2000, month: 2, budgetSliceId: slice.id, amount: .value(50))
 
-        let yearlyOverview = try YearlyBudgetOverview(budgets: [budget], transactions: [transaction1, transaction2])
+        let yearlyOverview = YearlyBudgetOverview(name: "Name", year: 2000, budgets: [budget], expenses: [transaction1, transaction2])
 
         // Assert
 
@@ -48,7 +131,7 @@ final class YearlyBudgetOverviewTests: XCTestCase {
         // Starting amount: 100 budget - 0 transactions in months before >> 100
         // Remaining amount: 100 starting amount - 50 transaction in month 01 >> 50
 
-        let montlyOverview_month1 = try XCTUnwrap(yearlyOverview.monthlyOverview(month: 1, forBudgetWith: budget.id))
+        let montlyOverview_month1 = try XCTUnwrap(yearlyOverview.monthlyOverviews(month: 1).first { $0.name == budget.name })
         XCTAssertEqual(montlyOverview_month1.startingAmount, .value(100))
         XCTAssertEqual(montlyOverview_month1.remainingAmount, .value(50))
 
@@ -58,7 +141,7 @@ final class YearlyBudgetOverviewTests: XCTestCase {
         // Starting amount: 200 budget - 50 transactions in months before >> 150
         // Remaining amount: 150 starting amount - 50 transaction in month 02 >> 100
 
-        let montlyOverview_month2 = try XCTUnwrap(yearlyOverview.monthlyOverview(month: 2, forBudgetWith: budget.id))
+        let montlyOverview_month2 = try XCTUnwrap(yearlyOverview.monthlyOverviews(month: 2).first { $0.name == budget.name })
         XCTAssertEqual(montlyOverview_month2.startingAmount, .value(150))
         XCTAssertEqual(montlyOverview_month2.remainingAmount, .value(100))
 
@@ -68,18 +151,9 @@ final class YearlyBudgetOverviewTests: XCTestCase {
         // Starting amount: 300 budget - 100 transactions in months before >> 200
         // Remaining amount: 200 starting amount - 0 transaction in month 02 >> 200
 
-        let montlyOverview_month3 = try XCTUnwrap(yearlyOverview.monthlyOverview(month: 3, forBudgetWith: budget.id))
+        let montlyOverview_month3 = try XCTUnwrap(yearlyOverview.monthlyOverviews(month: 3).first { $0.name == budget.name })
         XCTAssertEqual(montlyOverview_month3.startingAmount, .value(200))
         XCTAssertEqual(montlyOverview_month3.remainingAmount, .value(200))
     }
 
-    // MARK: Private factory methods
-
-    private func makeTransaction(year: Int, month: Int, budgetSliceId: BudgetSlice.ID, amount: MoneyValue) -> Transaction {
-        var components = DateComponents()
-        components.year = year
-        components.month = month
-        let date = Calendar.current.date(from: components)!
-        return Transaction(description: nil, amount: amount, date: date, budgetSliceId: budgetSliceId)
-    }
 }

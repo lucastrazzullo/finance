@@ -13,8 +13,8 @@ struct YearlyBudgetOverview: Identifiable {
     let name: String
     let year: Int
 
-    var budgets: [Budget]
-    var expenses: [Transaction]
+    private(set) var budgets: [Budget]
+    private(set) var expenses: [Transaction]
 
     // MARK: Object life cycle
 
@@ -42,5 +42,48 @@ struct YearlyBudgetOverview: Identifiable {
         monthlyOverviews(month: month)
             .filter({ $0.remainingAmount <= .value(100) })
             .sorted(by: { $0.remainingAmount < $1.remainingAmount })
+    }
+
+    // MARK: Mutating
+
+    mutating func set(budgets: [Budget]) {
+        self.budgets = budgets.filter { $0.year == year }
+    }
+
+    mutating func set(expenses: [Transaction]) {
+        self.expenses = expenses.filter { $0.year == year }
+    }
+
+    mutating func append(budget: Budget) throws {
+        try YearlyBudgetOverviewValidator.willAdd(budget: budget, to: budgets, year: year)
+        self.budgets.append(budget)
+    }
+
+    mutating func delete(budgetsWith identifiers: Set<Budget.ID>) {
+        budgets.removeAll(where: { identifiers.contains($0.id) })
+    }
+
+    mutating func append(slice: BudgetSlice, toBudgetWith identifier: Budget.ID) throws {
+        if let index = budgets.firstIndex(where: { $0.id == identifier }) {
+            try budgets[index].append(slice: slice)
+        }
+    }
+
+    mutating func delete(slicesWith identifiers: Set<BudgetSlice.ID>, toBudgetWith identifier: Budget.ID) throws {
+        if let index = budgets.firstIndex(where: { $0.id == identifier }) {
+            try budgets[index].delete(slicesWith: identifiers)
+        }
+    }
+
+    mutating func update(name: String, icon: SystemIcon, inBudgetWith identifier: Budget.ID) throws {
+        if let index = budgets.firstIndex(where: { $0.id == identifier }) {
+            try budgets[index].update(name: name)
+            try budgets[index].update(icon: icon)
+        }
+    }
+
+    mutating func append(expenses: [Transaction]) throws {
+        try YearlyBudgetOverviewValidator.willAdd(expenses: expenses, for: year)
+        self.expenses.append(contentsOf: expenses)
     }
 }

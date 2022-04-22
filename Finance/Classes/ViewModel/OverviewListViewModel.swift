@@ -9,7 +9,7 @@ import Foundation
 
 protocol OverviewListViewDelegate: AnyObject {
     func willAdd(expenses: [Transaction]) throws
-    func didAdd(expenses: [Transaction])
+    func didAdd(expenses: [Transaction]) throws
 }
 
 @MainActor final class OverviewListViewModel: ObservableObject {
@@ -52,10 +52,10 @@ protocol OverviewListViewDelegate: AnyObject {
 
         for expense in expenses {
             try await storageProvider.add(transaction: expense)
-            yearlyOverview.expenses.append(expense)
         }
 
-        delegate?.didAdd(expenses: expenses)
+        try yearlyOverview.append(expenses: expenses)
+        try delegate?.didAdd(expenses: expenses)
 
         addNewTransactionIsPresented = false
     }
