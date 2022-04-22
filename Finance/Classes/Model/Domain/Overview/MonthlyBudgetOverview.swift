@@ -15,34 +15,47 @@ struct MonthlyBudgetOverview: Hashable {
     let startingAmount: MoneyValue
     let remainingAmount: MoneyValue
     let remainingAmountPercentage: Float
-    let totalMonthExpenses: MoneyValue
 
-    init(month: Int, budget: Budget, expenses: [Transaction]) {
-        let budgetExpenses = expenses.filter { transaction in
-            budget.slices.contains {
-                $0.id == transaction.budgetSliceId
+    let expensesUntilMonth: [Transaction]
+    let expensesInMonth: [Transaction]
+
+    var totalExpenses: [Transaction] {
+        return expensesUntilMonth + expensesInMonth
+    }
+
+    init(month: Int, expenses: [Transaction], budget: Budget?) {
+        let filteredExpenses: [Transaction]
+        if let budget = budget {
+            let slicesIdentifiers = Set(budget.slices.map(\.id))
+            filteredExpenses = expenses.filter { transaction in
+                slicesIdentifiers.contains(transaction.budgetSliceId)
             }
+        } else {
+            filteredExpenses = expenses
         }
 
-        let totalExpensesUntilMonth = budgetExpenses
+
+        let expensesUntilMonth = filteredExpenses
             .filter { transaction in transaction.month < month }
-            .totalAmount
 
-        let totalMonthExpenses = expenses
+        let expensesInMonth = filteredExpenses
             .filter { transaction in transaction.month == month }
-            .totalAmount
 
-        let startingAmount = budget.availability(upTo: month) + budget.availability(for: month) - totalExpensesUntilMonth
-        let remainingAmount = startingAmount - totalMonthExpenses
+        let budgetAvailabilityUpToMonth = budget?.availability(upTo: month) ?? .zero
+        let budgetAvailabilityInMonth = budget?.availability(for: month) ?? .zero
+
+        let startingAmount = budgetAvailabilityUpToMonth + budgetAvailabilityInMonth - expensesUntilMonth.totalAmount
+        let remainingAmount = startingAmount - expensesInMonth.totalAmount
         let remainingAmountPercentage = remainingAmount.value > 0
-            ? Float(truncating: NSDecimalNumber(decimal: 1 - totalMonthExpenses.value / startingAmount.value))
+            ? Float(truncating: NSDecimalNumber(decimal: 1 - expensesInMonth.totalAmount.value / startingAmount.value))
             : 0
 
-        self.name = budget.name
-        self.icon = budget.icon
+        self.name = budget?.name ?? "Unowned"
+        self.icon = budget?.icon ?? .default
         self.startingAmount = startingAmount
         self.remainingAmount = remainingAmount
         self.remainingAmountPercentage = remainingAmountPercentage
-        self.totalMonthExpenses = totalMonthExpenses
+        self.expensesUntilMonth = expensesUntilMonth
+        self.expensesInMonth = expensesInMonth
     }
 }

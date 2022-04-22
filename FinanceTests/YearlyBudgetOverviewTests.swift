@@ -165,7 +165,7 @@ final class YearlyBudgetOverviewTests: XCTestCase {
         let overview = try XCTUnwrap(yearlyOverview.monthlyOverviews(month: 1).first)
 
         XCTAssertEqual(overview.startingAmount, .zero)
-        XCTAssertEqual(overview.totalMonthExpenses, expenses.totalAmount)
+        XCTAssertEqual(overview.totalExpenses.totalAmount, expenses.totalAmount)
     }
 
 }

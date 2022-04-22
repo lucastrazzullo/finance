@@ -34,8 +34,8 @@ final class MonthlyBudgetOverviewTests: XCTestCase {
 
         return MonthlyBudgetOverview(
             month: 1,
-            budget: budget,
-            expenses: [expense]
+            expenses: [expense],
+            budget: budget
         )
     }
 

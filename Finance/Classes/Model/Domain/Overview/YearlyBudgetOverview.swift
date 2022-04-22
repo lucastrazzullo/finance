@@ -34,13 +34,13 @@ struct YearlyBudgetOverview: Identifiable {
         var overviews = budgets
             .filter { $0.year == year }
             .compactMap { budget in
-                MonthlyBudgetOverview(month: month, budget: budget, expenses: expenses)
+                MonthlyBudgetOverview(month: month, expenses: expenses, budget: budget)
             }
 
         let allSlicesIdentifiers = budgets.flatMap({ $0.slices.map(\.id) })
         let unownedExpenses = expenses.filter { transaction in !allSlicesIdentifiers.contains(transaction.budgetSliceId) }
-        if unownedExpenses.count > 0, let unownedBudget = try? Budget(year: year, name: "Unowned", icon: .default, monthlyAmount: .zero) {
-            let unownedOverview = MonthlyBudgetOverview(month: month, budget: unownedBudget, expenses: unownedExpenses)
+        if unownedExpenses.count > 0 {
+            let unownedOverview = MonthlyBudgetOverview(month: month, expenses: unownedExpenses, budget: nil)
             overviews.append(unownedOverview)
         }
 

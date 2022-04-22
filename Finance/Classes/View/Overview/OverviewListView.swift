@@ -19,8 +19,10 @@ struct OverviewListView<Header: ToolbarContent>: View {
                 if montlhyOverviews.count > 0 {
                     Section(header: Text("All Overviews")) {
                         ForEach(montlhyOverviews, id: \.self) { overview in
-                            MonthlyBudgetOverviewItem(overview: overview)
-                                .listRowSeparator(.hidden)
+                            NavigationLink(destination: TransactionsListView(transactions: overview.expensesInMonth)) {
+                                MonthlyBudgetOverviewItem(overview: overview)
+                            }
+                            .listRowSeparator(.hidden)
                         }
                     }
                 }
@@ -29,8 +31,10 @@ struct OverviewListView<Header: ToolbarContent>: View {
                 if monthlyOverviewsWithLowestAvailability.count > 0 {
                     Section(header: Text("Lowest budgets this month")) {
                         ForEach(monthlyOverviewsWithLowestAvailability, id: \.self) { overview in
-                            MonthlyBudgetOverviewItem(overview: overview)
-                                .listRowSeparator(.hidden)
+                            NavigationLink(destination: TransactionsListView(transactions: overview.expensesInMonth)) {
+                                MonthlyBudgetOverviewItem(overview: overview)
+                            }
+                            .listRowSeparator(.hidden)
                         }
                     }
                 }

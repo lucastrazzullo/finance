@@ -25,7 +25,7 @@ struct MonthlyBudgetOverviewItem: View {
 
                 HStack(spacing: 2) {
                     Text("Expenses").font(.caption2)
-                    AmountView(amount: overview.totalMonthExpenses).font(.caption2.bold())
+                    AmountView(amount: overview.expensesInMonth.totalAmount).font(.caption2.bold())
                 }
             }
             Spacer()
@@ -87,8 +87,8 @@ struct MonthlyBudgetOverviewItem_Previews: PreviewProvider {
         MonthlyBudgetOverviewItem(
             overview: MonthlyBudgetOverview(
                 month: 1,
-                budget: Mocks.budgets[0],
-                expenses: Mocks.transactions
+                expenses: Mocks.transactions,
+                budget: Mocks.budgets[0]
             )
         )
     }
