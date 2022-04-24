@@ -19,7 +19,7 @@ struct OverviewListView<Header: ToolbarContent>: View {
                 if montlhyOverviews.count > 0 {
                     Section(header: Text("All Overviews")) {
                         ForEach(montlhyOverviews, id: \.self) { overview in
-                            NavigationLink(destination: TransactionsListView(transactions: overview.expensesInMonth)) {
+                            NavigationLink(destination: makeTransactionListView(overview: overview)) {
                                 MonthlyBudgetOverviewItem(overview: overview)
                             }
                             .listRowSeparator(.hidden)
@@ -31,7 +31,7 @@ struct OverviewListView<Header: ToolbarContent>: View {
                 if monthlyOverviewsWithLowestAvailability.count > 0 {
                     Section(header: Text("Lowest budgets this month")) {
                         ForEach(monthlyOverviewsWithLowestAvailability, id: \.self) { overview in
-                            NavigationLink(destination: TransactionsListView(transactions: overview.expensesInMonth)) {
+                            NavigationLink(destination: makeTransactionListView(overview: overview)) {
                                 MonthlyBudgetOverviewItem(overview: overview)
                             }
                             .listRowSeparator(.hidden)
@@ -59,6 +59,13 @@ struct OverviewListView<Header: ToolbarContent>: View {
                 AddTransactionsView(budgets: viewModel.budgets, onSubmit: viewModel.add(expenses:))
             }
         }
+    }
+
+    // MARK: Private builder methods
+
+    @ViewBuilder private func makeTransactionListView(overview: MonthlyBudgetOverview) -> some View {
+        TransactionsListView(transactions: overview.expensesInMonth)
+            .navigationTitle("Expenses \(overview.name)")
     }
 }
 
