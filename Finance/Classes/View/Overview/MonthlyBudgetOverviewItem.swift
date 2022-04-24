@@ -12,34 +12,43 @@ struct MonthlyBudgetOverviewItem: View {
     let overview: MonthlyBudgetOverview
 
     var body: some View {
-        HStack(alignment: .lastTextBaseline) {
+        HStack(alignment: .center) {
             VStack(alignment: .leading, spacing: 4) {
                 HStack(alignment: .firstTextBaseline) {
                     Image(systemName: overview.icon.rawValue).symbolRenderingMode(.hierarchical)
                     Text(overview.name).font(.headline)
                 }
-                HStack(spacing: 2) {
-                    Text("Budget").font(.caption2)
-                    AmountView(amount: overview.startingAmount).font(.caption2.bold())
-                }
 
-                HStack(spacing: 2) {
-                    Text("Expenses").font(.caption2)
-                    AmountView(amount: overview.expensesInMonth.totalAmount).font(.caption2.bold())
+                VStack(alignment: .leading) {
+                    HStack(spacing: 2) {
+                        Text("Budget").font(.caption2)
+                        AmountView(amount: overview.startingAmount).font(.caption2.bold())
+                    }
+
+                    HStack(spacing: 2) {
+                        Text("Expenses").font(.caption2)
+                        AmountView(amount: overview.expensesInMonth.totalAmount).font(.caption2.bold())
+                    }
                 }
             }
+
             Spacer()
 
-            VStack(alignment: .trailing) {
-                Text(remainingLabel).font(.caption2)
-                AmountView(amount: overview.remainingAmount).font(.subheadline)
-
-                ZStack(alignment: .trailing) {
-                    Rectangle().foregroundColor(.gray.opacity(0.2))
-                    Rectangle().foregroundColor(rectangleColor).frame(width: rectangleWidth)
+            HStack {
+                VStack(alignment: .trailing) {
+                    Text(availabilityLabel).font(.caption2)
+                    AmountView(amount: overview.remainingAmount).font(.subheadline)
                 }
-                .frame(width: rectangleContainerWidth, height: rectangleContainerHeight)
-                .cornerRadius(rectangleContainerHeight/2)
+
+                ZStack(alignment: .leading) {
+                    availabilityIndicatorView(
+                        color: .gray.opacity(0.25),
+                        percentage: 1.0)
+
+                    availabilityIndicatorView(
+                        color: availabilityIndicatorColor,
+                        percentage: CGFloat(overview.remainingAmountPercentage))
+                }
             }
         }
         .padding(8)
@@ -48,14 +57,14 @@ struct MonthlyBudgetOverviewItem: View {
     }
 
     private var backgroundColor: Color {
-        if overview.remainingAmount.value >= 0 {
+        if overview.remainingAmount.value > 0 {
             return .clear
         } else {
             return Color.brown.opacity(0.2)
         }
     }
 
-    private var remainingLabel: String {
+    private var availabilityLabel: String {
         if overview.remainingAmount.value >= 0 {
             return "Remaining"
         } else {
@@ -63,7 +72,7 @@ struct MonthlyBudgetOverviewItem: View {
         }
     }
 
-    private var rectangleColor: Color {
+    private var availabilityIndicatorColor: Color {
         switch overview.remainingAmountPercentage {
         case 0..<0.33:
             return .red
@@ -74,22 +83,36 @@ struct MonthlyBudgetOverviewItem: View {
         }
     }
 
-    private var rectangleWidth: CGFloat {
-        return max(0, rectangleContainerWidth * CGFloat(overview.remainingAmountPercentage))
+    @ViewBuilder private func availabilityIndicatorView(color: Color, percentage: CGFloat) -> some View {
+        Circle()
+            .trim(from: 0.0, to: percentage)
+            .rotation(.degrees(-90))
+            .stroke(
+                color,
+                style: StrokeStyle(
+                    lineWidth: 4,
+                    lineCap: .round,
+                    dashPhase: 10
+                )
+            )
+           .frame(width: 30, height: 30)
     }
-
-    private let rectangleContainerWidth: CGFloat = 80
-    private let rectangleContainerHeight: CGFloat = 3
 }
 
 struct MonthlyBudgetOverviewItem_Previews: PreviewProvider {
     static var previews: some View {
-        MonthlyBudgetOverviewItem(
-            overview: MonthlyBudgetOverview(
-                month: 1,
-                expenses: Mocks.transactions,
-                budget: Mocks.budgets[0]
-            )
-        )
+        List {
+            ForEach(Mocks.budgets) { budget in
+                MonthlyBudgetOverviewItem(
+                    overview: MonthlyBudgetOverview(
+                        month: 1,
+                        expenses: Mocks.transactions,
+                        budget: budget
+                    )
+                )
+                .listRowSeparator(.hidden)
+            }
+        }
+        .listStyle(.plain)
     }
 }
