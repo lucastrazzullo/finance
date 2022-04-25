@@ -47,12 +47,7 @@ struct OverviewView_Previews: PreviewProvider {
         OverviewListView(
             viewModel: .init(
                 month: Calendar.current.component(.month, from: .now),
-                yearlyOverview: .init(
-                    name: "Mock",
-                    year: Mocks.year,
-                    budgets: Mocks.budgets,
-                    expenses: Mocks.transactions
-                ),
+                yearlyOverview: Mocks.overview,
                 storageProvider: MockStorageProvider(),
                 delegate: nil
             ),

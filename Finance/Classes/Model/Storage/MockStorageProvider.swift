@@ -13,6 +13,17 @@ enum Mocks {
 
     static let year: Int = 2022
 
+    // MARK: - Overview
+
+    static let overview: YearlyBudgetOverview = {
+        return YearlyBudgetOverview(
+            name: "Mock",
+            year: Mocks.year,
+            budgets: Mocks.budgets,
+            expenses: Mocks.transactions
+        )
+    }()
+
     // MARK: - Budget
 
     static func randomBudgetIdentifiers(count: Int) -> [Budget.ID] {
