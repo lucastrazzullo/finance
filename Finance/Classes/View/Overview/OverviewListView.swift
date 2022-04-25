@@ -7,73 +7,38 @@
 
 import SwiftUI
 
-struct OverviewListView<Header: ToolbarContent>: View {
+struct OverviewListView<Item: View>: View {
 
-    @Environment(\.storageProvider) private var storageProvider
     @ObservedObject var viewModel: OverviewListViewModel
-    @ToolbarContentBuilder var header: () -> Header
+
+    @ViewBuilder var item: (MonthlyBudgetOverview) -> Item
 
     var body: some View {
-        NavigationView {
-            List {
-                let montlhyOverviews = viewModel.monthlyOverviews
-                if montlhyOverviews.count > 0 {
-                    Section(header: Text("All Overviews")) {
-                        ForEach(montlhyOverviews, id: \.self) { overview in
-                            NavigationLink(destination: makeTransactionListView(overview: overview)) {
-                                MonthlyBudgetOverviewItem(overview: overview)
-                            }
+        List {
+            let montlhyOverviews = viewModel.monthlyOverviews
+            if montlhyOverviews.count > 0 {
+                Section(header: Text("All Overviews")) {
+                    ForEach(montlhyOverviews, id: \.self) { overview in
+                        item(overview)
                             .listRowSeparator(.hidden)
-                        }
-                    }
-                }
-
-                let monthlyOverviewsWithLowestAvailability = viewModel.monthlyOverviewsWithLowestAvailability
-                if monthlyOverviewsWithLowestAvailability.count > 0 {
-                    Section(header: Text("Lowest budgets this month")) {
-                        ForEach(monthlyOverviewsWithLowestAvailability, id: \.self) { overview in
-                            NavigationLink(destination: makeTransactionListView(overview: overview)) {
-                                MonthlyBudgetOverviewItem(overview: overview)
-                            }
-                            .listRowSeparator(.hidden)
-                        }
                     }
                 }
             }
-            .listStyle(.plain)
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar(content: {
-                header()
 
-                ToolbarItem(placement: .navigationBarLeading) {
-                    MonthPickerView(month: $viewModel.month)
-                        .pickerStyle(MenuPickerStyle())
-                }
-
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: { viewModel.addNewTransactionIsPresented = true }) {
-                        Label("New transaction", systemImage: "plus")
+            let monthlyOverviewsWithLowestAvailability = viewModel.monthlyOverviewsWithLowestAvailability
+            if monthlyOverviewsWithLowestAvailability.count > 0 {
+                Section(header: Text("Lowest budgets this month")) {
+                    ForEach(monthlyOverviewsWithLowestAvailability, id: \.self) { overview in
+                        item(overview)
+                            .listRowSeparator(.hidden)
                     }
                 }
-            })
-            .sheet(isPresented: $viewModel.addNewTransactionIsPresented) {
-                AddTransactionsView(budgets: viewModel.budgets, onSubmit: viewModel.add(expenses:))
             }
         }
-    }
-
-    // MARK: Private builder methods
-
-    @ViewBuilder private func makeTransactionListView(overview: MonthlyBudgetOverview) -> some View {
-        let month = Calendar.current.standaloneMonthSymbols[viewModel.month - 1]
-        let viewModel = TransactionsListViewModel(
-            transactions: overview.totalExpenses,
-            storageProvider: storageProvider,
-            delegate: viewModel
-        )
-
-        TransactionsListView(viewModel: viewModel)
-            .navigationTitle("Expenses \(overview.name), in \(month)")
+        .listStyle(.plain)
+        .sheet(isPresented: $viewModel.addNewTransactionIsPresented) {
+            AddTransactionsView(budgets: viewModel.budgets, onSubmit: viewModel.add(expenses:))
+        }
     }
 }
 
@@ -81,6 +46,7 @@ struct OverviewView_Previews: PreviewProvider {
     static var previews: some View {
         OverviewListView(
             viewModel: .init(
+                month: Calendar.current.component(.month, from: .now),
                 yearlyOverview: .init(
                     name: "Mock",
                     year: Mocks.year,
@@ -90,10 +56,8 @@ struct OverviewView_Previews: PreviewProvider {
                 storageProvider: MockStorageProvider(),
                 delegate: nil
             ),
-            header: {
-                ToolbarItem {
-                    Text("Header")
-                }
+            item: { overview in
+                MonthlyBudgetOverviewItem(overview: overview)
             }
         )
     }

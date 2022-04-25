@@ -9,6 +9,7 @@ import Foundation
 
 @MainActor final class DashboardViewModel: ObservableObject {
 
+    @Published var month: Int = Calendar.current.component(.month, from: .now)
     @Published var yearlyOverview: YearlyBudgetOverview
 
     var title: String {

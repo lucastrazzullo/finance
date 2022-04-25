@@ -17,7 +17,6 @@ protocol OverviewListViewDelegate: AnyObject {
     typealias Delegate = OverviewListViewDelegate & BudgetViewModelDelegate & TransactionsListViewModelDelegate
 
     @Published var yearlyOverview: YearlyBudgetOverview
-    @Published var month: Int = Calendar.current.component(.month, from: .now)
     @Published var addNewTransactionIsPresented: Bool = false
 
     var monthlyOverviews: [MonthlyBudgetOverview] {
@@ -32,12 +31,15 @@ protocol OverviewListViewDelegate: AnyObject {
         return yearlyOverview.budgets
     }
 
+    let month: Int
+
     private let storageProvider: StorageProvider
     private weak var delegate: Delegate?
 
     // MARK: Object life cycle
 
-    init(yearlyOverview: YearlyBudgetOverview, storageProvider: StorageProvider, delegate: Delegate?) {
+    init(month: Int, yearlyOverview: YearlyBudgetOverview, storageProvider: StorageProvider, delegate: Delegate?) {
+        self.month = month
         self.yearlyOverview = yearlyOverview
         self.storageProvider = storageProvider
         self.delegate = delegate
@@ -56,12 +58,5 @@ protocol OverviewListViewDelegate: AnyObject {
         try delegate?.didAdd(expenses: expenses)
 
         addNewTransactionIsPresented = false
-    }
-}
-
-extension OverviewListViewModel: TransactionsListViewModelDelegate {
-
-    func didDelete(transactionsWith identifiers: Set<Transaction.ID>) {
-        delegate?.didDelete(transactionsWith: identifiers)
     }
 }
