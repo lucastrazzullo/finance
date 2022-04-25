@@ -9,10 +9,10 @@ import SwiftUI
 
 struct OverviewListView<Item: View>: View {
 
-    let month: Int
-    let yearlyOverview: YearlyBudgetOverview
-
     @ViewBuilder var item: (MonthlyBudgetOverview) -> Item
+
+    let yearlyOverview: YearlyBudgetOverview
+    let month: Int
 
     var body: some View {
         List {
@@ -43,11 +43,11 @@ struct OverviewListView<Item: View>: View {
 struct OverviewView_Previews: PreviewProvider {
     static var previews: some View {
         OverviewListView(
-            month: Calendar.current.component(.month, from: .now),
-            yearlyOverview: Mocks.overview,
             item: { overview in
                 MonthlyBudgetOverviewItem(overview: overview)
-            }
+            },
+            yearlyOverview: Mocks.overview,
+            month: Calendar.current.component(.month, from: .now)
         )
     }
 }

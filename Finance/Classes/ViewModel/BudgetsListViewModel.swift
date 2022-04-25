@@ -7,59 +7,10 @@
 
 import Foundation
 
-protocol BudgetsListViewModelDelegate: AnyObject {
-    func willAdd(budget: Budget) throws
-    func didAdd(budget: Budget) throws
+protocol BudgetsListViewModel: ObservableObject {
+    var year: Int { get }
+    var budgets: [Budget] { get }
 
-    func didDelete(budgetsWith identifiers: Set<Budget.ID>)
-}
-
-@MainActor final class BudgetsListViewModel: ObservableObject {
-
-    typealias Delegate = BudgetsListViewModelDelegate & BudgetViewModelDelegate
-
-    @Published var budgets: [Budget]
-    @Published var deleteBudgetError: DomainError?
-    @Published var addNewBudgetIsPresented: Bool = false
-
-    let year: Int
-
-    private let storageProvider: StorageProvider
-    private weak var delegate: Delegate?
-
-    init(year: Int, budgets: [Budget], storageProvider: StorageProvider, delegate: Delegate?) {
-        self.year = year
-        self.budgets = budgets
-        self.storageProvider = storageProvider
-        self.delegate = delegate
-    }
-
-    // MARK: Internal methods
-
-    func add(budget: Budget) async throws {
-        try delegate?.willAdd(budget: budget)
-        try await storageProvider.add(budget: budget)
-
-        budgets.append(budget)
-        try delegate?.didAdd(budget: budget)
-
-        addNewBudgetIsPresented = false
-    }
-
-    func delete(budgetsAt offsets: IndexSet) async {
-        do {
-            let identifiers = budgets.at(offsets: offsets).map(\.id)
-            let identifiersSet = Set(identifiers)
-
-            try await storageProvider.delete(budgetsWith: identifiersSet)
-
-            budgets.remove(atOffsets: offsets)
-            delegate?.didDelete(budgetsWith: identifiersSet)
-
-            deleteBudgetError = nil
-
-        } catch {
-            deleteBudgetError = error as? DomainError
-        }
-    }
+    func add(budget: Budget) async throws
+    func delete(budgetsAt offsets: IndexSet) async throws
 }

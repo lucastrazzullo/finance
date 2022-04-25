@@ -15,10 +15,6 @@ import Foundation
         return yearlyOverview.year
     }
 
-    var budgets: [Budget] {
-        return yearlyOverview.budgets
-    }
-
     var expenses: [Transaction] {
         return yearlyOverview.expenses
     }
@@ -67,18 +63,23 @@ extension DashboardViewModel: BudgetViewModelDelegate {
     }
 }
 
-extension DashboardViewModel: BudgetsListViewModelDelegate {
+extension DashboardViewModel: BudgetsListViewModel {
 
-    func willAdd(budget: Budget) throws {
-        try YearlyBudgetOverviewValidator.willAdd(budget: budget, to: yearlyOverview.budgets, year: year)
+    var budgets: [Budget] {
+        return yearlyOverview.budgets
     }
 
-    func didAdd(budget: Budget) throws {
+    func add(budget: Budget) async throws {
+        try YearlyBudgetOverviewValidator.willAdd(budget: budget, to: yearlyOverview.budgets, year: year)
+        try await storageProvider.add(budget: budget)
         try yearlyOverview.append(budget: budget)
     }
 
-    func didDelete(budgetsWith identifiers: Set<Budget.ID>) {
-        yearlyOverview.delete(budgetsWith: identifiers)
+    func delete(budgetsAt offsets: IndexSet) async throws {
+        let identifiers = budgets.at(offsets: offsets).map(\.id)
+        let identifiersSet = Set(identifiers)
+        try await storageProvider.delete(budgetsWith: identifiersSet)
+        yearlyOverview.delete(budgetsWith: identifiersSet)
     }
 }
 
