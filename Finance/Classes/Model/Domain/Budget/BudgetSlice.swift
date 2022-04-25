@@ -51,7 +51,7 @@ struct BudgetSlice: Identifiable, Hashable, AmountHolder {
 
     // MARK: Object life cycle
 
-    init(id: UUID = .init(), name: String, configuration: Configuration) throws {
+    init(id: UUID, name: String, configuration: Configuration) throws {
         guard !name.isEmpty else {
             throw DomainError.budgetSlice(error: .nameNotValid)
         }

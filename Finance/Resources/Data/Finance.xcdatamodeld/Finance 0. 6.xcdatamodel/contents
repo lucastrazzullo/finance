@@ -25,11 +25,12 @@
         <attribute name="budgetSliceIdentifier" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="contentDescription" optional="YES" attributeType="String"/>
         <attribute name="date" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="identifier" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
     </entity>
     <elements>
         <element name="BudgetEntity" positionX="-209.69921875" positionY="-150.32421875" width="128" height="104"/>
         <element name="BudgetSliceEntity" positionX="-63" positionY="-18" width="128" height="119"/>
         <element name="BudgetSliceScheduledAmountEntity" positionX="-135" positionY="-45" width="128" height="74"/>
-        <element name="TransactionEntity" positionX="-135" positionY="-27" width="128" height="89"/>
+        <element name="TransactionEntity" positionX="-135" positionY="-27" width="128" height="104"/>
     </elements>
 </model>

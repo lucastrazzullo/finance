@@ -73,6 +73,7 @@ struct NewBudgetView: View {
         Task {
             do {
                 let budget = try Budget(
+                    id: .init(),
                     year: year,
                     name: budgetName,
                     icon: budgetSystemIcon,

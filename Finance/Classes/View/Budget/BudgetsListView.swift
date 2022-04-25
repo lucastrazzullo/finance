@@ -18,13 +18,7 @@ struct BudgetsListView<Header: ToolbarContent>: View {
             List {
                 Section(header: Text("Budgets")) {
                     ForEach(viewModel.budgets) { budget in
-                        NavigationLink(destination: {
-                            BudgetView(viewModel: BudgetViewModel(
-                                budget: budget,
-                                storageProvider: storageProvider,
-                                delegate: viewModel.delegate
-                            ))
-                        }, label: {
+                        NavigationLink(destination: makeBudgetsListView(budget: budget), label: {
                             HStack {
                                 Label(budget.name, systemImage: budget.icon.rawValue)
                                     .symbolRenderingMode(.hierarchical)
@@ -55,6 +49,18 @@ struct BudgetsListView<Header: ToolbarContent>: View {
                 NewBudgetView(year: viewModel.year, onSubmit: viewModel.add(budget:))
             }
         }
+    }
+
+    // MARK: Private builder methods
+
+    @ViewBuilder private func makeBudgetsListView(budget: Budget) -> some View {
+        let viewModel = BudgetViewModel(
+            budget: budget,
+            storageProvider: storageProvider,
+            delegate: viewModel
+        )
+
+        BudgetView(viewModel: viewModel)
     }
 }
 

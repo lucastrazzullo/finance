@@ -99,9 +99,9 @@ struct NewBudgetSliceView: View {
             guard let sliceMonthlyAmount = sliceMonthlyAmount else {
                 throw DomainError.budgetSlice(error: .amountNotValid)
             }
-            return try BudgetSlice(name: sliceName, configuration: .monthly(amount: .value(sliceMonthlyAmount)))
+            return try BudgetSlice(id: .init(), name: sliceName, configuration: .monthly(amount: .value(sliceMonthlyAmount)))
         case .scheduled:
-            return try BudgetSlice(name: sliceName, configuration: .scheduled(schedules: sliceSchedules))
+            return try BudgetSlice(id: .init(), name: sliceName, configuration: .scheduled(schedules: sliceSchedules))
         }
     }
 }

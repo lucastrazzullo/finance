@@ -100,3 +100,10 @@ extension DashboardViewModel: OverviewListViewDelegate {
         try yearlyOverview.append(expenses: expenses)
     }
 }
+
+extension DashboardViewModel: TransactionsListViewModelDelegate {
+
+    func didDelete(transactionsWith identifiers: Set<Transaction.ID>) {
+        yearlyOverview.delete(expensesWith: identifiers)
+    }
+}

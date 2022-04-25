@@ -22,6 +22,7 @@ protocol StorageProvider: AnyObject {
 
     // MARK: Delete
 
+    func delete(transactionsWith identifiers: Set<Transaction.ID>) async throws
     func delete(budgetsWith identifiers: Set<Budget.ID>) async throws
     func delete(slicesWith identifiers: Set<BudgetSlice.ID>, inBudgetWith id: Budget.ID) async throws
 

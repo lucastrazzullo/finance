@@ -80,11 +80,11 @@ enum Mocks {
         components.year = year
         let date = Calendar.current.date(from: components)!
         return [
-            Transaction(description: nil, amount: .value(100), date: date, budgetSliceId: houseSlices[0].id),
-            Transaction(description: nil, amount: .value(100), date: date, budgetSliceId: houseSlices[1].id),
-            Transaction(description: nil, amount: .value(100), date: date, budgetSliceId: houseSlices[2].id),
-            Transaction(description: nil, amount: .value(1000), date: date, budgetSliceId: groceriesSlices[0].id),
-            Transaction(description: nil, amount: .value(1000), date: date, budgetSliceId: groceriesSlices[1].id)
+            Transaction(id: .init(), description: nil, amount: .value(100), date: date, budgetSliceId: houseSlices[0].id),
+            Transaction(id: .init(), description: nil, amount: .value(100), date: date, budgetSliceId: houseSlices[1].id),
+            Transaction(id: .init(), description: nil, amount: .value(100), date: date, budgetSliceId: houseSlices[2].id),
+            Transaction(id: .init(), description: nil, amount: .value(1000), date: date, budgetSliceId: groceriesSlices[0].id),
+            Transaction(id: .init(), description: nil, amount: .value(1000), date: date, budgetSliceId: groceriesSlices[1].id)
         ]
     }()
 }
@@ -141,6 +141,10 @@ final class MockStorageProvider: StorageProvider {
     }
 
     // MARK: Delete
+
+    func delete(transactionsWith identifiers: Set<Transaction.ID>) async throws {
+        transactions.removeAll(where: { identifiers.contains($0.id) })
+    }
 
     func delete(budgetsWith identifiers: Set<Budget.ID>) async throws {
         budgets.removeAll(where: { identifiers.contains($0.id) })

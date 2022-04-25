@@ -26,14 +26,14 @@ struct Budget: Identifiable, Hashable, AmountHolder {
 
     // MARK: Object life cycle
 
-    init(id: ID = .init(), year: Int, name: String, icon: SystemIcon, monthlyAmount: MoneyValue) throws {
+    init(id: ID, year: Int, name: String, icon: SystemIcon, monthlyAmount: MoneyValue) throws {
         let slices = [
             try BudgetSlice(id: .init(), name: Self.defaultSliceName, configuration: .monthly(amount: monthlyAmount))
         ]
         try self.init(id: id, year: year, name: name, icon: icon, slices: slices)
     }
 
-    init(id: ID = .init(), year: Int, name: String, icon: SystemIcon, slices: [BudgetSlice]) throws {
+    init(id: ID, year: Int, name: String, icon: SystemIcon, slices: [BudgetSlice]) throws {
         try BudgetValidator.canUse(name: name)
         try BudgetValidator.canUse(slices: slices)
 

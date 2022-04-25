@@ -9,24 +9,30 @@ import SwiftUI
 
 struct TransactionsListView: View {
 
-    let transactions: [Transaction]
+    @ObservedObject var viewModel: TransactionsListViewModel
 
     var body: some View {
         List {
-            ForEach(transactions) { transaction in
+            ForEach(viewModel.transactions) { transaction in
                 HStack {
                     Text(transaction.date, style: .date)
                     Spacer()
                     AmountView(amount: transaction.amount)
                 }
             }
+            .onDelete { offsets in Task { await viewModel.delete(transactionsAt: offsets) } }
         }
         .listStyle(.plain)
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
 struct TransactionsListView_Previews: PreviewProvider {
     static var previews: some View {
-        TransactionsListView(transactions: Mocks.transactions)
+        TransactionsListView(viewModel: .init(
+            transactions: Mocks.transactions,
+            storageProvider: MockStorageProvider(),
+            delegate: nil
+        ))
     }
 }

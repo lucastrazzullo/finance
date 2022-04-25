@@ -9,6 +9,7 @@ import SwiftUI
 
 struct OverviewListView<Header: ToolbarContent>: View {
 
+    @Environment(\.storageProvider) private var storageProvider
     @ObservedObject var viewModel: OverviewListViewModel
     @ToolbarContentBuilder var header: () -> Header
 
@@ -64,8 +65,15 @@ struct OverviewListView<Header: ToolbarContent>: View {
     // MARK: Private builder methods
 
     @ViewBuilder private func makeTransactionListView(overview: MonthlyBudgetOverview) -> some View {
-        TransactionsListView(transactions: overview.expensesInMonth)
-            .navigationTitle("Expenses \(overview.name)")
+        let month = Calendar.current.standaloneMonthSymbols[viewModel.month - 1]
+        let viewModel = TransactionsListViewModel(
+            transactions: overview.totalExpenses,
+            storageProvider: storageProvider,
+            delegate: viewModel
+        )
+
+        TransactionsListView(viewModel: viewModel)
+            .navigationTitle("Expenses \(overview.name), in \(month)")
     }
 }
 

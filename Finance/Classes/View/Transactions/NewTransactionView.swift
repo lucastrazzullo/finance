@@ -78,6 +78,7 @@ struct NewTransactionView: View {
                 let transactionDescription = transactionDescription.isEmpty ? nil : transactionDescription
 
                 let transaction = Transaction(
+                    id: .init(),
                     description: transactionDescription,
                     amount: MoneyValue.value(transactionAmount),
                     date: transactionDate,

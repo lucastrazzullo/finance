@@ -41,10 +41,7 @@ final class CoreDataStorageProvider: StorageProvider {
 
     func add(transaction: Transaction) async throws {
         let transactionEntity = TransactionEntity(context: self.persistentContainer.viewContext)
-        transactionEntity.amount = NSDecimalNumber(decimal: transaction.amount.value)
-        transactionEntity.date = transaction.date
-        transactionEntity.budgetSliceIdentifier = transaction.budgetSliceId
-        transactionEntity.contentDescription = transaction.description
+        setupTransactionEntity(transactionEntity, with: transaction)
 
         try saveOrRollback()
     }
@@ -67,6 +64,17 @@ final class CoreDataStorageProvider: StorageProvider {
     }
 
     // MARK: Delete
+
+    func delete(transactionsWith identifiers: Set<Transaction.ID>) async throws {
+        let transactionsEntities = try fetchTransactionEntities()
+        transactionsEntities.forEach { transactionEntity in
+            if let identifier = transactionEntity.identifier, identifiers.contains(identifier) {
+                self.persistentContainer.viewContext.delete(transactionEntity)
+            }
+        }
+
+        try saveOrRollback()
+    }
 
     func delete(budgetsWith identifiers: Set<Budget.ID>) async throws {
         let budgetsEntities = try fetchBudgetEntities()
@@ -193,6 +201,14 @@ final class CoreDataStorageProvider: StorageProvider {
 
     // MARK: - Private setup methods
 
+    private func setupTransactionEntity(_ transactionEntity: TransactionEntity, with transaction: Transaction) {
+        transactionEntity.identifier = transaction.id
+        transactionEntity.amount = NSDecimalNumber(decimal: transaction.amount.value)
+        transactionEntity.date = transaction.date
+        transactionEntity.budgetSliceIdentifier = transaction.budgetSliceId
+        transactionEntity.contentDescription = transaction.description
+    }
+
     private func setupBudgetEntity(_ budgetEntity: BudgetEntity, with budget: Budget) {
         budgetEntity.identifier = budget.id
         budgetEntity.year = Int64(budget.year)
@@ -289,7 +305,9 @@ private extension BudgetSlice.Configuration {
     static func with(budgetSliceEntity: BudgetSliceEntity) throws -> Self? {
         let configurationType = budgetSliceEntity.configurationType
         let monthlyAmount = budgetSliceEntity.amount
-        let schedules = try budgetSliceEntity.schedules?.compactMap(BudgetSlice.Schedule.with(budgetSliceScheduleEntity:))
+        let schedules = try budgetSliceEntity.schedules?
+            .compactMap({ $0 as? BudgetSliceScheduledAmountEntity })
+            .compactMap(BudgetSlice.Schedule.with(budgetSliceScheduleEntity:))
 
         switch (configurationType, monthlyAmount, schedules) {
         case let (0, monthlyAmount?, _):
@@ -313,30 +331,30 @@ private extension BudgetSlice.Configuration {
 
 private extension BudgetSlice.Schedule {
 
-    static func with(budgetSliceScheduleEntity: NSSet.Element) throws -> Self? {
-        guard let schedule = budgetSliceScheduleEntity as? BudgetSliceScheduledAmountEntity,
-              let amount = schedule.amount else {
+    static func with(budgetSliceScheduleEntity: BudgetSliceScheduledAmountEntity) throws -> Self? {
+        guard let amount = budgetSliceScheduleEntity.amount else {
             return nil
         }
-        let month = Int(schedule.month)
+        let month = Int(budgetSliceScheduleEntity.month)
         return try .init(amount: .value(amount.decimalValue), month: month)
     }
 }
 
 private extension Transaction {
 
-    static func with(transactionEntity: NSSet.Element) -> Self? {
-        guard let transaction = transactionEntity as? TransactionEntity,
-              let amountValue = transaction.amount as? Decimal,
-              let date = transaction.date,
-              let sliceId = transaction.budgetSliceIdentifier else {
+    static func with(transactionEntity: TransactionEntity) -> Self? {
+        guard let identifier = transactionEntity.identifier,
+              let amountValue = transactionEntity.amount as? Decimal,
+              let date = transactionEntity.date,
+              let sliceId = transactionEntity.budgetSliceIdentifier else {
             return nil
         }
 
-        let description = transaction.contentDescription
+        let description = transactionEntity.contentDescription
         let amount = MoneyValue.value(amountValue)
 
         return .init(
+            id: identifier,
             description: description,
             amount: amount,
             date: date,

@@ -26,8 +26,6 @@ protocol BudgetViewModelDelegate: AnyObject {
 
     @Published var budget: Budget
 
-    weak var delegate: BudgetViewModelDelegate?
-
     var name: String {
         return budget.name
     }
@@ -45,6 +43,7 @@ protocol BudgetViewModelDelegate: AnyObject {
     }
 
     private let storageProvider: StorageProvider
+    private weak var delegate: BudgetViewModelDelegate?
 
     // MARK: Object life cycle
 

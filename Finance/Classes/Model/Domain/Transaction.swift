@@ -9,7 +9,7 @@ import Foundation
 
 struct Transaction: Hashable, AmountHolder, Identifiable {
 
-    let id: UUID = .init()
+    let id: UUID
     let description: String?
     let amount: MoneyValue
     let date: Date
@@ -28,5 +28,9 @@ extension Array where Element == Transaction {
 
     func with(identifier: Budget.ID) -> Transaction? {
         return self.first(where: { $0.id == identifier })
+    }
+
+    func at(offsets: IndexSet) -> [Transaction] {
+        return NSArray(array: self).objects(at: offsets) as? [Transaction] ?? []
     }
 }

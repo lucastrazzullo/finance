@@ -53,14 +53,10 @@ struct YearlyBudgetOverview: Identifiable {
             .sorted(by: { $0.remainingAmount < $1.remainingAmount })
     }
 
-    // MARK: Mutating
+    // MARK: Mutating - Budgets
 
     mutating func set(budgets: [Budget]) {
         self.budgets = budgets.filter { $0.year == year }
-    }
-
-    mutating func set(expenses: [Transaction]) {
-        self.expenses = expenses.filter { $0.year == year }
     }
 
     mutating func append(budget: Budget) throws {
@@ -91,8 +87,18 @@ struct YearlyBudgetOverview: Identifiable {
         }
     }
 
+    // MARK: Mutating - Expenses
+
+    mutating func set(expenses: [Transaction]) {
+        self.expenses = expenses.filter { $0.year == year }
+    }
+
     mutating func append(expenses: [Transaction]) throws {
         try YearlyBudgetOverviewValidator.willAdd(expenses: expenses, for: year)
         self.expenses.append(contentsOf: expenses)
+    }
+
+    mutating func delete(expensesWith identifiers: Set<Budget.ID>) {
+        expenses.removeAll(where: { identifiers.contains($0.id) })
     }
 }

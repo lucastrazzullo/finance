@@ -18,17 +18,15 @@ protocol BudgetsListViewModelDelegate: AnyObject {
 
     typealias Delegate = BudgetsListViewModelDelegate & BudgetViewModelDelegate
 
+    @Published var budgets: [Budget]
     @Published var deleteBudgetError: DomainError?
     @Published var addNewBudgetIsPresented: Bool = false
-
-    @Published var budgets: [Budget]
-
-    weak var delegate: Delegate?
 
     let year: Int
     let title: String
 
     private let storageProvider: StorageProvider
+    private weak var delegate: Delegate?
 
     init(year: Int, title: String, budgets: [Budget], storageProvider: StorageProvider, delegate: Delegate?) {
         self.year = year
@@ -65,5 +63,24 @@ protocol BudgetsListViewModelDelegate: AnyObject {
         } catch {
             deleteBudgetError = error as? DomainError
         }
+    }
+}
+
+extension BudgetsListViewModel: BudgetViewModelDelegate {
+
+    func didAdd(slice: BudgetSlice, toBudgetWith identifier: Budget.ID) throws {
+        try delegate?.didAdd(slice: slice, toBudgetWith: identifier)
+    }
+
+    func didDelete(slicesWith identifiers: Set<BudgetSlice.ID>, inBudgetWith identifier: Budget.ID) throws {
+        try delegate?.didDelete(slicesWith: identifiers, inBudgetWith: identifier)
+    }
+
+    func willUpdate(name: String, in budget: Budget) throws {
+        try delegate?.willUpdate(name: name, in: budget)
+    }
+
+    func didUpdate(name: String, icon: SystemIcon, inBudgetWith identifier: Budget.ID) throws {
+        try delegate?.didUpdate(name: name, icon: icon, inBudgetWith: identifier)
     }
 }
