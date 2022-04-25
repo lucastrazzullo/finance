@@ -18,11 +18,11 @@ final class YearlyBudgetOverviewTests: XCTestCase {
 
     private func makeBudget(year: Int, name: String = "Name", slices: [BudgetSlice]? = nil) throws -> Budget {
         let slices = try (slices ?? [try makeSlice()])
-        return try Budget(year: year, name: name, icon: .default, slices: slices)
+        return try Budget(id: .init(), year: year, name: name, icon: .default, slices: slices)
     }
 
     private func makeSlice() throws -> BudgetSlice {
-        return try BudgetSlice(name: "Name", configuration: .monthly(amount: .value(100)))
+        return try BudgetSlice(id: .init(), name: "Name", configuration: .monthly(amount: .value(100)))
     }
 
     private func makeTransaction(year: Int, month: Int = 1, budgetSliceId: BudgetSlice.ID = .init(), amount: MoneyValue = .value(100)) -> Transaction {
@@ -30,7 +30,7 @@ final class YearlyBudgetOverviewTests: XCTestCase {
         components.year = year
         components.month = month
         let date = Calendar.current.date(from: components)!
-        return Transaction(description: nil, amount: amount, date: date, budgetSliceId: budgetSliceId)
+        return Transaction(id: .init(), description: nil, amount: amount, date: date, budgetSliceId: budgetSliceId)
     }
 
     // MARK: Instantiating
@@ -116,8 +116,8 @@ final class YearlyBudgetOverviewTests: XCTestCase {
     // MARK: Getting
 
     func testGetMonthlyOverview_forGivenBudget_andMonth() throws {
-        let slice = try BudgetSlice(name: "Monthly", configuration: .monthly(amount: .value(100)))
-        let budget = try Budget(year: 2000, name: "Name", icon: .default, slices: [slice])
+        let slice = try BudgetSlice(id: .init(), name: "Monthly", configuration: .monthly(amount: .value(100)))
+        let budget = try Budget(id: .init(), year: 2000, name: "Name", icon: .default, slices: [slice])
 
         let transaction1 = makeTransaction(year: 2000, month: 1, budgetSliceId: slice.id, amount: .value(50))
         let transaction2 = makeTransaction(year: 2000, month: 2, budgetSliceId: slice.id, amount: .value(50))

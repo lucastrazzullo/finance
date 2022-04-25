@@ -29,7 +29,7 @@ import XCTest
     func testAddBudget() async throws {
         let budget = Mocks.budgets[0]
         storageProvider = MockStorageProvider()
-        viewModel = BudgetsListViewModel(year: Mocks.year, title: "Title", budgets: [], storageProvider: storageProvider, delegate: nil)
+        viewModel = BudgetsListViewModel(year: Mocks.year, budgets: [], storageProvider: storageProvider, delegate: nil)
 
         viewModel.addNewBudgetIsPresented = true
         try await viewModel.add(budget: budget)
@@ -44,7 +44,7 @@ import XCTest
     func testDeleteBudgets() async throws {
         let budgetToDelete = Mocks.budgets[0]
         storageProvider = MockStorageProvider(budgets: Mocks.budgets, transactions: [])
-        viewModel = BudgetsListViewModel(year: Mocks.year, title: "Title", budgets: Mocks.budgets, storageProvider: storageProvider, delegate: nil)
+        viewModel = BudgetsListViewModel(year: Mocks.year, budgets: Mocks.budgets, storageProvider: storageProvider, delegate: nil)
 
         XCTAssertNil(viewModel.deleteBudgetError)
         XCTAssertTrue(viewModel.budgets.contains(budgetToDelete))

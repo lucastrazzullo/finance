@@ -28,7 +28,7 @@ import XCTest
 
     func testAddSlice() async throws {
         let budget = Mocks.budgets[0]
-        let slice = try BudgetSlice(name: "Adding slice", configuration: .monthly(amount: .value(100)))
+        let slice = try BudgetSlice(id: .init(), name: "Adding slice", configuration: .monthly(amount: .value(100)))
 
         storageProvider = MockStorageProvider(budgets: [budget], transactions: [])
         viewModel = BudgetViewModel(budget: budget, storageProvider: storageProvider, delegate: nil)
@@ -50,7 +50,7 @@ import XCTest
         let slicesToDelete = Mocks.houseSlices
         let slicesWillRemain = Mocks.groceriesSlices
         let slices = slicesToDelete + slicesWillRemain
-        let budget = try Budget(year: Mocks.year, name: "Name", icon: .default, slices: slices)
+        let budget = try Budget(id: .init(), year: Mocks.year, name: "Name", icon: .default, slices: slices)
         storageProvider = MockStorageProvider(budgets: [budget], transactions: [])
         viewModel = BudgetViewModel(budget: budget, storageProvider: storageProvider, delegate: nil)
 
@@ -83,7 +83,7 @@ import XCTest
     }
 
     func testSaveUpdates() async throws {
-        let budget = try Budget(year: Mocks.year, name: "Name 1", icon: .default, monthlyAmount: .value(100))
+        let budget = try Budget(id: .init(), year: Mocks.year, name: "Name 1", icon: .default, monthlyAmount: .value(100))
         storageProvider = MockStorageProvider(budgets: [budget], transactions: [])
         viewModel = BudgetViewModel(budget: budget, storageProvider: storageProvider, delegate: nil)
 

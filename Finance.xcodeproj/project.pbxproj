@@ -12,6 +12,7 @@
 		810F86A427FF91CB00A1CDD4 /* MonthlyBudgetOverview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 810F86A327FF91CA00A1CDD4 /* MonthlyBudgetOverview.swift */; };
 		810F86A628002CD700A1CDD4 /* MonthlyBudgetOverviewItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 810F86A528002CD700A1CDD4 /* MonthlyBudgetOverviewItem.swift */; };
 		811F255A2816B670005D74B1 /* BudgetsListItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 811F25592816B670005D74B1 /* BudgetsListItem.swift */; };
+		811F255C2816D016005D74B1 /* TransactionsListViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 811F255B2816D016005D74B1 /* TransactionsListViewModelTests.swift */; };
 		811F7BD3278C2A3500F1B8C9 /* BudgetSlice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 811F7BD2278C2A3500F1B8C9 /* BudgetSlice.swift */; };
 		8126BA7F2806E98A00C06C93 /* StorageProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8126BA7E2806E98A00C06C93 /* StorageProvider.swift */; };
 		8126BA8928073A7C00C06C93 /* ErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8126BA8828073A7C00C06C93 /* ErrorView.swift */; };
@@ -106,6 +107,7 @@
 		810F86A327FF91CA00A1CDD4 /* MonthlyBudgetOverview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthlyBudgetOverview.swift; sourceTree = "<group>"; };
 		810F86A528002CD700A1CDD4 /* MonthlyBudgetOverviewItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthlyBudgetOverviewItem.swift; sourceTree = "<group>"; };
 		811F25592816B670005D74B1 /* BudgetsListItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetsListItem.swift; sourceTree = "<group>"; };
+		811F255B2816D016005D74B1 /* TransactionsListViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionsListViewModelTests.swift; sourceTree = "<group>"; };
 		811F7BD2278C2A3500F1B8C9 /* BudgetSlice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetSlice.swift; sourceTree = "<group>"; };
 		8126BA7E2806E98A00C06C93 /* StorageProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageProvider.swift; sourceTree = "<group>"; };
 		8126BA802806F69A00C06C93 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -308,6 +310,7 @@
 				818D0AEA2812E8860007A6F6 /* OverviewListViewModelTests.swift */,
 				818D0AEC2812EB0A0007A6F6 /* BudgetsListViewModelTests.swift */,
 				818D0AEE2812ED250007A6F6 /* BudgetViewModelTests.swift */,
+				811F255B2816D016005D74B1 /* TransactionsListViewModelTests.swift */,
 			);
 			path = FinanceTests;
 			sourceTree = "<group>";
@@ -616,6 +619,7 @@
 				81F3B90C28042F2100A1B89F /* MonthlyBudgetOverviewTests.swift in Sources */,
 				81F3B90A28041EAD00A1B89F /* YearlyBudgetOverviewTests.swift in Sources */,
 				818D0AE72812D0870007A6F6 /* DashboardViewModelTests.swift in Sources */,
+				811F255C2816D016005D74B1 /* TransactionsListViewModelTests.swift in Sources */,
 				818D0AED2812EB0A0007A6F6 /* BudgetsListViewModelTests.swift in Sources */,
 				818D0AEB2812E8860007A6F6 /* OverviewListViewModelTests.swift in Sources */,
 				81F3B90828041AB900A1B89F /* BudgetSliceTests.swift in Sources */,

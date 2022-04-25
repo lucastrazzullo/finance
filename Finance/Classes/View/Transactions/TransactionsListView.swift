@@ -29,10 +29,15 @@ struct TransactionsListView: View {
 
 struct TransactionsListView_Previews: PreviewProvider {
     static var previews: some View {
-        TransactionsListView(viewModel: .init(
-            transactions: Mocks.transactions,
-            storageProvider: MockStorageProvider(),
-            delegate: nil
-        ))
+        NavigationView {
+            TransactionsListView(
+                viewModel: .init(
+                    transactions: Mocks.transactions,
+                    storageProvider: MockStorageProvider(),
+                    delegate: nil
+                )
+            )
+            .navigationTitle("Transactions")
+        }
     }
 }

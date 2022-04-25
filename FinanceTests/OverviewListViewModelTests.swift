@@ -29,7 +29,7 @@ import XCTest
     func testAddExpenses() async throws {
         let overview = YearlyBudgetOverview(name: "Mock", year: Mocks.year, budgets: [], expenses: [])
         storageProvider = MockStorageProvider()
-        viewModel = OverviewListViewModel(yearlyOverview: overview, storageProvider: storageProvider, delegate: nil)
+        viewModel = OverviewListViewModel(month: 1, yearlyOverview: overview, storageProvider: storageProvider, delegate: nil)
 
         let expenses = Mocks.transactions
 

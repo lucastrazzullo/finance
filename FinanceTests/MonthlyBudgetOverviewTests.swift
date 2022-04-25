@@ -19,6 +19,7 @@ final class MonthlyBudgetOverviewTests: XCTestCase {
         let date = Calendar.current.date(from: components)!
 
         let budget = try Budget(
+            id: .init(),
             year: date.year,
             name: "Name",
             icon: .default,
@@ -26,6 +27,7 @@ final class MonthlyBudgetOverviewTests: XCTestCase {
         )
 
         let expense = Transaction(
+            id: .init(),
             description: nil,
             amount: .value(expensesAmount),
             date: date,

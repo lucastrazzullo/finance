@@ -13,7 +13,7 @@ final class BudgetTests: XCTestCase {
     // MARK: Factories
 
     private func makeSlice(name: String = "Name", configuration: BudgetSlice.Configuration = .monthly(amount: .value(100))) throws -> BudgetSlice {
-        return try BudgetSlice(name: name, configuration: configuration)
+        return try BudgetSlice(id: .init(), name: name, configuration: configuration)
     }
 
     private func makeBudget(year: Int = 2000, name: String = "Name", icon: SystemIcon = .default, slices: [BudgetSlice]? = nil) throws -> Budget {
@@ -26,27 +26,27 @@ final class BudgetTests: XCTestCase {
                 try makeSlice(name: "Name 2")
             ]
         }
-        return try Budget(year: year, name: name, icon: icon, slices: budgetSlices)
+        return try Budget(id: .init(), year: year, name: name, icon: icon, slices: budgetSlices)
     }
 
     // MARK: Instantiating
 
     func testInstantiateBudget_withValidData() {
-        XCTAssertNoThrow(try Budget(year: 2000, name: "Name", icon: .cat, monthlyAmount: .value(100)))
-        XCTAssertNoThrow(try Budget(year: 2000, name: "Name", icon: .default, monthlyAmount: .value(100)))
-        XCTAssertNoThrow(try Budget(year: 2000, name: "Name", icon: .default, monthlyAmount: .zero))
-        XCTAssertNoThrow(try Budget(year: 2000, name: "Name", icon: .default, slices: [
+        XCTAssertNoThrow(try Budget(id: .init(), year: 2000, name: "Name", icon: .cat, monthlyAmount: .value(100)))
+        XCTAssertNoThrow(try Budget(id: .init(), year: 2000, name: "Name", icon: .default, monthlyAmount: .value(100)))
+        XCTAssertNoThrow(try Budget(id: .init(), year: 2000, name: "Name", icon: .default, monthlyAmount: .zero))
+        XCTAssertNoThrow(try Budget(id: .init(), year: 2000, name: "Name", icon: .default, slices: [
             try makeSlice(name: "Name"),
         ]))
-        XCTAssertNoThrow(try Budget(year: 2000, name: "Name", icon: .default, slices: [
+        XCTAssertNoThrow(try Budget(id: .init(), year: 2000, name: "Name", icon: .default, slices: [
             try makeSlice(name: "Name 1"),
             try makeSlice(name: "Name 2")
         ]))
     }
 
     func testInstantiateBudget_withInvalidData() {
-        XCTAssertThrowsError(try Budget(year: 2000, name: "", icon: .default, monthlyAmount: .value(100)))
-        XCTAssertThrowsError(try Budget(year: 2000, name: "Name", icon: .default, slices: []))
+        XCTAssertThrowsError(try Budget(id: .init(), year: 2000, name: "", icon: .default, monthlyAmount: .value(100)))
+        XCTAssertThrowsError(try Budget(id: .init(), year: 2000, name: "Name", icon: .default, slices: []))
         XCTAssertThrowsError(try makeBudget(slices: [
             try makeSlice(name: "Name"),
             try makeSlice(name: "Name")
@@ -54,10 +54,10 @@ final class BudgetTests: XCTestCase {
     }
 
     func testInstantiateBudget_totalAmount_withSlices() throws {
-        let budget = try Budget(year: 2000, name: "Name", icon: .default, slices: [
-            BudgetSlice(name: "Name 1", configuration: .monthly(amount: .value(100))),
-            BudgetSlice(name: "Name 2", configuration: .monthly(amount: .value(100))),
-            BudgetSlice(name: "Name 3", configuration: .scheduled(schedules: [
+        let budget = try Budget(id: .init(), year: 2000, name: "Name", icon: .default, slices: [
+            BudgetSlice(id: .init(), name: "Name 1", configuration: .monthly(amount: .value(100))),
+            BudgetSlice(id: .init(), name: "Name 2", configuration: .monthly(amount: .value(100))),
+            BudgetSlice(id: .init(), name: "Name 3", configuration: .scheduled(schedules: [
                 BudgetSlice.Schedule(amount: .value(100), month: 1),
                 BudgetSlice.Schedule(amount: .value(150), month: 2)
             ]))
