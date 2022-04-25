@@ -9,13 +9,14 @@ import SwiftUI
 
 struct OverviewListView<Item: View>: View {
 
-    @ObservedObject var viewModel: OverviewListViewModel
+    let month: Int
+    let yearlyOverview: YearlyBudgetOverview
 
     @ViewBuilder var item: (MonthlyBudgetOverview) -> Item
 
     var body: some View {
         List {
-            let montlhyOverviews = viewModel.monthlyOverviews
+            let montlhyOverviews = yearlyOverview.monthlyOverviews(month: month)
             if montlhyOverviews.count > 0 {
                 Section(header: Text("All Overviews")) {
                     ForEach(montlhyOverviews, id: \.self) { overview in
@@ -25,7 +26,7 @@ struct OverviewListView<Item: View>: View {
                 }
             }
 
-            let monthlyOverviewsWithLowestAvailability = viewModel.monthlyOverviewsWithLowestAvailability
+            let monthlyOverviewsWithLowestAvailability = yearlyOverview.monthlyOverviewsWithLowestAvailability(month: month)
             if monthlyOverviewsWithLowestAvailability.count > 0 {
                 Section(header: Text("Lowest budgets this month")) {
                     ForEach(monthlyOverviewsWithLowestAvailability, id: \.self) { overview in
@@ -36,21 +37,14 @@ struct OverviewListView<Item: View>: View {
             }
         }
         .listStyle(.plain)
-        .sheet(isPresented: $viewModel.addNewTransactionIsPresented) {
-            AddTransactionsView(budgets: viewModel.budgets, onSubmit: viewModel.add(expenses:))
-        }
     }
 }
 
 struct OverviewView_Previews: PreviewProvider {
     static var previews: some View {
         OverviewListView(
-            viewModel: .init(
-                month: Calendar.current.component(.month, from: .now),
-                yearlyOverview: Mocks.overview,
-                storageProvider: MockStorageProvider(),
-                delegate: nil
-            ),
+            month: Calendar.current.component(.month, from: .now),
+            yearlyOverview: Mocks.overview,
             item: { overview in
                 MonthlyBudgetOverviewItem(overview: overview)
             }

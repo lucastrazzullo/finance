@@ -9,16 +9,7 @@ import Foundation
 
 @MainActor final class DashboardViewModel: ObservableObject {
 
-    @Published var month: Int = Calendar.current.component(.month, from: .now)
     @Published var yearlyOverview: YearlyBudgetOverview
-
-    var title: String {
-        return yearlyOverview.name
-    }
-
-    var subtitle: String {
-        return String(yearlyOverview.year)
-    }
 
     var year: Int {
         return yearlyOverview.year
@@ -91,20 +82,25 @@ extension DashboardViewModel: BudgetsListViewModelDelegate {
     }
 }
 
-extension DashboardViewModel: OverviewListViewDelegate {
+extension DashboardViewModel: TransactionsListViewModel {
 
-    func willAdd(expenses: [Transaction]) throws {
-        try YearlyBudgetOverviewValidator.willAdd(expenses: expenses, for: yearlyOverview.year)
+    var transactions: [Transaction] {
+        return expenses
     }
 
-    func didAdd(expenses: [Transaction]) throws {
-        try yearlyOverview.append(expenses: expenses)
+    func add(transactions: [Transaction]) async throws {
+        try YearlyBudgetOverviewValidator.willAdd(expenses: transactions, for: yearlyOverview.year)
+        for transaction in transactions {
+            try await storageProvider.add(transaction: transaction)
+        }
+        try yearlyOverview.append(expenses: transactions)
     }
-}
 
-extension DashboardViewModel: TransactionsListViewModelDelegate {
+    func delete(transactionsAt offsets: IndexSet) async throws {
+        let identifiers = transactions.at(offsets: offsets).map(\.id)
+        let identifiersSet = Set(identifiers)
 
-    func didDelete(transactionsWith identifiers: Set<Transaction.ID>) {
-        yearlyOverview.delete(expensesWith: identifiers)
+        try await storageProvider.delete(transactionsWith: identifiersSet)
+        yearlyOverview.delete(expensesWith: identifiersSet)
     }
 }

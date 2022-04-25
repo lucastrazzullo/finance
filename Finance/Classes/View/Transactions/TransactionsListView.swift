@@ -7,9 +7,11 @@
 
 import SwiftUI
 
-struct TransactionsListView: View {
+struct TransactionsListView<ViewModel: TransactionsListViewModel>: View {
 
-    @ObservedObject var viewModel: TransactionsListViewModel
+    @ObservedObject var viewModel: ViewModel
+
+    @State var deleteTransactionError: DomainError?
 
     var body: some View {
         List {
@@ -20,7 +22,18 @@ struct TransactionsListView: View {
                     AmountView(amount: transaction.amount)
                 }
             }
-            .onDelete { offsets in Task { await viewModel.delete(transactionsAt: offsets) } }
+            .onDelete { offsets in Task {
+                do {
+                    try await viewModel.delete(transactionsAt: offsets)
+                    deleteTransactionError = nil
+                } catch {
+                    deleteTransactionError = error as? DomainError
+                }
+            }}
+
+            if let error = deleteTransactionError {
+                InlineErrorView(error: error)
+            }
         }
         .listStyle(.plain)
         .navigationBarTitleDisplayMode(.inline)
@@ -30,14 +43,19 @@ struct TransactionsListView: View {
 struct TransactionsListView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
-            TransactionsListView(
-                viewModel: .init(
-                    transactions: Mocks.transactions,
-                    storageProvider: MockStorageProvider(),
-                    delegate: nil
-                )
-            )
-            .navigationTitle("Transactions")
+            TransactionsListView(viewModel: MockViewModel())
+                .navigationTitle("Transactions")
         }
+    }
+}
+
+private final class MockViewModel: TransactionsListViewModel {
+
+    var transactions: [Transaction] = Mocks.transactions
+
+    func add(transactions: [Transaction]) async throws {
+    }
+
+    func delete(transactionsAt offsets: IndexSet) async {
     }
 }
