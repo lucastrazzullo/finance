@@ -7,60 +7,33 @@
 
 import SwiftUI
 
-struct BudgetsListView<Header: ToolbarContent>: View {
+struct BudgetsListView<Item: View>: View {
 
-    @Environment(\.storageProvider) private var storageProvider
     @ObservedObject var viewModel: BudgetsListViewModel
-    @ToolbarContentBuilder var header: () -> Header
+
+    @ViewBuilder var item: (Budget) -> Item
 
     var body: some View {
-        NavigationView {
-            List {
-                Section(header: Text("Budgets")) {
-                    ForEach(viewModel.budgets) { budget in
-                        NavigationLink(destination: makeBudgetsListView(budget: budget), label: {
-                            HStack {
-                                Label(budget.name, systemImage: budget.icon.rawValue)
-                                    .symbolRenderingMode(.hierarchical)
-                                    .font(.body.bold())
-                                    .accentColor(.secondary)
-                                Spacer()
-                                AmountView(amount: budget.amount)
-                            }
-                            .padding(.vertical, 8)
-                        })
+        List {
+            Section(header: Text("Budgets")) {
+                ForEach(viewModel.budgets) { budget in
+                    item(budget)
                         .accessibilityIdentifier(AccessibilityIdentifier.BudgetsListView.budgetLink)
-                    }
-                    .onDelete { offsets in
-                        Task { await viewModel.delete(budgetsAt: offsets) }
-                    }
+                }
+                .onDelete { offsets in
+                    Task { await viewModel.delete(budgetsAt: offsets) }
+                }
 
-                    Button(action: { viewModel.addNewBudgetIsPresented = true }) {
-                        Label("Add", systemImage: "plus")
-                            .accessibilityIdentifier(AccessibilityIdentifier.BudgetsListView.addBudgetButton)
-                    }
+                Button(action: { viewModel.addNewBudgetIsPresented = true }) {
+                    Label("Add", systemImage: "plus")
+                        .accessibilityIdentifier(AccessibilityIdentifier.BudgetsListView.addBudgetButton)
                 }
             }
-            .listStyle(.inset)
-            .navigationBarTitleDisplayMode(.inline)
-            .navigationBarItems(trailing: EditButton())
-            .toolbar(content: header)
-            .sheet(isPresented: $viewModel.addNewBudgetIsPresented) {
-                NewBudgetView(year: viewModel.year, onSubmit: viewModel.add(budget:))
-            }
         }
-    }
-
-    // MARK: Private builder methods
-
-    @ViewBuilder private func makeBudgetsListView(budget: Budget) -> some View {
-        let viewModel = BudgetViewModel(
-            budget: budget,
-            storageProvider: storageProvider,
-            delegate: viewModel
-        )
-
-        BudgetView(viewModel: viewModel)
+        .listStyle(.inset)
+        .sheet(isPresented: $viewModel.addNewBudgetIsPresented) {
+            NewBudgetView(year: viewModel.year, onSubmit: viewModel.add(budget:))
+        }
     }
 }
 
@@ -72,15 +45,12 @@ struct BudgetsListView_Previews: PreviewProvider {
         BudgetsListView(
             viewModel: .init(
                 year: Mocks.year,
-                title: "Title",
                 budgets: Mocks.budgets,
                 storageProvider: MockStorageProvider(),
                 delegate: nil
             ),
-            header: {
-                ToolbarItem {
-                    Text("Header")
-                }
+            item: { budget in
+                BudgetsListItem(budget: budget)
             }
         )
     }

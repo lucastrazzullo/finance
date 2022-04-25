@@ -29,19 +29,9 @@ struct DashboardView: View {
                 Label("Overview", systemImage: "list.bullet.below.rectangle")
             }
 
-            BudgetsListView(
-                viewModel: BudgetsListViewModel(
-                    year: viewModel.year,
-                    title: viewModel.title,
-                    budgets: viewModel.budgets,
-                    storageProvider: storageProvider,
-                    delegate: viewModel
-                ),
-                header: { DashboardHeader(
-                    title: viewModel.title,
-                    subtitle: viewModel.subtitle
-                )}
-            )
+            NavigationView {
+                makeBudgetsListView()
+            }
             .tabItem {
                 Label("Budgets", systemImage: "list.dash")
                     .accessibilityIdentifier(AccessibilityIdentifier.DashboardView.budgetsTab)
@@ -53,6 +43,43 @@ struct DashboardView: View {
         .refreshable {
             try? await viewModel.load()
         }
+    }
+
+    // MARK: Private builder methods
+
+    @ViewBuilder private func makeBudgetsListView() -> some View {
+        let viewModel = BudgetsListViewModel(
+            year: viewModel.year,
+            budgets: viewModel.budgets,
+            storageProvider: storageProvider,
+            delegate: viewModel
+        )
+
+        BudgetsListView(viewModel: viewModel, item: makeBudgetListItem(budget:))
+    }
+
+    @ViewBuilder private func makeBudgetListItem(budget: Budget) -> some View {
+        NavigationLink(destination: makeBudgetView(budget: budget), label: {
+            BudgetsListItem(budget: budget)
+                .navigationBarTitleDisplayMode(.inline)
+                .navigationBarItems(trailing: EditButton())
+                .toolbar {
+                    DashboardHeader(
+                        title: viewModel.title,
+                        subtitle: viewModel.subtitle
+                    )
+                }
+        })
+    }
+
+    @ViewBuilder private func makeBudgetView(budget: Budget) -> some View {
+        let viewModel = BudgetViewModel(
+            budget: budget,
+            storageProvider: storageProvider,
+            delegate: viewModel
+        )
+
+        BudgetView(viewModel: viewModel)
     }
 }
 
