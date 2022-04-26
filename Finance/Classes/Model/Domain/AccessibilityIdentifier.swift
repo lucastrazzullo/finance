@@ -18,7 +18,7 @@ enum AccessibilityIdentifier {
         static let invalidSlicesError = "InvalidSlicesError"
     }
 
-    enum DashboardView {
+    enum YearlyOverviewView {
         static let budgetsTab = "BudgetsTab"
     }
 

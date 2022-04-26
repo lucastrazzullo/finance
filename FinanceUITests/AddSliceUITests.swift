@@ -13,7 +13,7 @@ final class AddSliceUITests: FinanceUITestCase {
     // MARK: - Happy cases
 
     func testAddSlice_toNewBudget() {
-        let addBudgetFlow = DashboardFlow(app: app)
+        let addBudgetFlow = YearlyOverviewFlow(app: app)
             .tapBudgetsTab()
             .tapAddNewBudget()
             .assertSliceItemDoesntExists()
@@ -31,7 +31,7 @@ final class AddSliceUITests: FinanceUITestCase {
     // MARK: - Unhappy cases
 
     func testAddSlice_toNewBudget_withSameName() {
-        _ = DashboardFlow(app: app)
+        _ = YearlyOverviewFlow(app: app)
             .tapBudgetsTab()
             .tapAddNewBudget()
             .insertNewBudgetSlice()
@@ -45,7 +45,7 @@ final class AddSliceUITests: FinanceUITestCase {
     }
 
     func testAddSlice_toNewBudget_withoutName() {
-        _ = DashboardFlow(app: app)
+        _ = YearlyOverviewFlow(app: app)
             .tapBudgetsTab()
             .tapAddNewBudget()
             .tapAddNewSlice()
@@ -56,7 +56,7 @@ final class AddSliceUITests: FinanceUITestCase {
     }
 
     func testAddSlice_toNewBudget_withoutAmount() {
-        _ = DashboardFlow(app: app)
+        _ = YearlyOverviewFlow(app: app)
             .tapBudgetsTab()
             .tapAddNewBudget()
             .tapAddNewSlice()

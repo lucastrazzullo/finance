@@ -1,5 +1,5 @@
 //
-//  MonthlyBudgetOverviewItem.swift
+//  MonthlyOverviewItem.swift
 //  Finance
 //
 //  Created by Luca Strazzullo on 08/04/2022.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct MonthlyBudgetOverviewItem: View {
+struct MonthlyOverviewItem: View {
 
     let overview: MonthlyBudgetOverview
 
@@ -103,7 +103,7 @@ struct MonthlyBudgetOverviewItem_Previews: PreviewProvider {
     static var previews: some View {
         List {
             ForEach(Mocks.budgets) { budget in
-                MonthlyBudgetOverviewItem(
+                MonthlyOverviewItem(
                     overview: MonthlyBudgetOverview(
                         month: 1,
                         expenses: Mocks.transactions,

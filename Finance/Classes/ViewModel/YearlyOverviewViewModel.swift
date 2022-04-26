@@ -1,5 +1,5 @@
 //
-//  DashboardViewModel.swift
+//  YearlyOverviewViewModel.swift
 //  Finance
 //
 //  Created by Luca Strazzullo on 19/04/2022.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-@MainActor final class DashboardViewModel: ObservableObject {
+@MainActor final class YearlyOverviewViewModel: ObservableObject {
 
     @Published var yearlyOverview: YearlyBudgetOverview
 
@@ -44,7 +44,7 @@ import Foundation
     }
 }
 
-extension DashboardViewModel: BudgetViewModelDelegate {
+extension YearlyOverviewViewModel: BudgetViewModelDelegate {
 
     func didAdd(slice: BudgetSlice, toBudgetWith identifier: Budget.ID) throws {
         try yearlyOverview.append(slice: slice, toBudgetWith: identifier)
@@ -63,7 +63,7 @@ extension DashboardViewModel: BudgetViewModelDelegate {
     }
 }
 
-extension DashboardViewModel: BudgetsListViewModel {
+extension YearlyOverviewViewModel: BudgetsListViewModel {
 
     var budgets: [Budget] {
         return yearlyOverview.budgets
@@ -83,7 +83,7 @@ extension DashboardViewModel: BudgetsListViewModel {
     }
 }
 
-extension DashboardViewModel: TransactionsListViewModel {
+extension YearlyOverviewViewModel: TransactionsListViewModel {
 
     var transactions: [Transaction] {
         return expenses

@@ -13,7 +13,7 @@ import SwiftUI
 
     var body: some Scene {
         WindowGroup {
-            DashboardView(viewModel: .init(year: 2022, storageProvider: storageProvider))
+            YearlyOverviewView(viewModel: .init(year: 2022, storageProvider: storageProvider))
         }
     }
 }

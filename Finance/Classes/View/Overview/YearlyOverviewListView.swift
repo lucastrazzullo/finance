@@ -1,5 +1,5 @@
 //
-//  OverviewListView.swift
+//  YearlyOverviewListView.swift
 //  Finance
 //
 //  Created by Luca Strazzullo on 07/04/2022.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct OverviewListView<Item: View>: View {
+struct YearlyOverviewListView<Item: View>: View {
 
     @ViewBuilder var item: (MonthlyBudgetOverview) -> Item
 
@@ -42,9 +42,9 @@ struct OverviewListView<Item: View>: View {
 
 struct OverviewView_Previews: PreviewProvider {
     static var previews: some View {
-        OverviewListView(
+        YearlyOverviewListView(
             item: { overview in
-                MonthlyBudgetOverviewItem(overview: overview)
+                MonthlyOverviewItem(overview: overview)
             },
             yearlyOverview: Mocks.overview,
             month: Calendar.current.component(.month, from: .now)
