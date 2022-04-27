@@ -7,12 +7,11 @@
 
 import Foundation
 
-protocol BudgetViewModelDelegate: AnyObject {
-    func didAdd(slice: BudgetSlice, toBudgetWith identifier: Budget.ID) throws
-    func didDelete(slicesWith identifiers: Set<BudgetSlice.ID>, inBudgetWith identifier: Budget.ID) throws
-
-    func willUpdate(name: String, in budget: Budget) throws
-    func didUpdate(name: String, icon: SystemIcon, inBudgetWith identifier: Budget.ID) throws
+protocol BudgetDataProvider: AnyObject {
+    func budget(with identifier: Budget.ID) async throws -> Budget
+    func add(slice: BudgetSlice, toBudgetWith identifier: Budget.ID) async throws
+    func delete(slicesWith identifiers: Set<BudgetSlice.ID>, inBudgetWith identifier: Budget.ID) async throws
+    func update(name: String, icon: SystemIcon, in budget: Budget) async throws
 }
 
 @MainActor final class BudgetViewModel: ObservableObject {
@@ -42,15 +41,13 @@ protocol BudgetViewModelDelegate: AnyObject {
         return budget.icon.rawValue
     }
 
-    private let storageProvider: StorageProvider
-    private weak var delegate: BudgetViewModelDelegate?
+    private let dataProvider: BudgetDataProvider
 
     // MARK: Object life cycle
 
-    init(budget: Budget, storageProvider: StorageProvider, delegate: BudgetViewModelDelegate?) {
+    init(budget: Budget, dataProvider: BudgetDataProvider) {
         self.budget = budget
-        self.storageProvider = storageProvider
-        self.delegate = delegate
+        self.dataProvider = dataProvider
 
         self.updatingBudgetName = budget.name
         self.updatingBudgetIcon = budget.icon
@@ -60,11 +57,9 @@ protocol BudgetViewModelDelegate: AnyObject {
 
     func add(slice: BudgetSlice) async throws {
         try BudgetValidator.willAdd(slice: slice, to: budget.slices)
-        try await storageProvider.add(slice: slice, toBudgetWith: budget.id)
-        
-        try budget.append(slice: slice)
-        try delegate?.didAdd(slice: slice, toBudgetWith: budget.id)
+        try await dataProvider.add(slice: slice, toBudgetWith: budget.id)
 
+        budget = try await dataProvider.budget(with: budget.id)
         isInsertNewSlicePresented = false
     }
 
@@ -74,11 +69,9 @@ protocol BudgetViewModelDelegate: AnyObject {
             let identifiersSet = Set(identifiers)
 
             try BudgetValidator.willDelete(slicesWith: identifiersSet, from: budget.slices)
-            try await storageProvider.delete(slicesWith: identifiersSet, inBudgetWith: budget.id)
+            try await dataProvider.delete(slicesWith: identifiersSet, inBudgetWith: budget.id)
 
-            try budget.delete(slicesWith: identifiersSet)
-            try delegate?.didDelete(slicesWith: identifiersSet, inBudgetWith: budget.id)
-
+            budget = try await dataProvider.budget(with: budget.id)
             deleteSlicesError = nil
         } catch {
             deleteSlicesError = error as? DomainError
@@ -88,16 +81,10 @@ protocol BudgetViewModelDelegate: AnyObject {
     func saveUpdates() async {
         do {
             try BudgetValidator.canUse(name: name)
-            try delegate?.willUpdate(name: updatingBudgetName, in: budget)
+            try await dataProvider.update(name: updatingBudgetName, icon: updatingBudgetIcon, in: budget)
 
-            try await storageProvider.update(name: updatingBudgetName, iconSystemName: updatingBudgetIcon.rawValue, inBudgetWith: budget.id)
-
-            try budget.update(name: updatingBudgetName)
-            try budget.update(icon: updatingBudgetIcon)
-            try delegate?.didUpdate(name: budget.name, icon: budget.icon, inBudgetWith: budget.id)
-
+            budget = try await dataProvider.budget(with: budget.id)
             updateBudgetInfoError = nil
-
         } catch {
             updateBudgetInfoError = error as? DomainError
         }

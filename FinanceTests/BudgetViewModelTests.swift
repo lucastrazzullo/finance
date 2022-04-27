@@ -11,7 +11,7 @@ import XCTest
 
 @MainActor final class BudgetViewModelTests: XCTestCase {
 
-    private var storageProvider: StorageProvider!
+    private var dataProvider: BudgetDataProvider!
     private var viewModel: BudgetViewModel!
 
     @MainActor override func setUpWithError() throws {
@@ -20,7 +20,7 @@ import XCTest
 
     @MainActor override func tearDownWithError() throws {
         viewModel = nil
-        storageProvider = nil
+        dataProvider = nil
         try super.tearDownWithError()
     }
 
@@ -30,8 +30,8 @@ import XCTest
         let budget = Mocks.budgets[0]
         let slice = try BudgetSlice(id: .init(), name: "Adding slice", configuration: .monthly(amount: .value(100)))
 
-        storageProvider = MockStorageProvider(budgets: [budget], transactions: [])
-        viewModel = BudgetViewModel(budget: budget, storageProvider: storageProvider, delegate: nil)
+        dataProvider = MockBudgetDataProvider(budgets: [budget])
+        viewModel = BudgetViewModel(budget: budget, dataProvider: dataProvider)
 
         XCTAssertFalse(budget.slices.contains(slice))
 
@@ -41,65 +41,138 @@ import XCTest
         XCTAssertFalse(viewModel.isInsertNewSlicePresented)
         XCTAssertTrue(viewModel.slices.contains(slice))
 
-        let storedBudgets = try await storageProvider.fetchBudgets(year: budget.year)
-        let storedBudget = try XCTUnwrap(storedBudgets.with(identifier: budget.id))
-        XCTAssertTrue(storedBudget.slices.contains(slice))
+        let updatedBudget = try await dataProvider.budget(with: budget.id)
+        XCTAssertTrue(updatedBudget.slices.contains(slice))
     }
 
     func testDeleteSlices() async throws {
-        let slicesToDelete = Mocks.houseSlices
-        let slicesWillRemain = Mocks.groceriesSlices
-        let slices = slicesToDelete + slicesWillRemain
+        let firstSlicesSet = Mocks.houseSlices
+        let secondSlicesSet = Mocks.groceriesSlices
+        let extraSlice = try BudgetSlice(id: .init(), name: "Extra slice", configuration: .monthly(amount: .value(100)))
+        let slices = firstSlicesSet + secondSlicesSet + [extraSlice]
         let budget = try Budget(id: .init(), year: Mocks.year, name: "Name", icon: .default, slices: slices)
-        storageProvider = MockStorageProvider(budgets: [budget], transactions: [])
-        viewModel = BudgetViewModel(budget: budget, storageProvider: storageProvider, delegate: nil)
 
+        dataProvider = MockBudgetDataProvider(budgets: [budget])
+        viewModel = BudgetViewModel(budget: budget, dataProvider: dataProvider)
+
+        // Assert initial state
         XCTAssertNil(viewModel.deleteSlicesError)
-        slicesToDelete.forEach { slice in
+        firstSlicesSet.forEach { slice in
             XCTAssertTrue(viewModel.budget.slices.contains(slice))
         }
-        slicesWillRemain.forEach { slice in
+        secondSlicesSet.forEach { slice in
             XCTAssertTrue(viewModel.budget.slices.contains(slice))
         }
+        XCTAssertTrue(viewModel.budget.slices.contains(extraSlice))
 
-        await viewModel.delete(slicesAt: .init(integersIn: 0..<slicesToDelete.count))
+        // Delete first slices set
+        var offsets = IndexSet(integersIn: 0..<firstSlicesSet.count)
+        await viewModel.delete(slicesAt: offsets)
 
         XCTAssertNil(viewModel.deleteSlicesError)
-        slicesToDelete.forEach { slice in
+        firstSlicesSet.forEach { slice in
             XCTAssertFalse(viewModel.budget.slices.contains(slice))
         }
-        slicesWillRemain.forEach { slice in
+        secondSlicesSet.forEach { slice in
             XCTAssertTrue(viewModel.budget.slices.contains(slice))
         }
+        XCTAssertTrue(viewModel.budget.slices.contains(extraSlice))
 
-        let storedBudgets = try await storageProvider.fetchBudgets(year: budget.year)
-        let storedBudget = try XCTUnwrap(storedBudgets.with(identifier: budget.id))
-        slicesToDelete.forEach { slice in
-            XCTAssertFalse(storedBudget.slices.contains(slice))
+        var updatedBudget = try await dataProvider.budget(with: budget.id)
+        firstSlicesSet.forEach { slice in
+            XCTAssertFalse(updatedBudget.slices.contains(slice))
         }
-        slicesWillRemain.forEach { slice in
-            XCTAssertTrue(storedBudget.slices.contains(slice))
+        secondSlicesSet.forEach { slice in
+            XCTAssertTrue(updatedBudget.slices.contains(slice))
         }
+        XCTAssertTrue(updatedBudget.slices.contains(extraSlice))
+
+        // Delete second slices set
+        offsets = IndexSet(integersIn: 0..<secondSlicesSet.count)
+        await viewModel.delete(slicesAt: offsets)
+
+        XCTAssertNil(viewModel.deleteSlicesError)
+        firstSlicesSet.forEach { slice in
+            XCTAssertFalse(viewModel.budget.slices.contains(slice))
+        }
+        secondSlicesSet.forEach { slice in
+            XCTAssertFalse(viewModel.budget.slices.contains(slice))
+        }
+        XCTAssertTrue(viewModel.budget.slices.contains(extraSlice))
+
+        updatedBudget = try await dataProvider.budget(with: budget.id)
+        firstSlicesSet.forEach { slice in
+            XCTAssertFalse(updatedBudget.slices.contains(slice))
+        }
+        secondSlicesSet.forEach { slice in
+            XCTAssertFalse(updatedBudget.slices.contains(slice))
+        }
+        XCTAssertTrue(updatedBudget.slices.contains(extraSlice))
+
+        // Delete extra slice
+        offsets = IndexSet(integer: 0)
+        await viewModel.delete(slicesAt: offsets)
+
+        let error = try XCTUnwrap(viewModel.deleteSlicesError)
+        guard case DomainError.budget(error: .thereMustBeAtLeastOneSlice) = error else {
+            XCTFail("Error not expected: \(error)")
+            return
+        }
+
+        firstSlicesSet.forEach { slice in
+            XCTAssertFalse(viewModel.budget.slices.contains(slice))
+        }
+        secondSlicesSet.forEach { slice in
+            XCTAssertFalse(viewModel.budget.slices.contains(slice))
+        }
+        XCTAssertTrue(viewModel.budget.slices.contains(extraSlice))
+
+        updatedBudget = try await dataProvider.budget(with: budget.id)
+        firstSlicesSet.forEach { slice in
+            XCTAssertFalse(updatedBudget.slices.contains(slice))
+        }
+        secondSlicesSet.forEach { slice in
+            XCTAssertFalse(updatedBudget.slices.contains(slice))
+        }
+        XCTAssertTrue(updatedBudget.slices.contains(extraSlice))
     }
 
     func testSaveUpdates() async throws {
         let budget = try Budget(id: .init(), year: Mocks.year, name: "Name 1", icon: .default, monthlyAmount: .value(100))
-        storageProvider = MockStorageProvider(budgets: [budget], transactions: [])
-        viewModel = BudgetViewModel(budget: budget, storageProvider: storageProvider, delegate: nil)
+        dataProvider = MockBudgetDataProvider(budgets: [budget])
+        viewModel = BudgetViewModel(budget: budget, dataProvider: dataProvider)
 
         XCTAssertNil(viewModel.deleteSlicesError)
 
+        // Update to valid name and icon
         viewModel.updatingBudgetName = "Name 2"
         viewModel.updatingBudgetIcon = .car
         await viewModel.saveUpdates()
 
+        XCTAssertNil(viewModel.deleteSlicesError)
         XCTAssertEqual(viewModel.budget.name, "Name 2")
         XCTAssertEqual(viewModel.budget.icon, .car)
-        XCTAssertNil(viewModel.deleteSlicesError)
 
-        let storedBudgets = try await storageProvider.fetchBudgets(year: budget.year)
-        let storedBudget = try XCTUnwrap(storedBudgets.with(identifier: budget.id))
-        XCTAssertEqual(storedBudget.name, "Name 2")
-        XCTAssertEqual(storedBudget.icon, .car)
+        var updatedBudget = try await dataProvider.budget(with: budget.id)
+        XCTAssertEqual(updatedBudget.name, "Name 2")
+        XCTAssertEqual(updatedBudget.icon, .car)
+
+        // Update to not valid name
+        viewModel.updatingBudgetName = ""
+        viewModel.updatingBudgetIcon = .car
+        await viewModel.saveUpdates()
+
+        let error = try XCTUnwrap(viewModel.updateBudgetInfoError)
+        guard case DomainError.budget(error: .nameNotValid) = error else {
+            XCTFail("Error not expected: \(error)")
+            return
+        }
+
+        XCTAssertEqual(viewModel.budget.name, "Name 2")
+        XCTAssertEqual(viewModel.budget.icon, .car)
+
+        updatedBudget = try await dataProvider.budget(with: budget.id)
+        XCTAssertEqual(updatedBudget.name, "Name 2")
+        XCTAssertEqual(updatedBudget.icon, .car)
     }
 }

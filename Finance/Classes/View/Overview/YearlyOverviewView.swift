@@ -13,9 +13,6 @@ struct YearlyOverviewView: View {
 
     @ObservedObject var viewModel: YearlyOverviewViewModel
 
-    @State var month: Int = Calendar.current.component(.month, from: .now)
-    @State var addNewTransactionIsPresented: Bool = false
-
     var body: some View {
         TabView {
             NavigationView {
@@ -47,13 +44,10 @@ struct YearlyOverviewView: View {
         YearlyOverviewListView(
             item: makeOverviewListViewItem(overview:),
             yearlyOverview: viewModel.yearlyOverview,
-            month: month
+            month: viewModel.month
         )
-        .sheet(isPresented: $addNewTransactionIsPresented) {
-            AddTransactionsView(budgets: viewModel.budgets, onSubmit: { transactions in
-                try await viewModel.add(transactions: transactions)
-                addNewTransactionIsPresented = false
-            })
+        .sheet(isPresented: $viewModel.addNewTransactionIsPresented) {
+            AddTransactionsView(budgets: viewModel.budgets, onSubmit: viewModel.add(transactions:))
         }
         .navigationBarTitleDisplayMode(.inline)
         .toolbar(content: {
@@ -65,12 +59,12 @@ struct YearlyOverviewView: View {
             }
 
             ToolbarItem(placement: .navigationBarLeading) {
-                MonthPickerView(month: $month)
+                MonthPickerView(month: $viewModel.month)
                     .pickerStyle(MenuPickerStyle())
             }
 
             ToolbarItem(placement: .navigationBarTrailing) {
-                Button(action: { addNewTransactionIsPresented = true }) {
+                Button(action: { viewModel.addNewTransactionIsPresented = true }) {
                     Label("New transaction", systemImage: "plus")
                 }
             }
@@ -83,13 +77,13 @@ struct YearlyOverviewView: View {
         }
     }
 
-    // MARK: Private builder methods - Transactions list
+    // MARK: Private builder methods - Transactions
 
     @ViewBuilder private func makeExpensesListView(overview: MonthlyBudgetOverview) -> some View {
-        let month = Calendar.current.standaloneMonthSymbols[month - 1]
+        let month = Calendar.current.standaloneMonthSymbols[viewModel.month - 1]
 
         TransactionsListView(viewModel: viewModel)
-            .sheet(isPresented: $addNewTransactionIsPresented) {
+            .sheet(isPresented: $viewModel.addNewTransactionIsPresented) {
                 AddTransactionsView(budgets: viewModel.budgets, onSubmit: viewModel.add(transactions:))
             }
             .toolbar(content: {
@@ -101,16 +95,17 @@ struct YearlyOverviewView: View {
                 }
 
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: { addNewTransactionIsPresented = true }) {
+                    Button(action: { viewModel.addNewTransactionIsPresented = true }) {
                         Label("New transaction", systemImage: "plus")
                     }
                 }
             })
     }
 
-    // MARK: Private builder methods - Budgets list
+    // MARK: Private builder methods - Budgets
 
     @ViewBuilder private func makeBudgetsListView() -> some View {
+        let viewModel = BudgetsListViewModel(dataProvider: viewModel)
         BudgetsListView(viewModel: viewModel, item: makeBudgetListItem(budget:))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -132,8 +127,7 @@ struct YearlyOverviewView: View {
     @ViewBuilder private func makeBudgetView(budget: Budget) -> some View {
         let viewModel = BudgetViewModel(
             budget: budget,
-            storageProvider: storageProvider,
-            delegate: viewModel
+            dataProvider: viewModel
         )
 
         BudgetView(viewModel: viewModel)

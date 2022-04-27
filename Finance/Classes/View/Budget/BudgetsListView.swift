@@ -7,14 +7,11 @@
 
 import SwiftUI
 
-struct BudgetsListView<ViewModel: BudgetsListViewModel, Item: View>: View {
+struct BudgetsListView<Item: View>: View {
 
-    @ObservedObject var viewModel: ViewModel
+    @ObservedObject var viewModel: BudgetsListViewModel
 
     @ViewBuilder var item: (Budget) -> Item
-
-    @State var deleteBudgetError: DomainError?
-    @State var addNewBudgetIsPresented: Bool = false
 
     var body: some View {
         List {
@@ -25,27 +22,23 @@ struct BudgetsListView<ViewModel: BudgetsListViewModel, Item: View>: View {
                 }
                 .onDelete { offsets in
                     Task {
-                        do {
-                            try await viewModel.delete(budgetsAt: offsets)
-                            deleteBudgetError = nil
-                        } catch {
-                            deleteBudgetError = error as? DomainError
-                        }
+                        await viewModel.delete(budgetsAt: offsets)
                     }
                 }
 
-                Button(action: { addNewBudgetIsPresented = true }) {
+                Button(action: { viewModel.isAddNewBudgetPresented = true }) {
                     Label("Add", systemImage: "plus")
                         .accessibilityIdentifier(AccessibilityIdentifier.BudgetsListView.addBudgetButton)
+                }
+
+                if let error = viewModel.deleteBudgetError {
+                    InlineErrorView(error: error)
                 }
             }
         }
         .listStyle(.inset)
-        .sheet(isPresented: $addNewBudgetIsPresented) {
-            NewBudgetView(year: viewModel.year, onSubmit: { budget in
-                try await viewModel.add(budget: budget)
-                addNewBudgetIsPresented = false
-            })
+        .sheet(isPresented: $viewModel.isAddNewBudgetPresented) {
+            NewBudgetView(year: viewModel.year, onSubmit: viewModel.add(budget:))
         }
     }
 }
@@ -56,22 +49,10 @@ struct BudgetsListView_Previews: PreviewProvider {
     static let storageProvider = MockStorageProvider()
     static var previews: some View {
         BudgetsListView(
-            viewModel: MockViewModel(),
+            viewModel: .init(dataProvider: MockBudgetsListDataProvider(budgets: Mocks.budgets)),
             item: { budget in
                 BudgetsListItem(budget: budget)
             }
         )
-    }
-}
-
-private final class MockViewModel: BudgetsListViewModel {
-
-    let year: Int = Mocks.year
-    let budgets: [Budget] = Mocks.budgets
-
-    func add(budget: Budget) async throws {
-    }
-
-    func delete(budgetsAt offsets: IndexSet) async throws {
     }
 }

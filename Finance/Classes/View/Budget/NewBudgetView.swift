@@ -56,7 +56,7 @@ struct NewBudgetView: View {
             .sheet(isPresented: $isInsertNewBudgetSlicePresented) {
                 NewBudgetSliceView(onSubmit: add(slice:))
             }
-            .navigationTitle("New schedule")
+            .navigationTitle("New budget")
             .navigationBarTitleDisplayMode(.inline)
         }
     }

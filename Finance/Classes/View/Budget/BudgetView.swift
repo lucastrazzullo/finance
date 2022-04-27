@@ -133,8 +133,7 @@ struct BudgetView_Previews: PreviewProvider {
             BudgetView(
                 viewModel: BudgetViewModel(
                     budget: Mocks.budgets[0],
-                    storageProvider: MockStorageProvider(),
-                    delegate: nil
+                    dataProvider: MockBudgetDataProvider(budgets: Mocks.budgets)
                 )
             )
         }

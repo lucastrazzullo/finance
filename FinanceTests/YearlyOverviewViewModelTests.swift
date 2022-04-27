@@ -34,8 +34,8 @@ import XCTest
 
         try await viewModel.load()
 
-        XCTAssertEqual(viewModel.budgets, budgets)
-        XCTAssertEqual(viewModel.expenses, transactions)
+        XCTAssertEqual(viewModel.yearlyOverview.budgets, budgets)
+        XCTAssertEqual(viewModel.yearlyOverview.expenses, transactions)
     }
 
     func testNoLoad() throws {
@@ -44,27 +44,26 @@ import XCTest
         storageProvider = MockStorageProvider(budgets: budgets, transactions: transactions)
         viewModel = YearlyOverviewViewModel(year: Mocks.year, storageProvider: storageProvider)
 
-        XCTAssertNotEqual(viewModel.budgets, budgets)
-        XCTAssertNotEqual(viewModel.expenses, transactions)
+        XCTAssertNotEqual(viewModel.yearlyOverview.budgets, budgets)
+        XCTAssertNotEqual(viewModel.yearlyOverview.expenses, transactions)
     }
 
-    // MARK: - BudgetViewModel delegate
+    // MARK: - Budget data provider
 
-    func testDidAddSliceInBudget() async throws {
+    func testAddSlice() async throws {
         let slice1 = try BudgetSlice(id: .init(), name: "Name 1", configuration: .monthly(amount: .value(100)))
         let slice2 = try BudgetSlice(id: .init(), name: "Name 2", configuration: .monthly(amount: .value(100)))
         let budget = try Budget(id: .init(), year: Mocks.year, name: "Name", icon: .default, slices: [slice1])
         storageProvider = MockStorageProvider(budgets: [budget], transactions: [])
         viewModel = YearlyOverviewViewModel(year: Mocks.year, storageProvider: storageProvider)
         try await viewModel.load()
+        try await viewModel.add(slice: slice2, toBudgetWith: budget.id)
 
-        XCTAssertNoThrow(try viewModel.didAdd(slice: slice2, toBudgetWith: budget.id))
-
-        let updatedBudget = try XCTUnwrap(viewModel.budgets.with(identifier: budget.id))
+        let updatedBudget = try await viewModel.budget(with: budget.id)
         XCTAssertNotNil(updatedBudget.slices.with(identifier: slice2.id))
     }
 
-    func testDidDeleteSlicesFromBudget() async throws {
+    func testDeleteSlices() async throws {
         let slice1 = try BudgetSlice(id: .init(), name: "Name 1", configuration: .monthly(amount: .value(100)))
         let slice2 = try BudgetSlice(id: .init(), name: "Name 2", configuration: .monthly(amount: .value(100)))
         let budget = try Budget(id: .init(), year: Mocks.year, name: "Name", icon: .default, slices: [slice1, slice2])
@@ -73,42 +72,52 @@ import XCTest
         try await viewModel.load()
 
         // Delete slice 1
-        XCTAssertNoThrow(try viewModel.didDelete(slicesWith: [slice1.id], inBudgetWith: budget.id))
-        XCTAssertNil(viewModel.budgets.with(identifier: budget.id)?.slices.with(identifier: slice1.id))
+        try await viewModel.delete(slicesWith: [slice1.id], inBudgetWith: budget.id)
+        var updatedBudget = try await viewModel.budget(with: budget.id)
+        XCTAssertNil(updatedBudget.slices.with(identifier: slice1.id))
 
         // Delete slice 2
-        XCTAssertThrowsError(try viewModel.didDelete(slicesWith: [slice2.id], inBudgetWith: budget.id))
-        XCTAssertNotNil(viewModel.budgets.with(identifier: budget.id)?.slices.with(identifier: slice2.id))
+        try? await viewModel.delete(slicesWith: [slice2.id], inBudgetWith: budget.id)
+        updatedBudget = try await viewModel.budget(with: budget.id)
+        XCTAssertNotNil(updatedBudget.slices.with(identifier: slice2.id))
     }
 
-    func testWillUpdateNameInBudget() async throws {
+    func testUpdateNameInBudget() async throws {
         let budget1 = try Budget(id: .init(), year: Mocks.year, name: "Name 1", icon: .default, monthlyAmount: .value(100))
         let budget2 = try Budget(id: .init(), year: Mocks.year, name: "Name 2", icon: .default, monthlyAmount: .value(100))
         storageProvider = MockStorageProvider(budgets: [budget1, budget2], transactions: [])
         viewModel = YearlyOverviewViewModel(year: Mocks.year, storageProvider: storageProvider)
         try await viewModel.load()
 
-        XCTAssertNoThrow(try viewModel.willUpdate(name: "Name 1", in: budget1))
-        XCTAssertThrowsError(try viewModel.willUpdate(name: "Name 2", in: budget1))
-        XCTAssertNoThrow(try viewModel.willUpdate(name: "Name 3", in: budget1))
+        // Update with same name
+        try await viewModel.update(name: "Name 1", icon: .car, in: budget1)
+        var updatedBudget = try await viewModel.budget(with: budget1.id)
+        updatedBudget = try XCTUnwrap(updatedBudget)
+        XCTAssertEqual(updatedBudget.name, "Name 1")
+        XCTAssertEqual(updatedBudget.icon, .car)
 
+        // Update with different name
+        try await viewModel.update(name: "Name 3", icon: .default, in: budget1)
+        updatedBudget = try await viewModel.budget(with: budget1.id)
+        updatedBudget = try XCTUnwrap(updatedBudget)
+        XCTAssertEqual(updatedBudget.name, "Name 3")
+        XCTAssertEqual(updatedBudget.icon, .default)
+
+        // Update with same name as another budget
+        do {
+            try await viewModel.update(name: "Name 2", icon: .car, in: budget1)
+            XCTFail("Error expected")
+        } catch {
+            guard case DomainError.budgetOverview(error: .budgetAlreadyExistsWith(name: "Name 2")) = error else {
+                XCTFail("Different error thrown: \(error)")
+                return
+            }
+        }
+        XCTAssertEqual(updatedBudget.name, "Name 3")
+        XCTAssertEqual(updatedBudget.icon, .default)
     }
 
-    func testDidUpdateNameAndIconInBudget() async throws {
-        let budget1 = try Budget(id: .init(), year: Mocks.year, name: "Name 1", icon: .default, monthlyAmount: .value(100))
-        let budget2 = try Budget(id: .init(), year: Mocks.year, name: "Name 2", icon: .default, monthlyAmount: .value(100))
-        storageProvider = MockStorageProvider(budgets: [budget1, budget2], transactions: [])
-        viewModel = YearlyOverviewViewModel(year: Mocks.year, storageProvider: storageProvider)
-        try await viewModel.load()
-
-        try viewModel.didUpdate(name: "Name 3", icon: .car, inBudgetWith: budget1.id)
-
-        let updatedBudget1 = try XCTUnwrap(viewModel.budgets.with(identifier: budget1.id))
-        XCTAssertEqual(updatedBudget1.name, "Name 3")
-        XCTAssertEqual(updatedBudget1.icon, .car)
-    }
-
-    // MARK: - BudgetsListViewModel
+    // MARK: - Budgets List Data Provider
 
     func testAddBudget_valid() async throws {
         let budget = Mocks.budgets[0]
@@ -125,20 +134,28 @@ import XCTest
 
     func testAddBudget_invalid() async throws {
         let budget1 = try Budget(id: .init(), year: Mocks.year, name: "Name 1", icon: .default, monthlyAmount: .value(100))
-        let budget2 = try Budget(id: .init(), year: Mocks.year, name: "Name 2", icon: .default, monthlyAmount: .value(100))
+        let budget2 = try Budget(id: .init(), year: Mocks.year, name: "Name 1", icon: .default, monthlyAmount: .value(100))
         let budget3 = try Budget(id: .init(), year: Mocks.year - 1, name: "Name 3", icon: .default, monthlyAmount: .value(100))
-        storageProvider = MockStorageProvider(budgets: [budget2], transactions: [])
+        storageProvider = MockStorageProvider(budgets: [budget1], transactions: [])
         viewModel = YearlyOverviewViewModel(year: Mocks.year, storageProvider: storageProvider)
         try await viewModel.load()
 
-        // Budget that was not in the list already
+        // Budget that was already in the list
         do {
             try await viewModel.add(budget: budget1)
+            XCTFail("Error expected")
         } catch {
-            XCTFail("Error not expected")
+            guard case DomainError.budgetOverview(error: .budgetAlreadyExistsWith(name: budget1.name)) = error else {
+                XCTFail("Expected different error than \(error)")
+                return
+            }
         }
+        XCTAssertTrue(viewModel.budgets.contains(budget1))
 
-        // Budget that was already in the list, hence same name
+        var storedBudgets = try await storageProvider.fetchBudgets(year: viewModel.year)
+        XCTAssertTrue(storedBudgets.contains(budget1))
+
+        // Budget that has the same name
         do {
             try await viewModel.add(budget: budget2)
             XCTFail("Error expected")
@@ -148,6 +165,10 @@ import XCTest
                 return
             }
         }
+        XCTAssertFalse(viewModel.budgets.contains(budget2))
+
+        storedBudgets = try await storageProvider.fetchBudgets(year: viewModel.year)
+        XCTAssertFalse(storedBudgets.contains(budget2))
 
         // Budget with different year
         do {
@@ -159,6 +180,10 @@ import XCTest
                 return
             }
         }
+        XCTAssertFalse(viewModel.budgets.contains(budget3))
+
+        storedBudgets = try await storageProvider.fetchBudgets(year: viewModel.year)
+        XCTAssertFalse(storedBudgets.contains(budget3))
     }
 
     func testDeleteBudgets_valid() async throws {
@@ -169,7 +194,7 @@ import XCTest
         try await viewModel.load()
         XCTAssertTrue(viewModel.budgets.contains(budgetToDelete))
 
-        try await viewModel.delete(budgetsAt: .init(integer: 0))
+        try await viewModel.delete(budgetsWith: [budgetToDelete.id])
         XCTAssertFalse(viewModel.budgets.contains(budgetToDelete))
     }
 
@@ -182,11 +207,11 @@ import XCTest
         try await viewModel.load()
         XCTAssertFalse(viewModel.budgets.contains(budgetToDelete))
 
-        try await viewModel.delete(budgetsAt: .init(integer: 0))
+        try await viewModel.delete(budgetsWith: [budgetToDelete.id])
         XCTAssertNil(viewModel.budgets.with(identifier: budgetToDelete.id))
     }
 
-    // MARK: - OverviewListView
+    // MARK: - Overview List Data Provider
 
     func testAddExpenses_invalid() async throws {
         var components = DateComponents()
@@ -220,8 +245,8 @@ import XCTest
         try await viewModel.load()
 
         try await viewModel.add(transactions: [expense1, expense2])
-        XCTAssertNotNil(viewModel.expenses.with(identifier: expense1.id))
-        XCTAssertNotNil(viewModel.expenses.with(identifier: expense2.id))
+        XCTAssertNotNil(viewModel.transactions.with(identifier: expense1.id))
+        XCTAssertNotNil(viewModel.transactions.with(identifier: expense2.id))
     }
 
     func testDeleteExpenses() async throws {
