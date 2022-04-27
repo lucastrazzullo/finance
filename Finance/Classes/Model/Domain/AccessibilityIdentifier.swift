@@ -18,6 +18,11 @@ enum AccessibilityIdentifier {
         static let invalidSlicesError = "InvalidSlicesError"
     }
 
+    enum TransactionsListView {
+        static let addTransactionButton = "AddTransactionButton"
+        static let transactionLink = "BudgetLink"
+    }
+
     enum YearlyOverviewView {
         static let budgetsTab = "BudgetsTab"
     }

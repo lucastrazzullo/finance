@@ -46,7 +46,7 @@ struct YearlyOverviewView: View {
             yearlyOverview: viewModel.yearlyOverview,
             month: viewModel.month
         )
-        .sheet(isPresented: $viewModel.addNewTransactionIsPresented) {
+        .sheet(isPresented: $viewModel.isAddNewTransactionPresented) {
             AddTransactionsView(budgets: viewModel.budgets, onSubmit: viewModel.add(transactions:))
         }
         .navigationBarTitleDisplayMode(.inline)
@@ -64,7 +64,7 @@ struct YearlyOverviewView: View {
             }
 
             ToolbarItem(placement: .navigationBarTrailing) {
-                Button(action: { viewModel.addNewTransactionIsPresented = true }) {
+                Button(action: { viewModel.isAddNewTransactionPresented = true }) {
                     Label("New transaction", systemImage: "plus")
                 }
             }
@@ -81,23 +81,15 @@ struct YearlyOverviewView: View {
 
     @ViewBuilder private func makeExpensesListView(overview: MonthlyBudgetOverview) -> some View {
         let month = Calendar.current.standaloneMonthSymbols[viewModel.month - 1]
-
+        let viewModel = TransactionsListViewModel(dataProvider: viewModel)
         TransactionsListView(viewModel: viewModel)
-            .sheet(isPresented: $viewModel.addNewTransactionIsPresented) {
-                AddTransactionsView(budgets: viewModel.budgets, onSubmit: viewModel.add(transactions:))
-            }
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar(content: {
                 ToolbarItem(placement: .principal) {
                     DefaultToolbar(
                         title: "Expenses \(overview.name)",
                         subtitle: "in \(month)"
                     )
-                }
-
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: { viewModel.addNewTransactionIsPresented = true }) {
-                        Label("New transaction", systemImage: "plus")
-                    }
                 }
             })
     }

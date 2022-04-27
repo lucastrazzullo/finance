@@ -7,11 +7,9 @@
 
 import SwiftUI
 
-struct TransactionsListView<ViewModel: TransactionsListViewModel>: View {
+struct TransactionsListView: View {
 
-    @ObservedObject var viewModel: ViewModel
-
-    @State var deleteTransactionError: DomainError?
+    @ObservedObject var viewModel: TransactionsListViewModel
 
     var body: some View {
         List {
@@ -21,41 +19,27 @@ struct TransactionsListView<ViewModel: TransactionsListViewModel>: View {
                     Spacer()
                     AmountView(amount: transaction.amount)
                 }
+                .accessibilityIdentifier(AccessibilityIdentifier.TransactionsListView.transactionLink)
             }
-            .onDelete { offsets in Task {
-                do {
-                    try await viewModel.delete(transactionsAt: offsets)
-                    deleteTransactionError = nil
-                } catch {
-                    deleteTransactionError = error as? DomainError
+            .onDelete { offsets in
+                Task {
+                    await viewModel.delete(transactionsAt: offsets)
                 }
-            }}
+            }
 
-            if let error = deleteTransactionError {
+            if let error = viewModel.deleteTransactionError {
                 InlineErrorView(error: error)
             }
         }
         .listStyle(.plain)
-        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
 struct TransactionsListView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
-            TransactionsListView(viewModel: MockViewModel())
+            TransactionsListView(viewModel: .init(dataProvider: MockTransactionsListDataProvider(transactions: Mocks.transactions)))
                 .navigationTitle("Transactions")
         }
-    }
-}
-
-private final class MockViewModel: TransactionsListViewModel {
-
-    var transactions: [Transaction] = Mocks.transactions
-
-    func add(transactions: [Transaction]) async throws {
-    }
-
-    func delete(transactionsAt offsets: IndexSet) async {
     }
 }

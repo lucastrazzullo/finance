@@ -17,8 +17,8 @@ protocol BudgetsListDataProvider: AnyObject {
 
 final class BudgetsListViewModel: ObservableObject {
 
-    @Published var deleteBudgetError: DomainError?
     @Published var isAddNewBudgetPresented: Bool = false
+    @Published var deleteBudgetError: DomainError?
 
     var year: Int { dataProvider.year }
     var budgets: [Budget] { dataProvider.budgets }

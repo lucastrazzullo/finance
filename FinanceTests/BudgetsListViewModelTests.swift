@@ -24,7 +24,7 @@ import XCTest
         try super.tearDownWithError()
     }
 
-    // MARK: - Slices
+    // MARK: - Budgets
 
     func testAddBudget() async throws {
         let budget = try Budget(id: .init(), year: Mocks.year, name: "Mock", icon: .default, monthlyAmount: .value(100))
@@ -55,7 +55,7 @@ import XCTest
         }
 
         // Delete budgets
-        var offsets = IndexSet(integersIn: 0..<budgets.count)
+        let offsets = IndexSet(integersIn: 0..<budgets.count)
         await viewModel.delete(budgetsAt: offsets)
 
         XCTAssertNil(viewModel.deleteBudgetError)

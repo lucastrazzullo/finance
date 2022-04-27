@@ -10,7 +10,7 @@ import Foundation
 @MainActor final class YearlyOverviewViewModel: ObservableObject {
 
     @Published var month: Int = Calendar.current.component(.month, from: .now)
-    @Published var addNewTransactionIsPresented: Bool = false
+    @Published var isAddNewTransactionPresented: Bool = false
     @Published var yearlyOverview: YearlyBudgetOverview
 
     private let storageProvider: StorageProvider
@@ -35,6 +35,15 @@ import Foundation
 
         yearlyOverview.set(budgets: budgets)
         yearlyOverview.set(expenses: expenses)
+    }
+
+    func add(transactions: [Transaction]) async throws {
+        try YearlyBudgetOverviewValidator.willAdd(expenses: transactions, for: yearlyOverview.year)
+        for transaction in transactions {
+            try await storageProvider.add(transaction: transaction)
+        }
+        try yearlyOverview.append(expenses: transactions)
+        isAddNewTransactionPresented = false
     }
 }
 
@@ -86,26 +95,14 @@ extension YearlyOverviewViewModel: BudgetsListDataProvider {
     }
 }
 
-extension YearlyOverviewViewModel: TransactionsListViewModel {
+extension YearlyOverviewViewModel: TransactionsListDataProvider {
 
     var transactions: [Transaction] {
         return yearlyOverview.expenses
     }
 
-    func add(transactions: [Transaction]) async throws {
-        try YearlyBudgetOverviewValidator.willAdd(expenses: transactions, for: yearlyOverview.year)
-        for transaction in transactions {
-            try await storageProvider.add(transaction: transaction)
-        }
-        try yearlyOverview.append(expenses: transactions)
-        addNewTransactionIsPresented = false
-    }
-
-    func delete(transactionsAt offsets: IndexSet) async throws {
-        let identifiers = transactions.at(offsets: offsets).map(\.id)
-        let identifiersSet = Set(identifiers)
-
-        try await storageProvider.delete(transactionsWith: identifiersSet)
-        yearlyOverview.delete(expensesWith: identifiersSet)
+    func delete(transactionsWith identifiers: Set<Transaction.ID>) async throws {
+        try await storageProvider.delete(transactionsWith: identifiers)
+        yearlyOverview.delete(expensesWith: identifiers)
     }
 }
