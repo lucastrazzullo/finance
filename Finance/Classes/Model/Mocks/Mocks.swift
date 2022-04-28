@@ -89,6 +89,7 @@ enum Mocks {
     static let transactions: [Transaction] = {
         var components = DateComponents()
         components.year = year
+        components.month = 1
         let date = Calendar.current.date(from: components)!
         return [
             Transaction(id: .init(), description: nil, amount: .value(100), date: date, budgetSliceId: houseSlices[0].id),

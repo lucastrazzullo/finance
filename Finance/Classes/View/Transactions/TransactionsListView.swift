@@ -38,7 +38,7 @@ struct TransactionsListView: View {
 struct TransactionsListView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
-            TransactionsListView(viewModel: .init(dataProvider: MockTransactionsListDataProvider(transactions: Mocks.transactions)))
+            TransactionsListView(viewModel: .init(month: 1, dataProvider: MockTransactionsListDataProvider(transactions: Mocks.transactions)))
                 .navigationTitle("Transactions")
         }
     }

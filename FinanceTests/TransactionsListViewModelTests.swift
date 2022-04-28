@@ -27,10 +27,10 @@ import XCTest
     // MARK: - Transactions
 
     func testDeleteTransactions() async throws {
-        let transactions = Mocks.transactions
+        let transactions = Mocks.transactions.filter({ $0.month == 1 })
 
         dataProvider = MockTransactionsListDataProvider(transactions: transactions)
-        viewModel = TransactionsListViewModel(dataProvider: dataProvider)
+        viewModel = TransactionsListViewModel(month: 1, dataProvider: dataProvider)
 
         // Assert initial state
         XCTAssertNil(viewModel.deleteTransactionError)

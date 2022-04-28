@@ -17,13 +17,15 @@ final class TransactionsListViewModel: ObservableObject {
 
     @Published var deleteTransactionError: DomainError?
 
-    var transactions: [Transaction] { dataProvider.transactions }
+    let month: Int
+    var transactions: [Transaction] { return dataProvider.transactions.filter({ $0.month == month }) }
 
     private let dataProvider: TransactionsListDataProvider
 
     // MARK: Object life cycle
 
-    init(dataProvider: TransactionsListDataProvider) {
+    init(month: Int, dataProvider: TransactionsListDataProvider) {
+        self.month = month
         self.dataProvider = dataProvider
     }
 

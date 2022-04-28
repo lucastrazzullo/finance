@@ -80,15 +80,15 @@ struct YearlyOverviewView: View {
     // MARK: Private builder methods - Transactions
 
     @ViewBuilder private func makeExpensesListView(overview: MonthlyBudgetOverview) -> some View {
-        let month = Calendar.current.standaloneMonthSymbols[viewModel.month - 1]
-        let viewModel = TransactionsListViewModel(dataProvider: viewModel)
+        let monthSymbol = Calendar.current.standaloneMonthSymbols[viewModel.month - 1]
+        let viewModel = TransactionsListViewModel(month: viewModel.month, dataProvider: viewModel)
         TransactionsListView(viewModel: viewModel)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar(content: {
                 ToolbarItem(placement: .principal) {
                     DefaultToolbar(
                         title: "Expenses \(overview.name)",
-                        subtitle: "in \(month)"
+                        subtitle: "in \(monthSymbol)"
                     )
                 }
             })
