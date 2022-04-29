@@ -27,6 +27,14 @@ final class TransactionsListViewModel: ObservableObject {
 
     // MARK: Internal methods
 
+    func months() -> [Int] {
+        return transactions.map(\.month).removeDuplicates()
+    }
+
+    func transactions(month: Int) -> [Transaction] {
+        return transactions.filter({ $0.month == month })
+    }
+
     func delete(transactionsAt offsets: IndexSet) async {
         do {
             let identifiers = transactions.at(offsets: offsets).map(\.id)

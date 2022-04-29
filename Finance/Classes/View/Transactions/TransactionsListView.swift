@@ -13,17 +13,21 @@ struct TransactionsListView: View {
 
     var body: some View {
         List {
-            ForEach(viewModel.transactions) { transaction in
-                HStack {
-                    Text(transaction.date, style: .date)
-                    Spacer()
-                    AmountView(amount: transaction.amount)
-                }
-                .accessibilityIdentifier(AccessibilityIdentifier.TransactionsListView.transactionLink)
-            }
-            .onDelete { offsets in
-                Task {
-                    await viewModel.delete(transactionsAt: offsets)
+            ForEach(viewModel.months(), id: \.self) { month in
+                Section(Calendar.current.standaloneMonthSymbols[month - 1]) {
+                    ForEach(viewModel.transactions(month: month)) { transaction in
+                        HStack {
+                            Text(transaction.date, style: .date)
+                            Spacer()
+                            AmountView(amount: transaction.amount)
+                        }
+                        .accessibilityIdentifier(AccessibilityIdentifier.TransactionsListView.transactionLink)
+                    }
+                    .onDelete { offsets in
+                        Task {
+                            await viewModel.delete(transactionsAt: offsets)
+                        }
+                    }
                 }
             }
 

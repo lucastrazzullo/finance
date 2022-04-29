@@ -20,6 +20,7 @@ struct YearlyOverviewView: View {
             }
             .tabItem {
                 Label("Overview", systemImage: "list.bullet.below.rectangle")
+                    .accessibilityIdentifier(AccessibilityIdentifier.YearlyOverviewView.overviewTab)
             }
 
             NavigationView {
@@ -28,6 +29,14 @@ struct YearlyOverviewView: View {
             .tabItem {
                 Label("Budgets", systemImage: "list.dash")
                     .accessibilityIdentifier(AccessibilityIdentifier.YearlyOverviewView.budgetsTab)
+            }
+
+            NavigationView {
+                makeTransactionsListView()
+            }
+            .tabItem {
+                Label("Transactions", systemImage: "note.text")
+                    .accessibilityIdentifier(AccessibilityIdentifier.YearlyOverviewView.transactionsTab)
             }
         }
         .task {
@@ -120,6 +129,25 @@ struct YearlyOverviewView: View {
                     )
                 }
             })
+    }
+
+    // MARK: Private builder methods - Transactions
+
+    @ViewBuilder private func makeTransactionsListView() -> some View {
+        let year = viewModel.yearlyOverview.year
+        let transactions = viewModel.yearlyOverview.expenses
+        let viewModel = TransactionsListViewModel(transactions: transactions, dataProvider: viewModel)
+
+        TransactionsListView(viewModel: viewModel)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    DefaultToolbar(
+                        title: "Transactions \(self.viewModel.yearlyOverview.name)",
+                        subtitle: String(year)
+                    )
+                }
+            }
     }
 }
 

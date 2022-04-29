@@ -24,7 +24,9 @@ enum AccessibilityIdentifier {
     }
 
     enum YearlyOverviewView {
+        static let overviewTab = "OverviewTab"
         static let budgetsTab = "BudgetsTab"
+        static let transactionsTab = "TransactionsTab"
     }
 
     enum BudgetsListView {
