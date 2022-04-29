@@ -13,8 +13,6 @@ struct YearlyOverviewView: View {
 
     @ObservedObject var viewModel: YearlyOverviewViewModel
 
-    @State var month: Int = Calendar.current.component(.month, from: .now)
-
     var body: some View {
         TabView {
             NavigationView {
@@ -43,10 +41,10 @@ struct YearlyOverviewView: View {
     // MARK: Private builder methods - Overview
 
     @ViewBuilder private func makeOverviewListView() -> some View {
-        YearlyOverviewListView(
+        MontlyOverviewsListView(
             item: makeOverviewListViewItem(overview:),
-            yearlyOverview: viewModel.yearlyOverview,
-            month: month
+            montlhyOverviews: viewModel.yearlyOverview.monthlyOverviews(month: viewModel.month),
+            monthlyOverviewsWithLowestAvailability: viewModel.yearlyOverview.monthlyOverviewsWithLowestAvailability(month: viewModel.month)
         )
         .sheet(isPresented: $viewModel.isAddNewTransactionPresented) {
             AddTransactionsView(budgets: viewModel.yearlyOverview.budgets, onSubmit: viewModel.add(transactions:))
@@ -61,7 +59,7 @@ struct YearlyOverviewView: View {
             }
 
             ToolbarItem(placement: .navigationBarLeading) {
-                MonthPickerView(month: $month)
+                MonthPickerView(month: $viewModel.month)
                     .pickerStyle(MenuPickerStyle())
             }
 

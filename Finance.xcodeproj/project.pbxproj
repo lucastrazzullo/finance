@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		810F869F27FF4E1C00A1CDD4 /* BudgetsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 810F869E27FF4E1C00A1CDD4 /* BudgetsListView.swift */; };
-		810F86A227FF833600A1CDD4 /* YearlyOverviewListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 810F86A127FF833600A1CDD4 /* YearlyOverviewListView.swift */; };
+		810F86A227FF833600A1CDD4 /* MontlyOverviewsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 810F86A127FF833600A1CDD4 /* MontlyOverviewsListView.swift */; };
 		810F86A427FF91CB00A1CDD4 /* MonthlyBudgetOverview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 810F86A327FF91CA00A1CDD4 /* MonthlyBudgetOverview.swift */; };
 		810F86A628002CD700A1CDD4 /* MonthlyOverviewItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 810F86A528002CD700A1CDD4 /* MonthlyOverviewItem.swift */; };
 		811F255A2816B670005D74B1 /* BudgetsListItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 811F25592816B670005D74B1 /* BudgetsListItem.swift */; };
@@ -105,7 +105,7 @@
 
 /* Begin PBXFileReference section */
 		810F869E27FF4E1C00A1CDD4 /* BudgetsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetsListView.swift; sourceTree = "<group>"; };
-		810F86A127FF833600A1CDD4 /* YearlyOverviewListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YearlyOverviewListView.swift; sourceTree = "<group>"; };
+		810F86A127FF833600A1CDD4 /* MontlyOverviewsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MontlyOverviewsListView.swift; sourceTree = "<group>"; };
 		810F86A327FF91CA00A1CDD4 /* MonthlyBudgetOverview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthlyBudgetOverview.swift; sourceTree = "<group>"; };
 		810F86A528002CD700A1CDD4 /* MonthlyOverviewItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthlyOverviewItem.swift; sourceTree = "<group>"; };
 		811F25592816B670005D74B1 /* BudgetsListItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetsListItem.swift; sourceTree = "<group>"; };
@@ -221,7 +221,7 @@
 			isa = PBXGroup;
 			children = (
 				81F24A782743D6DC00C37ADE /* YearlyOverviewView.swift */,
-				810F86A127FF833600A1CDD4 /* YearlyOverviewListView.swift */,
+				810F86A127FF833600A1CDD4 /* MontlyOverviewsListView.swift */,
 				810F86A528002CD700A1CDD4 /* MonthlyOverviewItem.swift */,
 			);
 			path = Overview;
@@ -682,7 +682,7 @@
 				81C222DC279CD11F00759CCB /* MockStorageProvider.swift in Sources */,
 				8122A34A2819B54E002912D3 /* MockBudgetsListDataProvider.swift in Sources */,
 				81F7E16A27D16F3F00D67EB8 /* BudgetSlicesListItem.swift in Sources */,
-				810F86A227FF833600A1CDD4 /* YearlyOverviewListView.swift in Sources */,
+				810F86A227FF833600A1CDD4 /* MontlyOverviewsListView.swift in Sources */,
 				81735ACC279A2B8D007C9AA3 /* Array+Extensions.swift in Sources */,
 				819993D72752FAA300FA3E03 /* AmountTextField.swift in Sources */,
 				81F3B9132804949A00A1B89F /* NewTransactionView.swift in Sources */,

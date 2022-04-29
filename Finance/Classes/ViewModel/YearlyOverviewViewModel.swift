@@ -9,8 +9,10 @@ import Foundation
 
 @MainActor final class YearlyOverviewViewModel: ObservableObject {
 
-    @Published var isAddNewTransactionPresented: Bool = false
     @Published var yearlyOverview: YearlyBudgetOverview
+
+    @Published var month: Int = Calendar.current.component(.month, from: .now)
+    @Published var isAddNewTransactionPresented: Bool = false
 
     private let storageProvider: StorageProvider
 

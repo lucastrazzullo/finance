@@ -1,5 +1,5 @@
 //
-//  YearlyOverviewListView.swift
+//  MontlyOverviewsListView.swift
 //  Finance
 //
 //  Created by Luca Strazzullo on 07/04/2022.
@@ -7,16 +7,15 @@
 
 import SwiftUI
 
-struct YearlyOverviewListView<Item: View>: View {
+struct MontlyOverviewsListView<Item: View>: View {
 
     @ViewBuilder var item: (MonthlyBudgetOverview) -> Item
 
-    let yearlyOverview: YearlyBudgetOverview
-    let month: Int
+    let montlhyOverviews: [MonthlyBudgetOverview]
+    let monthlyOverviewsWithLowestAvailability: [MonthlyBudgetOverview]
 
     var body: some View {
         List {
-            let montlhyOverviews = yearlyOverview.monthlyOverviews(month: month)
             if montlhyOverviews.count > 0 {
                 Section(header: Text("All Overviews")) {
                     ForEach(montlhyOverviews, id: \.self) { overview in
@@ -26,7 +25,6 @@ struct YearlyOverviewListView<Item: View>: View {
                 }
             }
 
-            let monthlyOverviewsWithLowestAvailability = yearlyOverview.monthlyOverviewsWithLowestAvailability(month: month)
             if monthlyOverviewsWithLowestAvailability.count > 0 {
                 Section(header: Text("Lowest budgets this month")) {
                     ForEach(monthlyOverviewsWithLowestAvailability, id: \.self) { overview in
@@ -42,12 +40,12 @@ struct YearlyOverviewListView<Item: View>: View {
 
 struct OverviewView_Previews: PreviewProvider {
     static var previews: some View {
-        YearlyOverviewListView(
+        MontlyOverviewsListView(
             item: { overview in
                 MonthlyOverviewItem(overview: overview)
             },
-            yearlyOverview: Mocks.overview,
-            month: Calendar.current.component(.month, from: .now)
+            montlhyOverviews: Mocks.overview.monthlyOverviews(month: 1),
+            monthlyOverviewsWithLowestAvailability: Mocks.overview.monthlyOverviewsWithLowestAvailability(month: 1)
         )
     }
 }
