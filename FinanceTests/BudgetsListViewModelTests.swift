@@ -11,7 +11,7 @@ import XCTest
 
 @MainActor final class BudgetsListViewModelTests: XCTestCase {
 
-    private var dataProvider: BudgetsListDataProvider!
+    private var dataProvider: MockBudgetsListDataProvider!
     private var viewModel: BudgetsListViewModel!
 
     @MainActor override func setUpWithError() throws {
@@ -30,7 +30,7 @@ import XCTest
         let budget = try Budget(id: .init(), year: Mocks.year, name: "Mock", icon: .default, monthlyAmount: .value(100))
 
         dataProvider = MockBudgetsListDataProvider(budgets: [])
-        viewModel = BudgetsListViewModel(dataProvider: dataProvider)
+        viewModel = BudgetsListViewModel(budgets: [], dataProvider: dataProvider)
 
         XCTAssertFalse(viewModel.budgets.contains(budget))
 
@@ -38,7 +38,6 @@ import XCTest
         try await viewModel.add(budget: budget)
 
         XCTAssertFalse(viewModel.isAddNewBudgetPresented)
-        XCTAssertTrue(viewModel.budgets.contains(budget))
         XCTAssertTrue(dataProvider.budgets.contains(budget))
     }
 
@@ -46,7 +45,7 @@ import XCTest
         let budgets = Mocks.budgets
 
         dataProvider = MockBudgetsListDataProvider(budgets: budgets)
-        viewModel = BudgetsListViewModel(dataProvider: dataProvider)
+        viewModel = BudgetsListViewModel(budgets: budgets, dataProvider: dataProvider)
 
         // Assert initial state
         XCTAssertNil(viewModel.deleteBudgetError)
@@ -60,7 +59,7 @@ import XCTest
 
         XCTAssertNil(viewModel.deleteBudgetError)
         budgets.forEach { budget in
-            XCTAssertFalse(viewModel.budgets.contains(budget))
+            XCTAssertFalse(dataProvider.budgets.contains(budget))
         }
     }
 }

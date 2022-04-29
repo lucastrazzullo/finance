@@ -9,7 +9,6 @@ import Foundation
 
 @MainActor final class YearlyOverviewViewModel: ObservableObject {
 
-    @Published var month: Int = Calendar.current.component(.month, from: .now)
     @Published var isAddNewTransactionPresented: Bool = false
     @Published var yearlyOverview: YearlyBudgetOverview
 
@@ -36,6 +35,8 @@ import Foundation
         yearlyOverview.set(budgets: budgets)
         yearlyOverview.set(expenses: expenses)
     }
+
+    // MARK: Transactions
 
     func add(transactions: [Transaction]) async throws {
         try YearlyBudgetOverviewValidator.willAdd(expenses: transactions, for: yearlyOverview.year)
@@ -75,16 +76,8 @@ extension YearlyOverviewViewModel: BudgetDataProvider {
 
 extension YearlyOverviewViewModel: BudgetsListDataProvider {
 
-    var year: Int {
-        return yearlyOverview.year
-    }
-
-    var budgets: [Budget] {
-        return yearlyOverview.budgets
-    }
-
     func add(budget: Budget) async throws {
-        try YearlyBudgetOverviewValidator.willAdd(budget: budget, to: yearlyOverview.budgets, year: year)
+        try YearlyBudgetOverviewValidator.willAdd(budget: budget, to: yearlyOverview.budgets, year: yearlyOverview.year)
         try await storageProvider.add(budget: budget)
         try yearlyOverview.append(budget: budget)
     }
@@ -96,10 +89,6 @@ extension YearlyOverviewViewModel: BudgetsListDataProvider {
 }
 
 extension YearlyOverviewViewModel: TransactionsListDataProvider {
-
-    var transactions: [Transaction] {
-        return yearlyOverview.expenses
-    }
 
     func delete(transactionsWith identifiers: Set<Transaction.ID>) async throws {
         try await storageProvider.delete(transactionsWith: identifiers)

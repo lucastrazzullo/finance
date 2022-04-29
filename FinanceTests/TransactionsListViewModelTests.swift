@@ -11,7 +11,7 @@ import XCTest
 
 @MainActor final class TransactionsListViewModelTests: XCTestCase {
 
-    private var dataProvider: TransactionsListDataProvider!
+    private var dataProvider: MockTransactionsListDataProvider!
     private var viewModel: TransactionsListViewModel!
 
     @MainActor override func setUpWithError() throws {
@@ -30,7 +30,7 @@ import XCTest
         let transactions = Mocks.transactions.filter({ $0.month == 1 })
 
         dataProvider = MockTransactionsListDataProvider(transactions: transactions)
-        viewModel = TransactionsListViewModel(month: 1, dataProvider: dataProvider)
+        viewModel = TransactionsListViewModel(transactions: transactions, dataProvider: dataProvider)
 
         // Assert initial state
         XCTAssertNil(viewModel.deleteTransactionError)
@@ -44,7 +44,7 @@ import XCTest
 
         XCTAssertNil(viewModel.deleteTransactionError)
         transactions.forEach { transaction in
-            XCTAssertFalse(viewModel.transactions.contains(transaction))
+            XCTAssertFalse(dataProvider.transactions.contains(transaction))
         }
     }
 }

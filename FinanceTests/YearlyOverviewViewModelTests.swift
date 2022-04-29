@@ -126,9 +126,9 @@ import XCTest
         try await viewModel.load()
         try await viewModel.add(budget: budget)
 
-        XCTAssertTrue(viewModel.budgets.contains(budget))
+        XCTAssertTrue(viewModel.yearlyOverview.budgets.contains(budget))
 
-        let storedBudgets = try await storageProvider.fetchBudgets(year: viewModel.year)
+        let storedBudgets = try await storageProvider.fetchBudgets(year: viewModel.yearlyOverview.year)
         XCTAssertTrue(storedBudgets.contains(budget))
     }
 
@@ -150,9 +150,9 @@ import XCTest
                 return
             }
         }
-        XCTAssertTrue(viewModel.budgets.contains(budget1))
+        XCTAssertTrue(viewModel.yearlyOverview.budgets.contains(budget1))
 
-        var storedBudgets = try await storageProvider.fetchBudgets(year: viewModel.year)
+        var storedBudgets = try await storageProvider.fetchBudgets(year: viewModel.yearlyOverview.year)
         XCTAssertTrue(storedBudgets.contains(budget1))
 
         // Budget that has the same name
@@ -165,9 +165,9 @@ import XCTest
                 return
             }
         }
-        XCTAssertFalse(viewModel.budgets.contains(budget2))
+        XCTAssertFalse(viewModel.yearlyOverview.budgets.contains(budget2))
 
-        storedBudgets = try await storageProvider.fetchBudgets(year: viewModel.year)
+        storedBudgets = try await storageProvider.fetchBudgets(year: viewModel.yearlyOverview.year)
         XCTAssertFalse(storedBudgets.contains(budget2))
 
         // Budget with different year
@@ -180,9 +180,9 @@ import XCTest
                 return
             }
         }
-        XCTAssertFalse(viewModel.budgets.contains(budget3))
+        XCTAssertFalse(viewModel.yearlyOverview.budgets.contains(budget3))
 
-        storedBudgets = try await storageProvider.fetchBudgets(year: viewModel.year)
+        storedBudgets = try await storageProvider.fetchBudgets(year: viewModel.yearlyOverview.year)
         XCTAssertFalse(storedBudgets.contains(budget3))
     }
 
@@ -192,10 +192,10 @@ import XCTest
         viewModel = YearlyOverviewViewModel(year: Mocks.year, storageProvider: storageProvider)
 
         try await viewModel.load()
-        XCTAssertTrue(viewModel.budgets.contains(budgetToDelete))
+        XCTAssertTrue(viewModel.yearlyOverview.budgets.contains(budgetToDelete))
 
         try await viewModel.delete(budgetsWith: [budgetToDelete.id])
-        XCTAssertFalse(viewModel.budgets.contains(budgetToDelete))
+        XCTAssertFalse(viewModel.yearlyOverview.budgets.contains(budgetToDelete))
     }
 
     func testDeleteBudgets_invalid() async throws {
@@ -205,10 +205,10 @@ import XCTest
         viewModel = YearlyOverviewViewModel(year: Mocks.year, storageProvider: storageProvider)
 
         try await viewModel.load()
-        XCTAssertFalse(viewModel.budgets.contains(budgetToDelete))
+        XCTAssertFalse(viewModel.yearlyOverview.budgets.contains(budgetToDelete))
 
         try await viewModel.delete(budgetsWith: [budgetToDelete.id])
-        XCTAssertNil(viewModel.budgets.with(identifier: budgetToDelete.id))
+        XCTAssertNil(viewModel.yearlyOverview.budgets.with(identifier: budgetToDelete.id))
     }
 
     // MARK: - Overview List Data Provider
@@ -225,8 +225,8 @@ import XCTest
         try await viewModel.load()
 
         try await viewModel.add(transactions: [expense1, expense2])
-        XCTAssertNotNil(viewModel.transactions.with(identifier: expense1.id))
-        XCTAssertNotNil(viewModel.transactions.with(identifier: expense2.id))
+        XCTAssertNotNil(viewModel.yearlyOverview.expenses.with(identifier: expense1.id))
+        XCTAssertNotNil(viewModel.yearlyOverview.expenses.with(identifier: expense2.id))
     }
 
     func testAddExpenses_invalid() async throws {
@@ -255,9 +255,9 @@ import XCTest
         viewModel = YearlyOverviewViewModel(year: Mocks.year, storageProvider: storageProvider)
         try await viewModel.load()
 
-        XCTAssertTrue(viewModel.transactions.contains(expensesToDelete))
+        XCTAssertTrue(viewModel.yearlyOverview.expenses.contains(expensesToDelete))
 
         try await viewModel.delete(transactionsWith: [expensesToDelete.id])
-        XCTAssertFalse(viewModel.transactions.contains(expensesToDelete))
+        XCTAssertFalse(viewModel.yearlyOverview.expenses.contains(expensesToDelete))
     }
 }

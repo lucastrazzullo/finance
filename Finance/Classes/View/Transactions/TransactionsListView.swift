@@ -38,8 +38,11 @@ struct TransactionsListView: View {
 struct TransactionsListView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
-            TransactionsListView(viewModel: .init(month: 1, dataProvider: MockTransactionsListDataProvider(transactions: Mocks.transactions)))
-                .navigationTitle("Transactions")
+            TransactionsListView(viewModel: .init(
+                transactions: Mocks.transactions,
+                dataProvider: MockTransactionsListDataProvider(transactions: Mocks.transactions)
+            ))
+            .navigationTitle("Transactions")
         }
     }
 }

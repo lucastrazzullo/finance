@@ -8,8 +8,6 @@
 import Foundation
 
 protocol TransactionsListDataProvider: AnyObject {
-    var transactions: [Transaction] { get }
-
     func delete(transactionsWith identifiers: Set<Transaction.ID>) async throws
 }
 
@@ -17,15 +15,13 @@ final class TransactionsListViewModel: ObservableObject {
 
     @Published var deleteTransactionError: DomainError?
 
-    let month: Int
-    var transactions: [Transaction] { return dataProvider.transactions.filter({ $0.month == month }) }
-
+    let transactions: [Transaction]
     private let dataProvider: TransactionsListDataProvider
 
     // MARK: Object life cycle
 
-    init(month: Int, dataProvider: TransactionsListDataProvider) {
-        self.month = month
+    init(transactions: [Transaction], dataProvider: TransactionsListDataProvider) {
+        self.transactions = transactions
         self.dataProvider = dataProvider
     }
 

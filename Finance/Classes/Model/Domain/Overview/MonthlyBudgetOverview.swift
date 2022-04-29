@@ -9,6 +9,7 @@ import Foundation
 
 struct MonthlyBudgetOverview: Hashable {
 
+    let month: Int
     let name: String
     let icon: SystemIcon
 
@@ -50,6 +51,7 @@ struct MonthlyBudgetOverview: Hashable {
             ? Float(truncating: NSDecimalNumber(decimal: 1 - expensesInMonth.totalAmount.value / startingAmount.value))
             : 0
 
+        self.month = month
         self.name = budget?.name ?? "Unowned"
         self.icon = budget?.icon ?? .default
         self.startingAmount = startingAmount

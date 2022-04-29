@@ -13,6 +13,8 @@ struct BudgetsListView<Item: View>: View {
 
     @ViewBuilder var item: (Budget) -> Item
 
+    let year: Int
+
     var body: some View {
         List {
             Section(header: Text("Budgets")) {
@@ -38,7 +40,7 @@ struct BudgetsListView<Item: View>: View {
         }
         .listStyle(.inset)
         .sheet(isPresented: $viewModel.isAddNewBudgetPresented) {
-            NewBudgetView(year: viewModel.year, onSubmit: viewModel.add(budget:))
+            NewBudgetView(year: year, onSubmit: viewModel.add(budget:))
         }
     }
 }
@@ -46,13 +48,12 @@ struct BudgetsListView<Item: View>: View {
 // MARK: - Previews
 
 struct BudgetsListView_Previews: PreviewProvider {
-    static let storageProvider = MockStorageProvider()
+    static let budgets = Mocks.budgets
     static var previews: some View {
         BudgetsListView(
-            viewModel: .init(dataProvider: MockBudgetsListDataProvider(budgets: Mocks.budgets)),
-            item: { budget in
-                BudgetsListItem(budget: budget)
-            }
+            viewModel: .init(budgets: budgets, dataProvider: MockBudgetsListDataProvider(budgets: budgets)),
+            item: { budget in BudgetsListItem(budget: budget) },
+            year: Mocks.year
         )
     }
 }

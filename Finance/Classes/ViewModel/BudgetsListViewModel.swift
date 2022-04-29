@@ -6,11 +6,9 @@
 //
 
 import Foundation
+import Combine
 
 protocol BudgetsListDataProvider: AnyObject {
-    var year: Int { get }
-    var budgets: [Budget] { get }
-
     func add(budget: Budget) async throws
     func delete(budgetsWith identifiers: Set<Budget.ID>) async throws
 }
@@ -20,15 +18,14 @@ final class BudgetsListViewModel: ObservableObject {
     @Published var isAddNewBudgetPresented: Bool = false
     @Published var deleteBudgetError: DomainError?
 
-    var year: Int { dataProvider.year }
-    var budgets: [Budget] { dataProvider.budgets }
-
+    let budgets: [Budget]
     private let dataProvider: BudgetsListDataProvider
 
     // MARK: Object life cycle
 
-    init(dataProvider: BudgetsListDataProvider) {
+    init(budgets: [Budget], dataProvider: BudgetsListDataProvider) {
         self.dataProvider = dataProvider
+        self.budgets = budgets
     }
 
     // MARK: Internal methods

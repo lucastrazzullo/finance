@@ -13,6 +13,8 @@ struct YearlyOverviewView: View {
 
     @ObservedObject var viewModel: YearlyOverviewViewModel
 
+    @State var month: Int = Calendar.current.component(.month, from: .now)
+
     var body: some View {
         TabView {
             NavigationView {
@@ -44,10 +46,10 @@ struct YearlyOverviewView: View {
         YearlyOverviewListView(
             item: makeOverviewListViewItem(overview:),
             yearlyOverview: viewModel.yearlyOverview,
-            month: viewModel.month
+            month: month
         )
         .sheet(isPresented: $viewModel.isAddNewTransactionPresented) {
-            AddTransactionsView(budgets: viewModel.budgets, onSubmit: viewModel.add(transactions:))
+            AddTransactionsView(budgets: viewModel.yearlyOverview.budgets, onSubmit: viewModel.add(transactions:))
         }
         .navigationBarTitleDisplayMode(.inline)
         .toolbar(content: {
@@ -59,7 +61,7 @@ struct YearlyOverviewView: View {
             }
 
             ToolbarItem(placement: .navigationBarLeading) {
-                MonthPickerView(month: $viewModel.month)
+                MonthPickerView(month: $month)
                     .pickerStyle(MenuPickerStyle())
             }
 
@@ -77,52 +79,49 @@ struct YearlyOverviewView: View {
         }
     }
 
-    // MARK: Private builder methods - Transactions
-
-    @ViewBuilder private func makeExpensesListView(overview: MonthlyBudgetOverview) -> some View {
-        let monthSymbol = Calendar.current.standaloneMonthSymbols[viewModel.month - 1]
-        let viewModel = TransactionsListViewModel(month: viewModel.month, dataProvider: viewModel)
-        TransactionsListView(viewModel: viewModel)
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar(content: {
-                ToolbarItem(placement: .principal) {
-                    DefaultToolbar(
-                        title: "Expenses \(overview.name)",
-                        subtitle: "in \(monthSymbol)"
-                    )
-                }
-            })
-    }
-
     // MARK: Private builder methods - Budgets
 
     @ViewBuilder private func makeBudgetsListView() -> some View {
-        let viewModel = BudgetsListViewModel(dataProvider: viewModel)
-        BudgetsListView(viewModel: viewModel, item: makeBudgetListItem(budget:))
+        let year = viewModel.yearlyOverview.year
+        let budgets = viewModel.yearlyOverview.budgets
+        let viewModel = BudgetsListViewModel(budgets: budgets, dataProvider: viewModel)
+
+        BudgetsListView(viewModel: viewModel, item: makeBudgetListItem(budget:), year: year)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     DefaultToolbar(
                         title: "Budgets \(self.viewModel.yearlyOverview.name)",
-                        subtitle: String(self.viewModel.yearlyOverview.year)
+                        subtitle: String(year)
                     )
                 }
             }
     }
 
     @ViewBuilder private func makeBudgetListItem(budget: Budget) -> some View {
-        NavigationLink(destination: makeBudgetView(budget: budget), label: {
+        let budgetViewModel = BudgetViewModel(budget: budget, dataProvider: viewModel)
+        let budgetView = BudgetView(viewModel: budgetViewModel)
+
+        NavigationLink(destination: budgetView, label: {
             BudgetsListItem(budget: budget)
         })
     }
 
-    @ViewBuilder private func makeBudgetView(budget: Budget) -> some View {
-        let viewModel = BudgetViewModel(
-            budget: budget,
-            dataProvider: viewModel
-        )
+    // MARK: Private builder methods - Expenses
 
-        BudgetView(viewModel: viewModel)
+    @ViewBuilder private func makeExpensesListView(overview: MonthlyBudgetOverview) -> some View {
+        let viewModel = TransactionsListViewModel(transactions: overview.expensesInMonth, dataProvider: viewModel)
+
+        TransactionsListView(viewModel: viewModel)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar(content: {
+                ToolbarItem(placement: .principal) {
+                    DefaultToolbar(
+                        title: "Expenses \(overview.name)",
+                        subtitle: "in \(Calendar.current.standaloneMonthSymbols[overview.month - 1])"
+                    )
+                }
+            })
     }
 }
 
