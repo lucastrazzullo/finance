@@ -11,7 +11,7 @@ import XCTest
 
 @MainActor final class BudgetViewModelTests: XCTestCase {
 
-    private var dataProvider: BudgetDataProvider!
+    private var dataProvider: MockBudgetDataProvider!
     private var viewModel: BudgetViewModel!
 
     @MainActor override func setUpWithError() throws {

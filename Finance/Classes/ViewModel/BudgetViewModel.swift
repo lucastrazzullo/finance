@@ -8,7 +8,6 @@
 import Foundation
 
 protocol BudgetDataProvider: AnyObject {
-    func budget(with identifier: Budget.ID) async throws -> Budget
     func add(slice: BudgetSlice, toBudgetWith identifier: Budget.ID) async throws
     func delete(slicesWith identifiers: Set<BudgetSlice.ID>, inBudgetWith identifier: Budget.ID) async throws
     func update(name: String, icon: SystemIcon, in budget: Budget) async throws
@@ -16,14 +15,14 @@ protocol BudgetDataProvider: AnyObject {
 
 @MainActor final class BudgetViewModel: ObservableObject {
 
+    @Published var budget: Budget
+
     @Published var updatingBudgetName: String
     @Published var updatingBudgetIcon: SystemIcon
     @Published var updateBudgetInfoError: DomainError?
 
     @Published var isInsertNewSlicePresented: Bool = false
     @Published var deleteSlicesError: DomainError?
-
-    @Published var budget: Budget
 
     var name: String {
         return budget.name
@@ -58,8 +57,7 @@ protocol BudgetDataProvider: AnyObject {
     func add(slice: BudgetSlice) async throws {
         try BudgetValidator.willAdd(slice: slice, to: budget.slices)
         try await dataProvider.add(slice: slice, toBudgetWith: budget.id)
-
-        budget = try await dataProvider.budget(with: budget.id)
+        try budget.append(slice: slice)
         isInsertNewSlicePresented = false
     }
 
@@ -70,8 +68,7 @@ protocol BudgetDataProvider: AnyObject {
 
             try BudgetValidator.willDelete(slicesWith: identifiersSet, from: budget.slices)
             try await dataProvider.delete(slicesWith: identifiersSet, inBudgetWith: budget.id)
-
-            budget = try await dataProvider.budget(with: budget.id)
+            try budget.delete(slicesWith: identifiersSet)
             deleteSlicesError = nil
         } catch {
             deleteSlicesError = error as? DomainError
@@ -80,10 +77,10 @@ protocol BudgetDataProvider: AnyObject {
 
     func saveUpdates() async {
         do {
-            try BudgetValidator.canUse(name: name)
+            try BudgetValidator.canUse(name: updatingBudgetName)
             try await dataProvider.update(name: updatingBudgetName, icon: updatingBudgetIcon, in: budget)
-
-            budget = try await dataProvider.budget(with: budget.id)
+            try budget.update(name: updatingBudgetName)
+            try budget.update(icon: updatingBudgetIcon)
             updateBudgetInfoError = nil
         } catch {
             updateBudgetInfoError = error as? DomainError

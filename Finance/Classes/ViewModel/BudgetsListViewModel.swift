@@ -15,10 +15,10 @@ protocol BudgetsListDataProvider: AnyObject {
 
 final class BudgetsListViewModel: ObservableObject {
 
+    @Published var budgets: [Budget]
     @Published var isAddNewBudgetPresented: Bool = false
     @Published var deleteBudgetError: DomainError?
 
-    let budgets: [Budget]
     private let dataProvider: BudgetsListDataProvider
 
     // MARK: Object life cycle
@@ -32,6 +32,7 @@ final class BudgetsListViewModel: ObservableObject {
 
     func add(budget: Budget) async throws {
         try await dataProvider.add(budget: budget)
+        budgets.append(budget)
         isAddNewBudgetPresented = false
     }
 
@@ -40,6 +41,7 @@ final class BudgetsListViewModel: ObservableObject {
             let identifiers = budgets.at(offsets: offsets).map(\.id)
             let identifiersSet = Set(identifiers)
             try await dataProvider.delete(budgetsWith: identifiersSet)
+            budgets.delete(withIdentifiers: identifiersSet)
             deleteBudgetError = nil
         } catch {
             deleteBudgetError = error as? DomainError

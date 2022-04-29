@@ -44,6 +44,9 @@ import XCTest
 
         XCTAssertNil(viewModel.deleteTransactionError)
         transactions.forEach { transaction in
+            XCTAssertFalse(viewModel.transactions.contains(transaction))
+        }
+        transactions.forEach { transaction in
             XCTAssertFalse(dataProvider.transactions.contains(transaction))
         }
     }

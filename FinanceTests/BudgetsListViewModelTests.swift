@@ -38,6 +38,7 @@ import XCTest
         try await viewModel.add(budget: budget)
 
         XCTAssertFalse(viewModel.isAddNewBudgetPresented)
+        XCTAssertTrue(viewModel.budgets.contains(budget))
         XCTAssertTrue(dataProvider.budgets.contains(budget))
     }
 
@@ -58,6 +59,9 @@ import XCTest
         await viewModel.delete(budgetsAt: offsets)
 
         XCTAssertNil(viewModel.deleteBudgetError)
+        budgets.forEach { budget in
+            XCTAssertFalse(viewModel.budgets.contains(budget))
+        }
         budgets.forEach { budget in
             XCTAssertFalse(dataProvider.budgets.contains(budget))
         }

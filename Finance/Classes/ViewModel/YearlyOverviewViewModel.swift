@@ -50,13 +50,6 @@ import Foundation
 
 extension YearlyOverviewViewModel: BudgetDataProvider {
 
-    func budget(with identifier: Budget.ID) async throws -> Budget {
-        guard let budget = yearlyOverview.budgets.with(identifier: identifier) else {
-            throw DomainError.budgetOverview(error: .budgetNotFound)
-        }
-        return budget
-    }
-
     func add(slice: BudgetSlice, toBudgetWith identifier: Budget.ID) async throws {
         try await storageProvider.add(slice: slice, toBudgetWith: identifier)
         try yearlyOverview.append(slice: slice, toBudgetWith: identifier)

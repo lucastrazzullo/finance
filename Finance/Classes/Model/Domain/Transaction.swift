@@ -33,4 +33,8 @@ extension Array where Element == Transaction {
     func at(offsets: IndexSet) -> [Transaction] {
         return NSArray(array: self).objects(at: offsets) as? [Transaction] ?? []
     }
+
+    mutating func delete(withIdentifiers identifiers: Set<Transaction.ID>) {
+        self.removeAll(where: { identifiers.contains($0.id) })
+    }
 }

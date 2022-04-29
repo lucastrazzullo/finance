@@ -33,7 +33,6 @@ import XCTest
         viewModel = YearlyOverviewViewModel(year: Mocks.year, storageProvider: storageProvider)
 
         try await viewModel.load()
-
         XCTAssertEqual(viewModel.yearlyOverview.budgets, budgets)
         XCTAssertEqual(viewModel.yearlyOverview.expenses, transactions)
     }
@@ -57,10 +56,10 @@ import XCTest
         storageProvider = MockStorageProvider(budgets: [budget], transactions: [])
         viewModel = YearlyOverviewViewModel(year: Mocks.year, storageProvider: storageProvider)
         try await viewModel.load()
-        try await viewModel.add(slice: slice2, toBudgetWith: budget.id)
 
-        let updatedBudget = try await viewModel.budget(with: budget.id)
-        XCTAssertNotNil(updatedBudget.slices.with(identifier: slice2.id))
+        try await viewModel.add(slice: slice2, toBudgetWith: budget.id)
+        let updatedBudget = viewModel.yearlyOverview.budgets.with(identifier: budget.id)
+        XCTAssertNotNil(updatedBudget?.slices.with(identifier: slice2.id))
     }
 
     func testDeleteSlices() async throws {
@@ -73,13 +72,13 @@ import XCTest
 
         // Delete slice 1
         try await viewModel.delete(slicesWith: [slice1.id], inBudgetWith: budget.id)
-        var updatedBudget = try await viewModel.budget(with: budget.id)
-        XCTAssertNil(updatedBudget.slices.with(identifier: slice1.id))
+        var updatedBudget = viewModel.yearlyOverview.budgets.with(identifier: budget.id)
+        XCTAssertNil(updatedBudget?.slices.with(identifier: slice1.id))
 
         // Delete slice 2
         try? await viewModel.delete(slicesWith: [slice2.id], inBudgetWith: budget.id)
-        updatedBudget = try await viewModel.budget(with: budget.id)
-        XCTAssertNotNil(updatedBudget.slices.with(identifier: slice2.id))
+        updatedBudget = viewModel.yearlyOverview.budgets.with(identifier: budget.id)
+        XCTAssertNotNil(updatedBudget?.slices.with(identifier: slice2.id))
     }
 
     func testUpdateNameInBudget() async throws {
@@ -91,17 +90,17 @@ import XCTest
 
         // Update with same name
         try await viewModel.update(name: "Name 1", icon: .car, in: budget1)
-        var updatedBudget = try await viewModel.budget(with: budget1.id)
+        var updatedBudget = viewModel.yearlyOverview.budgets.with(identifier: budget1.id)
         updatedBudget = try XCTUnwrap(updatedBudget)
-        XCTAssertEqual(updatedBudget.name, "Name 1")
-        XCTAssertEqual(updatedBudget.icon, .car)
+        XCTAssertEqual(updatedBudget?.name, "Name 1")
+        XCTAssertEqual(updatedBudget?.icon, .car)
 
         // Update with different name
         try await viewModel.update(name: "Name 3", icon: .default, in: budget1)
-        updatedBudget = try await viewModel.budget(with: budget1.id)
+        updatedBudget = viewModel.yearlyOverview.budgets.with(identifier: budget1.id)
         updatedBudget = try XCTUnwrap(updatedBudget)
-        XCTAssertEqual(updatedBudget.name, "Name 3")
-        XCTAssertEqual(updatedBudget.icon, .default)
+        XCTAssertEqual(updatedBudget?.name, "Name 3")
+        XCTAssertEqual(updatedBudget?.icon, .default)
 
         // Update with same name as another budget
         do {
@@ -113,8 +112,8 @@ import XCTest
                 return
             }
         }
-        XCTAssertEqual(updatedBudget.name, "Name 3")
-        XCTAssertEqual(updatedBudget.icon, .default)
+        XCTAssertEqual(updatedBudget?.name, "Name 3")
+        XCTAssertEqual(updatedBudget?.icon, .default)
     }
 
     // MARK: - Budgets List Data Provider
