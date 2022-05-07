@@ -11,11 +11,7 @@ struct NewTransactionView: View {
 
     @State private var transactionDescription: String = ""
     @State private var transactionDate: Date = .now
-    @State private var transactionAmount: Decimal? = nil
-
-    @State private var budgetIndex: Int = 0
-    @State private var budgetSliceIndex: Int = 0
-
+    @State private var transactionAmounts: [Transaction.Amount] = []
     @State private var submitError: DomainError?
 
     let budgets: [Budget]
@@ -24,23 +20,7 @@ struct NewTransactionView: View {
     var body: some View {
         NavigationView {
             Form {
-                Section(header: Text("Budget")) {
-                    Picker("Select Budget", selection: $budgetIndex) {
-                        ForEach(0..<budgets.count, id:\.self) { budgetIndex in
-                            let budget = budgets[budgetIndex]
-                            Text(budget.name)
-                        }
-                    }
-
-                    Picker("Select Slice", selection: $budgetSliceIndex) {
-                        ForEach(0..<budgets[budgetIndex].slices.count, id:\.self) { sliceIndex in
-                            let slice = budgets[budgetIndex].slices[sliceIndex]
-                            Text(slice.name)
-                        }
-                    }
-                }
-
-                Section(header: Text("Info")) {
+                Section(header: SectionHeader(title: "Info")) {
                     TextField("Description", text: $transactionDescription)
                         .accessibilityIdentifier(AccessibilityIdentifier.NewTransactionView.descriptionInputField)
 
@@ -48,8 +28,20 @@ struct NewTransactionView: View {
                         .datePickerStyle(.compact)
                 }
 
-                Section(header: Text("Amount")) {
-                    AmountTextField(amountValue: $transactionAmount, title: "Amount")
+                Section(header: SectionHeader(title: "Amount", amount: transactionAmounts.totalAmount)) {
+                    ForEach(transactionAmounts, id: \.self) { amount in
+                        AmountItem(amount: amount, budgets: budgets)
+                    }
+                    .onDelete { offsets in
+                        transactionAmounts.remove(atOffsets: offsets)
+                    }
+
+                    NavigationLink(destination: NewTransactionAmountView(budgets: budgets, onSubmit: { amount in
+                        transactionAmounts.append(amount)
+
+                    })) {
+                        Text("Add")
+                    }
                 }
 
                 Section {
@@ -57,13 +49,15 @@ struct NewTransactionView: View {
                         InlineErrorView(error: error)
                     }
 
-                    Button("Add", action: submit)
+                    Button("Save", action: submit)
+                        .frame(maxWidth: .infinity)
                         .accessibilityIdentifier(AccessibilityIdentifier.NewBudgetView.saveButton)
                 }
             }
             .navigationTitle("New transaction")
             .navigationBarTitleDisplayMode(.inline)
         }
+        .navigationViewStyle(.stack)
     }
 
     // MARK: Private helper methods
@@ -71,20 +65,11 @@ struct NewTransactionView: View {
     private func submit() {
         Task {
             do {
-                guard let transactionAmount = transactionAmount else {
+                guard !transactionAmounts.isEmpty else {
                     throw DomainError.transaction(error: .amountNotValid)
                 }
 
                 let transactionDescription = transactionDescription.isEmpty ? nil : transactionDescription
-                let transactionBudget = budgets[budgetIndex]
-                let transactionSlice = transactionBudget.slices[budgetSliceIndex]
-                let transactionAmounts = [
-                    Transaction.Amount(
-                        amount: MoneyValue.value(transactionAmount),
-                        budgetIdentifier: transactionBudget.id,
-                        sliceIdentifier: transactionSlice.id
-                    )
-                ]
 
                 let transaction = Transaction(
                     id: .init(),
@@ -99,6 +84,59 @@ struct NewTransactionView: View {
                 submitError = error as? DomainError
             }
         }
+    }
+}
+
+private struct AmountItem: View {
+
+    let amount: Transaction.Amount
+    let budgets: [Budget]
+
+    var body: some View {
+        let budget = budgets.with(identifier: amount.budgetIdentifier)
+        let slice = budget?.slices.with(identifier: amount.sliceIdentifier)
+
+        HStack {
+            if let budget = budget, let slice = slice {
+                HStack(alignment: .firstTextBaseline) {
+                    Image(systemName: budget.icon.rawValue)
+                        .symbolRenderingMode(.hierarchical)
+                        .font(.body.bold())
+
+                    VStack(alignment: .leading) {
+                        Text(budget.name).font(.body.bold())
+                        Text(slice.name).font(.caption)
+                    }
+                }
+                .accentColor(.secondary)
+            }
+
+            Spacer()
+            AmountView(amount: amount.amount)
+        }
+        .padding(.vertical, 8)
+    }
+}
+
+private struct SectionHeader: View {
+
+    let title: String
+    let amount: MoneyValue?
+
+    var body: some View {
+        HStack {
+            Text(title)
+
+            if let amount = amount {
+                Spacer()
+                AmountView(amount: amount)
+            }
+        }
+    }
+
+    init(title: String, amount: MoneyValue? = nil) {
+        self.title = title
+        self.amount = amount
     }
 }
 
