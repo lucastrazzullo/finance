@@ -37,8 +37,11 @@ struct YearlyBudgetOverview: Identifiable {
                 MonthlyBudgetOverview(month: month, expenses: expenses, budget: budget)
             }
 
-        let allSlicesIdentifiers = budgets.flatMap({ $0.slices.map(\.id) })
-        let unownedExpenses = expenses.filter { transaction in !allSlicesIdentifiers.contains(transaction.budgetSliceId) }
+        let allSlicesIdentifiers = Set(budgets.flatMap({ $0.slices.map(\.id) }))
+        let unownedExpenses = expenses.filter { transaction in
+            let transactionSlicesIdentifiers = Set(transaction.amounts.map(\.sliceIdentifier))
+            return allSlicesIdentifiers.intersection(transactionSlicesIdentifiers).isEmpty
+        }
         if unownedExpenses.count > 0 {
             let unownedOverview = MonthlyBudgetOverview(month: month, expenses: unownedExpenses, budget: nil)
             overviews.append(unownedOverview)

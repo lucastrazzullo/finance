@@ -125,6 +125,7 @@
 		8157AB8627BACCE9003FEB28 /* AddSliceUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddSliceUITests.swift; sourceTree = "<group>"; };
 		8157AB8827BACD2B003FEB28 /* FinanceUITestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceUITestCase.swift; sourceTree = "<group>"; };
 		8157AB8A27BEC3ED003FEB28 /* BudgetsListFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetsListFlow.swift; sourceTree = "<group>"; };
+		81681CE628267EB90070138D /* Finance 0. 7.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Finance 0. 7.xcdatamodel"; sourceTree = "<group>"; };
 		816A24CA2801DA1200AAF8C0 /* Finance 0. 6.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Finance 0. 6.xcdatamodel"; sourceTree = "<group>"; };
 		816A24CB2801E02E00AAF8C0 /* BudgetTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetTests.swift; sourceTree = "<group>"; };
 		817033E127B1B7BB001686FA /* YearlyBudgetOverview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YearlyBudgetOverview.swift; sourceTree = "<group>"; };
@@ -244,7 +245,7 @@
 			children = (
 				8170340127B59945001686FA /* AccessibilityIdentifier.swift */,
 				81B284EF27A02FB800EE51EB /* DomainError.swift */,
-				81F3B90D2804333600A1B89F /* Transaction.swift */,
+				81681CE3282675220070138D /* Transaction */,
 				81A6FB702800538D00D71BE6 /* Budget */,
 				81A6FB712800539400D71BE6 /* Overview */,
 			);
@@ -294,6 +295,14 @@
 				81CB8BF72746CA6500A64785 /* AmountListItem.swift */,
 			);
 			path = Amount;
+			sourceTree = "<group>";
+		};
+		81681CE3282675220070138D /* Transaction */ = {
+			isa = PBXGroup;
+			children = (
+				81F3B90D2804333600A1B89F /* Transaction.swift */,
+			);
+			path = Transaction;
 			sourceTree = "<group>";
 		};
 		817033E327B25E5E001686FA /* Classes */ = {
@@ -1053,6 +1062,7 @@
 		81FC874E279B65460031D3AC /* Finance.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				81681CE628267EB90070138D /* Finance 0. 7.xcdatamodel */,
 				816A24CA2801DA1200AAF8C0 /* Finance 0. 6.xcdatamodel */,
 				81A6FB6B28003D5400D71BE6 /* Finance 0. 5.xcdatamodel */,
 				81EB260E27D162C6006F53DA /* Finance 0. 4.xcdatamodel */,
@@ -1061,7 +1071,7 @@
 				81FCE397279C59F200A407A7 /* Finance 0.1.xcdatamodel */,
 				81FC874F279B65460031D3AC /* Finance.xcdatamodel */,
 			);
-			currentVersion = 816A24CA2801DA1200AAF8C0 /* Finance 0. 6.xcdatamodel */;
+			currentVersion = 81681CE628267EB90070138D /* Finance 0. 7.xcdatamodel */;
 			path = Finance.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

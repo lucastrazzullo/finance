@@ -9,11 +9,20 @@ import Foundation
 
 struct Transaction: Hashable, AmountHolder, Identifiable {
 
+    struct Amount: Hashable, AmountHolder {
+        let amount: MoneyValue
+        let budgetIdentifier: Budget.ID
+        let sliceIdentifier: BudgetSlice.ID
+    }
+
     let id: UUID
     let description: String?
-    let amount: MoneyValue
     let date: Date
-    let budgetSliceId: BudgetSlice.ID
+    let amounts: [Amount]
+
+    var amount: MoneyValue {
+        return amounts.totalAmount
+    }
 
     var year: Int {
         return Calendar.current.component(.year, from: date)
@@ -26,7 +35,7 @@ struct Transaction: Hashable, AmountHolder, Identifiable {
 
 extension Array where Element == Transaction {
 
-    func with(identifier: Budget.ID) -> Transaction? {
+    func with(identifier: Transaction.ID) -> Transaction? {
         return self.first(where: { $0.id == identifier })
     }
 

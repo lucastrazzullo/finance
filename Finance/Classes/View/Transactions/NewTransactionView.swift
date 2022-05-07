@@ -76,13 +76,21 @@ struct NewTransactionView: View {
                 }
 
                 let transactionDescription = transactionDescription.isEmpty ? nil : transactionDescription
+                let transactionBudget = budgets[budgetIndex]
+                let transactionSlice = transactionBudget.slices[budgetSliceIndex]
+                let transactionAmounts = [
+                    Transaction.Amount(
+                        amount: MoneyValue.value(transactionAmount),
+                        budgetIdentifier: transactionBudget.id,
+                        sliceIdentifier: transactionSlice.id
+                    )
+                ]
 
                 let transaction = Transaction(
                     id: .init(),
                     description: transactionDescription,
-                    amount: MoneyValue.value(transactionAmount),
                     date: transactionDate,
-                    budgetSliceId: budgets[budgetIndex].slices[budgetSliceIndex].id
+                    amounts: transactionAmounts
                 )
 
                 try await onSubmit(transaction)

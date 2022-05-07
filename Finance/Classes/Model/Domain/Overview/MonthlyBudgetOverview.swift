@@ -27,9 +27,10 @@ struct MonthlyBudgetOverview: Hashable {
     init(month: Int, expenses: [Transaction], budget: Budget?) {
         let filteredExpenses: [Transaction]
         if let budget = budget {
-            let slicesIdentifiers = Set(budget.slices.map(\.id))
+            let budgetSlicesIdentifiers = Set(budget.slices.map(\.id))
             filteredExpenses = expenses.filter { transaction in
-                slicesIdentifiers.contains(transaction.budgetSliceId)
+                let transactionSlicesIdentifiers = Set(transaction.amounts.map(\.sliceIdentifier))
+                return !budgetSlicesIdentifiers.intersection(transactionSlicesIdentifiers).isEmpty
             }
         } else {
             filteredExpenses = expenses

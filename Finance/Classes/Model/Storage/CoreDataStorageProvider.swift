@@ -29,7 +29,7 @@ final class CoreDataStorageProvider: StorageProvider {
 
     func fetchTransactions(year: Int) async throws -> [Transaction] {
         let entities = try fetchTransactionEntities(year: year)
-        return entities.compactMap { Transaction.with(transactionEntity: $0) }
+        return try entities.compactMap { try Transaction.with(transactionEntity: $0) }
     }
 
     func fetchBudgets(year: Int) async throws -> [Budget] {
@@ -203,10 +203,23 @@ final class CoreDataStorageProvider: StorageProvider {
 
     private func setupTransactionEntity(_ transactionEntity: TransactionEntity, with transaction: Transaction) {
         transactionEntity.identifier = transaction.id
-        transactionEntity.amount = NSDecimalNumber(decimal: transaction.amount.value)
         transactionEntity.date = transaction.date
-        transactionEntity.budgetSliceIdentifier = transaction.budgetSliceId
         transactionEntity.contentDescription = transaction.description
+
+        transactionEntity.amounts = NSSet(array: transaction.amounts.map { amount in
+            let amountEntity = TransactionAmountEntity(context: persistentContainer.viewContext)
+            amountEntity.transaction = transactionEntity
+
+            setupTransactionAmountEntity(amountEntity, with: amount)
+
+            return amountEntity
+        })
+    }
+
+    private func setupTransactionAmountEntity(_ transactionAmountEntity: TransactionAmountEntity, with amount: Transaction.Amount) {
+        transactionAmountEntity.amount = NSDecimalNumber(decimal: amount.amount.value)
+        transactionAmountEntity.budgetIdentifier = amount.budgetIdentifier
+        transactionAmountEntity.sliceIdentifier = amount.sliceIdentifier
     }
 
     private func setupBudgetEntity(_ budgetEntity: BudgetEntity, with budget: Budget) {
@@ -342,23 +355,40 @@ private extension BudgetSlice.Schedule {
 
 private extension Transaction {
 
-    static func with(transactionEntity: TransactionEntity) -> Self? {
+    static func with(transactionEntity: TransactionEntity) throws -> Self? {
         guard let identifier = transactionEntity.identifier,
-              let amountValue = transactionEntity.amount as? Decimal,
               let date = transactionEntity.date,
-              let sliceId = transactionEntity.budgetSliceIdentifier else {
+              let amounts = try transactionEntity.amounts?
+                .compactMap({ $0 as? TransactionAmountEntity })
+                .compactMap(Transaction.Amount.with(transactionAmountEntity:)),
+              !amounts.isEmpty else {
             return nil
         }
 
         let description = transactionEntity.contentDescription
-        let amount = MoneyValue.value(amountValue)
 
         return .init(
             id: identifier,
             description: description,
-            amount: amount,
             date: date,
-            budgetSliceId: sliceId
+            amounts: amounts
+        )
+    }
+}
+
+private extension Transaction.Amount {
+
+    static func with(transactionAmountEntity: TransactionAmountEntity) throws -> Self? {
+        guard let amount = transactionAmountEntity.amount,
+              let budgetIdentifier = transactionAmountEntity.budgetIdentifier,
+              let sliceIdentifier = transactionAmountEntity.sliceIdentifier else {
+            return nil
+        }
+
+        return Transaction.Amount(
+            amount: .value(amount.decimalValue),
+            budgetIdentifier: budgetIdentifier,
+            sliceIdentifier: sliceIdentifier
         )
     }
 }

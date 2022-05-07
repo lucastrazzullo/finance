@@ -217,8 +217,8 @@ import XCTest
         components.year = Mocks.year
         let date = Calendar.current.date(from: components)!
 
-        let expense1 = Transaction(id: .init(), description: nil, amount: .value(100), date: date, budgetSliceId: .init())
-        let expense2 = Transaction(id: .init(), description: nil, amount: .value(100), date: date, budgetSliceId: .init())
+        let expense1 = Transaction(id: .init(), description: nil, date: date, amounts: [.init(amount: .value(100), budgetIdentifier: .init(), sliceIdentifier: .init())])
+        let expense2 = Transaction(id: .init(), description: nil, date: date, amounts: [.init(amount: .value(100), budgetIdentifier: .init(), sliceIdentifier: .init())])
         storageProvider = MockStorageProvider(budgets: [], transactions: [])
         viewModel = YearlyOverviewViewModel(year: Mocks.year, storageProvider: storageProvider)
         try await viewModel.load()
@@ -232,7 +232,7 @@ import XCTest
         var components = DateComponents()
         components.year = Mocks.year - 1
         let date = Calendar.current.date(from: components)!
-        let expense = Transaction(id: .init(), description: nil, amount: .value(100), date: date, budgetSliceId: .init())
+        let expense = Transaction(id: .init(), description: nil, date: date, amounts: [.init(amount: .value(100), budgetIdentifier: .init(), sliceIdentifier: .init())])
         storageProvider = MockStorageProvider(budgets: [], transactions: [])
         viewModel = YearlyOverviewViewModel(year: Mocks.year, storageProvider: storageProvider)
         try await viewModel.load()

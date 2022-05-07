@@ -25,12 +25,12 @@ final class YearlyBudgetOverviewTests: XCTestCase {
         return try BudgetSlice(id: .init(), name: "Name", configuration: .monthly(amount: .value(100)))
     }
 
-    private func makeTransaction(year: Int, month: Int = 1, budgetSliceId: BudgetSlice.ID = .init(), amount: MoneyValue = .value(100)) -> Transaction {
+    private func makeTransaction(year: Int, month: Int = 1, budgetId: Budget.ID = .init(), budgetSliceId: BudgetSlice.ID = .init(), amount: MoneyValue = .value(100)) -> Transaction {
         var components = DateComponents()
         components.year = year
         components.month = month
         let date = Calendar.current.date(from: components)!
-        return Transaction(id: .init(), description: nil, amount: amount, date: date, budgetSliceId: budgetSliceId)
+        return Transaction(id: .init(), description: nil, date: date, amounts: [.init(amount: amount, budgetIdentifier: budgetId, sliceIdentifier: budgetSliceId)])
     }
 
     // MARK: Instantiating
@@ -38,7 +38,7 @@ final class YearlyBudgetOverviewTests: XCTestCase {
     func testInstantiateOverview() throws {
         let slice = try makeSlice()
         let budget = try makeBudget(year: 2000, slices: [slice])
-        let expense = makeTransaction(year: 2000, month: 1, budgetSliceId: slice.id)
+        let expense = makeTransaction(year: 2000, month: 1, budgetId: budget.id, budgetSliceId: slice.id)
         let overview = try makeOverview(year: 2000, budgets: [budget], expenses: [expense])
 
         XCTAssertEqual(overview.budgets, [budget])
@@ -48,7 +48,7 @@ final class YearlyBudgetOverviewTests: XCTestCase {
     func testInstantiateOverview_withDifferentYear() throws {
         let slice = try makeSlice()
         let budget = try makeBudget(year: 2000, slices: [slice])
-        let expense = makeTransaction(year: 2000, month: 1, budgetSliceId: slice.id)
+        let expense = makeTransaction(year: 2000, month: 1, budgetId: budget.id, budgetSliceId: slice.id)
         let overview = try makeOverview(year: 1999, budgets: [budget], expenses: [expense])
 
         XCTAssertTrue(overview.budgets.isEmpty)
@@ -62,7 +62,7 @@ final class YearlyBudgetOverviewTests: XCTestCase {
 
         let slice = try makeSlice()
         let budget = try makeBudget(year: overview.year, slices: [slice])
-        let expense = makeTransaction(year: overview.year, month: 1, budgetSliceId: slice.id)
+        let expense = makeTransaction(year: overview.year, month: 1, budgetId: budget.id, budgetSliceId: slice.id)
 
         overview.set(budgets: [budget])
         overview.set(expenses: [expense])
@@ -76,7 +76,7 @@ final class YearlyBudgetOverviewTests: XCTestCase {
 
         let slice = try makeSlice()
         let budget = try makeBudget(year: 1999, slices: [slice])
-        let expense = makeTransaction(year: 1999, month: 1, budgetSliceId: slice.id)
+        let expense = makeTransaction(year: 1999, month: 1, budgetId: budget.id, budgetSliceId: slice.id)
 
         overview.set(budgets: [budget])
         overview.set(expenses: [expense])
@@ -119,8 +119,8 @@ final class YearlyBudgetOverviewTests: XCTestCase {
         let slice = try BudgetSlice(id: .init(), name: "Monthly", configuration: .monthly(amount: .value(100)))
         let budget = try Budget(id: .init(), year: 2000, name: "Name", icon: .default, slices: [slice])
 
-        let transaction1 = makeTransaction(year: 2000, month: 1, budgetSliceId: slice.id, amount: .value(50))
-        let transaction2 = makeTransaction(year: 2000, month: 2, budgetSliceId: slice.id, amount: .value(50))
+        let transaction1 = makeTransaction(year: 2000, month: 1, budgetId: budget.id, budgetSliceId: slice.id, amount: .value(50))
+        let transaction2 = makeTransaction(year: 2000, month: 2, budgetId: budget.id, budgetSliceId: slice.id, amount: .value(50))
 
         let yearlyOverview = YearlyBudgetOverview(name: "Name", year: 2000, budgets: [budget], expenses: [transaction1, transaction2])
 
@@ -157,8 +157,8 @@ final class YearlyBudgetOverviewTests: XCTestCase {
     }
 
     func testGetMonthlyOverview_withUnownedTransactions() throws {
-        let transaction1 = makeTransaction(year: 2000, month: 1, budgetSliceId: .init(), amount: .value(50))
-        let transaction2 = makeTransaction(year: 2000, month: 1, budgetSliceId: .init(), amount: .value(50))
+        let transaction1 = makeTransaction(year: 2000, month: 1, amount: .value(50))
+        let transaction2 = makeTransaction(year: 2000, month: 1, amount: .value(50))
         let expenses = [transaction1, transaction2]
         let yearlyOverview = YearlyBudgetOverview(name: "Name", year: 2000, budgets: [], expenses: expenses)
 

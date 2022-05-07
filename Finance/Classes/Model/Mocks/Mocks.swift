@@ -92,11 +92,21 @@ enum Mocks {
         components.month = 1
         let date = Calendar.current.date(from: components)!
         return [
-            Transaction(id: .init(), description: nil, amount: .value(100), date: date, budgetSliceId: houseSlices[0].id),
-            Transaction(id: .init(), description: nil, amount: .value(100), date: date, budgetSliceId: houseSlices[1].id),
-            Transaction(id: .init(), description: nil, amount: .value(100), date: date, budgetSliceId: houseSlices[2].id),
-            Transaction(id: .init(), description: nil, amount: .value(1000), date: date, budgetSliceId: groceriesSlices[0].id),
-            Transaction(id: .init(), description: nil, amount: .value(1000), date: date, budgetSliceId: groceriesSlices[1].id)
+            Transaction(id: .init(), description: nil, date: date, amounts: [
+                .init(amount: .value(100), budgetIdentifier: budgets[0].id, sliceIdentifier: budgets[0].slices[0].id)
+            ]),
+            Transaction(id: .init(), description: nil, date: date, amounts: [
+                .init(amount: .value(100), budgetIdentifier: budgets[0].id, sliceIdentifier: budgets[0].slices[1].id)
+            ]),
+            Transaction(id: .init(), description: nil, date: date, amounts: [
+                .init(amount: .value(100), budgetIdentifier: budgets[0].id, sliceIdentifier: budgets[0].slices[2].id)
+            ]),
+            Transaction(id: .init(), description: nil, date: date, amounts: [
+                .init(amount: .value(100), budgetIdentifier: budgets[1].id, sliceIdentifier: budgets[1].slices[0].id)
+            ]),
+            Transaction(id: .init(), description: nil, date: date, amounts: [
+                .init(amount: .value(100), budgetIdentifier: budgets[1].id, sliceIdentifier: budgets[1].slices[1].id)
+            ])
         ]
     }()
 }

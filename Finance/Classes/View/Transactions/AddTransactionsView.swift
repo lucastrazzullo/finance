@@ -9,9 +9,8 @@ import SwiftUI
 
 struct AddTransactionsView: View {
 
-    @State private var transactions: [Transaction] = []
     @State private var addNewTransactionPresented: Bool = false
-
+    @State private var transactions: [Transaction] = []
     @State private var submitError: DomainError?
 
     let budgets: [Budget]
@@ -20,19 +19,11 @@ struct AddTransactionsView: View {
     var body: some View {
         NavigationView {
             List {
-                ForEach(budgets(for: transactions), id: \.self) { budget in
-                    let budgetTransactions = transactions(forBudgetWith: budget.id)
-                    let headerViewModel = SectionHeader.ViewModel(budget: budget, amount: budgetTransactions.totalAmount)
-                    Section(header: SectionHeader(viewModel: headerViewModel)) {
-                        ForEach(budgetTransactions, id: \.self) { transaction in
-                            let sliceName = sliceName(for: transaction.budgetSliceId, inBudgetWith: budget.id) ?? "--"
-                            let viewModel = TransactionItem.ViewModel(sliceName: sliceName, date: transaction.date, amount: transaction.amount)
-                            TransactionItem(viewModel: viewModel)
-                        }
-                        .onDelete { indices in
-                            transactions.remove(atOffsets: indices)
-                        }
-                    }
+                ForEach(transactions, id: \.self) { transaction in
+                    TransactionItem(transaction: transaction, budgets: budgets)
+                }
+                .onDelete { indices in
+                    transactions.remove(atOffsets: indices)
                 }
 
                 Section {
@@ -43,7 +34,7 @@ struct AddTransactionsView: View {
                     .padding(.vertical)
                 }
 
-                Section(header: SectionHeader(viewModel: .init(icon: .none, label: "Total", amount: transactions.totalAmount))) {
+                Section(header: SectionHeader(label: "Total", amount: transactions.totalAmount)) {
                     if let error = submitError {
                         InlineErrorView(error: error)
                     }
@@ -83,90 +74,56 @@ struct AddTransactionsView: View {
             }
         }
     }
-
-    private func budgets(for transactions: [Transaction]) -> [Budget] {
-        let transactionSliceIdentifiers = Set(transactions.map(\.budgetSliceId))
-        return budgets
-            .filter { budget in
-                let budgetSliceIdentifiers = Set(budget.slices.map(\.id))
-                return !transactionSliceIdentifiers.intersection(budgetSliceIdentifiers).isEmpty
-            }
-    }
-
-    private func transactions(forBudgetWith id: Budget.ID) -> [Transaction] {
-        return transactions.filter { transaction in
-            guard let budget = budgets.with(identifier: id) else {
-                return false
-            }
-            return budget.slices.map(\.id).contains(transaction.budgetSliceId)
-        }
-    }
-
-    private func sliceName(for sliceId: BudgetSlice.ID, inBudgetWith id: Budget.ID) -> String? {
-        return budgets
-            .with(identifier: id)?
-            .slices
-            .with(identifier: sliceId)?
-            .name
-    }
 }
 
 private struct SectionHeader: View {
 
-    struct ViewModel: Hashable {
-        let icon: SystemIcon?
-        let label: String
-        let amount: MoneyValue
-
-        init(icon: SystemIcon?, label: String, amount: MoneyValue) {
-            self.icon = icon
-            self.label = label
-            self.amount = amount
-        }
-
-        init(budget: Budget, amount: MoneyValue) {
-            self.icon = budget.icon
-            self.label = budget.name
-            self.amount = amount
-        }
-    }
-
-    let viewModel: ViewModel
+    let label: String
+    let amount: MoneyValue
 
     var body: some View {
         HStack {
-            if let systemIcon = viewModel.icon {
-                Image(systemName: systemIcon.rawValue)
-            }
-            Text(viewModel.label)
+            Text(label)
             Spacer()
-            AmountView(amount: viewModel.amount)
+            AmountView(amount: amount)
         }
     }
 }
 
 private struct TransactionItem: View {
 
-    struct ViewModel {
-        let sliceName: String
-        let date: Date
-        let amount: MoneyValue
-    }
-
-    let viewModel: ViewModel
+    let label: String
+    let date: Date
+    let amount: MoneyValue
 
     var body: some View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
-                Text(viewModel.sliceName).font(.headline)
-                Text(viewModel.date, style: .date).font(.caption)
+                Text(label).font(.headline)
+                Text(date, style: .date).font(.caption)
             }
 
             Spacer()
 
-            AmountView(amount: viewModel.amount)
+            AmountView(amount: amount)
         }
         .padding(.vertical, 8)
+    }
+
+    init(transaction: Transaction, budgets: [Budget]) {
+        self.label = transaction
+            .amounts
+            .compactMap { amount in
+                budgets
+                    .with(identifier: amount.budgetIdentifier)?
+                    .slices
+                    .with(identifier: amount.sliceIdentifier)?
+                    .name
+            }
+            .joined(separator: ", ")
+
+        self.date = transaction.date
+        self.amount = transaction.amount
     }
 }
 
