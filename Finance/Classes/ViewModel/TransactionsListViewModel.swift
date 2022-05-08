@@ -7,22 +7,23 @@
 
 import Foundation
 
-protocol TransactionsListDataProvider: AnyObject {
-    func delete(transactionsWith identifiers: Set<Transaction.ID>) async throws
-}
-
 @MainActor final class TransactionsListViewModel: ObservableObject {
+
+    typealias AddTransactionsHandler = () -> Void
+    typealias DeleteTransactionsHandler = (Set<Transaction.ID>) async throws -> Void
 
     @Published var transactions: [Transaction]
     @Published var deleteTransactionError: DomainError?
 
-    private let dataProvider: TransactionsListDataProvider
+    let addTransactions: AddTransactionsHandler
+    let deleteTransactions: DeleteTransactionsHandler
 
     // MARK: Object life cycle
 
-    init(transactions: [Transaction], dataProvider: TransactionsListDataProvider) {
+    init(transactions: [Transaction], addTransactions: @escaping AddTransactionsHandler, deleteTransactions: @escaping DeleteTransactionsHandler) {
         self.transactions = transactions
-        self.dataProvider = dataProvider
+        self.addTransactions = addTransactions
+        self.deleteTransactions = deleteTransactions
     }
 
     // MARK: Internal methods
@@ -40,7 +41,7 @@ protocol TransactionsListDataProvider: AnyObject {
         let identifiersSet = Set(identifiers)
 
         do {
-            try await dataProvider.delete(transactionsWith: identifiersSet)
+            try await deleteTransactions(identifiersSet)
             transactions.delete(withIdentifiers: identifiersSet)
             deleteTransactionError = nil
         } catch {

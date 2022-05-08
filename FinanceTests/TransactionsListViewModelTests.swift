@@ -11,7 +11,6 @@ import XCTest
 
 @MainActor final class TransactionsListViewModelTests: XCTestCase {
 
-    private var dataProvider: MockTransactionsListDataProvider!
     private var viewModel: TransactionsListViewModel!
 
     @MainActor override func setUpWithError() throws {
@@ -20,7 +19,6 @@ import XCTest
 
     @MainActor override func tearDownWithError() throws {
         viewModel = nil
-        dataProvider = nil
         try super.tearDownWithError()
     }
 
@@ -29,8 +27,7 @@ import XCTest
     func testDeleteTransactions() async throws {
         let transactions = Mocks.transactions.filter({ $0.month == 1 })
 
-        dataProvider = MockTransactionsListDataProvider(transactions: transactions)
-        viewModel = TransactionsListViewModel(transactions: transactions, dataProvider: dataProvider)
+        viewModel = TransactionsListViewModel(transactions: transactions, addTransactions: {}, deleteTransactions: { _ in })
 
         // Assert initial state
         XCTAssertNil(viewModel.deleteTransactionError)
@@ -45,9 +42,6 @@ import XCTest
         XCTAssertNil(viewModel.deleteTransactionError)
         transactions.forEach { transaction in
             XCTAssertFalse(viewModel.transactions.contains(transaction))
-        }
-        transactions.forEach { transaction in
-            XCTAssertFalse(dataProvider.transactions.contains(transaction))
         }
     }
 }

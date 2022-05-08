@@ -49,6 +49,11 @@ import Foundation
         isAddNewTransactionPresented = false
     }
 
+    func delete(transactionsWith identifiers: Set<Transaction.ID>) async throws {
+        try await storageProvider.delete(transactionsWith: identifiers)
+        yearlyOverview.delete(expensesWith: identifiers)
+    }
+
     // MARK: Budgets
 
     func add(budget: Budget) async throws {
@@ -83,13 +88,5 @@ extension YearlyOverviewViewModel: BudgetsListDataProvider {
     func delete(budgetsWith identifiers: Set<Budget.ID>) async throws {
         try await storageProvider.delete(budgetsWith: identifiers)
         yearlyOverview.delete(budgetsWith: identifiers)
-    }
-}
-
-extension YearlyOverviewViewModel: TransactionsListDataProvider {
-
-    func delete(transactionsWith identifiers: Set<Transaction.ID>) async throws {
-        try await storageProvider.delete(transactionsWith: identifiers)
-        yearlyOverview.delete(expensesWith: identifiers)
     }
 }

@@ -79,11 +79,9 @@ struct YearlyOverviewView: View {
                         TransactionsListView(
                             viewModel: TransactionsListViewModel(
                                 transactions: monthlyOverview.expensesInMonth,
-                                dataProvider: viewModel
-                            ),
-                            addNewTransaction: {
-                                self.viewModel.isAddNewTransactionPresented = true
-                            }
+                                addTransactions: { self.viewModel.isAddNewTransactionPresented = true },
+                                deleteTransactions: viewModel.delete(transactionsWith:)
+                            )
                         )
                         .navigationBarTitleDisplayMode(.inline)
                         .toolbar(content: { makeToolbar(titlePrefix: "Expenses", showsMenuPicker: true) })
@@ -120,9 +118,9 @@ struct YearlyOverviewView: View {
         TransactionsListView(
             viewModel: TransactionsListViewModel(
                 transactions: transactions,
-                dataProvider: viewModel
-            ),
-            addNewTransaction: { self.viewModel.isAddNewTransactionPresented = true }
+                addTransactions: { self.viewModel.isAddNewTransactionPresented = true },
+                deleteTransactions: viewModel.delete(transactionsWith:)
+            )
         )
     }
 

@@ -11,8 +11,6 @@ struct TransactionsListView: View {
 
     @ObservedObject var viewModel: TransactionsListViewModel
 
-    let addNewTransaction: () -> Void
-
     var body: some View {
         List {
             ForEach(viewModel.months(), id: \.self) { month in
@@ -27,7 +25,7 @@ struct TransactionsListView: View {
                 }
             }
 
-            Button(action: addNewTransaction) {
+            Button(action: viewModel.addTransactions) {
                 Label("Add", systemImage: "plus")
                     .accessibilityIdentifier(AccessibilityIdentifier.TransactionsListView.addTransactionButton)
             }
@@ -59,9 +57,9 @@ struct TransactionsListView_Previews: PreviewProvider {
             TransactionsListView(
                 viewModel: .init(
                     transactions: Mocks.transactions,
-                    dataProvider: MockTransactionsListDataProvider(transactions: Mocks.transactions)
-                ),
-                addNewTransaction: {}
+                    addTransactions: {},
+                    deleteTransactions: { _ in }
+                )
             )
             .navigationTitle("Transactions")
         }
