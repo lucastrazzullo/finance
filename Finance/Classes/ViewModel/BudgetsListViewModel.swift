@@ -16,7 +16,6 @@ protocol BudgetsListDataProvider: AnyObject {
 final class BudgetsListViewModel: ObservableObject {
 
     @Published var budgets: [Budget]
-    @Published var isAddNewBudgetPresented: Bool = false
     @Published var deleteBudgetError: DomainError?
 
     private let dataProvider: BudgetsListDataProvider
@@ -33,7 +32,6 @@ final class BudgetsListViewModel: ObservableObject {
     func add(budget: Budget) async throws {
         try await dataProvider.add(budget: budget)
         budgets.append(budget)
-        isAddNewBudgetPresented = false
     }
 
     func delete(budgetsAt offsets: IndexSet) async {

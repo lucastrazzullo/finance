@@ -11,8 +11,8 @@ import Foundation
 
     @Published var yearlyOverview: YearlyBudgetOverview
 
-    @Published var month: Int = Calendar.current.component(.month, from: .now)
     @Published var isAddNewTransactionPresented: Bool = false
+    @Published var isAddNewBudgetPresented: Bool = false
 
     private let storageProvider: StorageProvider
 
@@ -75,6 +75,7 @@ extension YearlyOverviewViewModel: BudgetsListDataProvider {
         try YearlyBudgetOverviewValidator.willAdd(budget: budget, to: yearlyOverview.budgets, year: yearlyOverview.year)
         try await storageProvider.add(budget: budget)
         try yearlyOverview.append(budget: budget)
+        isAddNewBudgetPresented = false
     }
 
     func delete(budgetsWith identifiers: Set<Budget.ID>) async throws {

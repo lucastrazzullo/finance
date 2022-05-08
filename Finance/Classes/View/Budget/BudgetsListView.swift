@@ -13,7 +13,7 @@ struct BudgetsListView<Item: View>: View {
 
     @ViewBuilder var item: (Budget) -> Item
 
-    let year: Int
+    let addNewBudget: () -> Void
 
     var body: some View {
         List {
@@ -28,7 +28,7 @@ struct BudgetsListView<Item: View>: View {
                     }
                 }
 
-                Button(action: { viewModel.isAddNewBudgetPresented = true }) {
+                Button(action: addNewBudget) {
                     Label("Add", systemImage: "plus")
                         .accessibilityIdentifier(AccessibilityIdentifier.BudgetsListView.addBudgetButton)
                 }
@@ -39,9 +39,6 @@ struct BudgetsListView<Item: View>: View {
             }
         }
         .listStyle(.inset)
-        .sheet(isPresented: $viewModel.isAddNewBudgetPresented) {
-            NewBudgetView(year: year, onSubmit: viewModel.add(budget:))
-        }
     }
 }
 
@@ -53,7 +50,7 @@ struct BudgetsListView_Previews: PreviewProvider {
         BudgetsListView(
             viewModel: .init(budgets: budgets, dataProvider: MockBudgetsListDataProvider(budgets: budgets)),
             item: { budget in BudgetsListItem(budget: budget) },
-            year: Mocks.year
+            addNewBudget: {}
         )
     }
 }

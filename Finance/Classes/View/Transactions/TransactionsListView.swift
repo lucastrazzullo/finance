@@ -11,6 +11,8 @@ struct TransactionsListView: View {
 
     @ObservedObject var viewModel: TransactionsListViewModel
 
+    let addNewTransaction: () -> Void
+
     var body: some View {
         List {
             ForEach(viewModel.months(), id: \.self) { month in
@@ -21,6 +23,11 @@ struct TransactionsListView: View {
                     }
                     .onDelete(perform: viewModel.delete(transactionsAt:))
                 }
+            }
+
+            Button(action: addNewTransaction) {
+                Label("Add", systemImage: "plus")
+                    .accessibilityIdentifier(AccessibilityIdentifier.TransactionsListView.addTransactionButton)
             }
 
             if let error = viewModel.deleteTransactionError {
@@ -47,10 +54,13 @@ private struct TransactionItem: View {
 struct TransactionsListView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
-            TransactionsListView(viewModel: .init(
-                transactions: Mocks.transactions,
-                dataProvider: MockTransactionsListDataProvider(transactions: Mocks.transactions)
-            ))
+            TransactionsListView(
+                viewModel: .init(
+                    transactions: Mocks.transactions,
+                    dataProvider: MockTransactionsListDataProvider(transactions: Mocks.transactions)
+                ),
+                addNewTransaction: {}
+            )
             .navigationTitle("Transactions")
         }
     }

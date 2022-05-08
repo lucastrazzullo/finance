@@ -13,6 +13,8 @@ struct YearlyOverviewView: View {
 
     @ObservedObject var viewModel: YearlyOverviewViewModel
 
+    @State private var month: Int = Calendar.current.component(.month, from: .now)
+
     var body: some View {
         TabView {
             NavigationView {
@@ -39,6 +41,18 @@ struct YearlyOverviewView: View {
                     .accessibilityIdentifier(AccessibilityIdentifier.YearlyOverviewView.transactionsTab)
             }
         }
+        .sheet(isPresented: $viewModel.isAddNewTransactionPresented) {
+            AddTransactionsView(
+                budgets: viewModel.yearlyOverview.budgets,
+                onSubmit: viewModel.add(transactions:)
+            )
+        }
+        .sheet(isPresented: $viewModel.isAddNewBudgetPresented) {
+            NewBudgetView(
+                year: viewModel.yearlyOverview.year,
+                onSubmit: viewModel.add(budget:)
+            )
+        }
         .task {
             try? await viewModel.load()
         }
@@ -52,12 +66,9 @@ struct YearlyOverviewView: View {
     @ViewBuilder private func makeOverviewListView() -> some View {
         MontlyOverviewsListView(
             item: makeOverviewListViewItem(overview:),
-            montlhyOverviews: viewModel.yearlyOverview.monthlyOverviews(month: viewModel.month),
-            monthlyOverviewsWithLowestAvailability: viewModel.yearlyOverview.monthlyOverviewsWithLowestAvailability(month: viewModel.month)
+            montlhyOverviews: viewModel.yearlyOverview.monthlyOverviews(month: month),
+            monthlyOverviewsWithLowestAvailability: viewModel.yearlyOverview.monthlyOverviewsWithLowestAvailability(month: month)
         )
-        .sheet(isPresented: $viewModel.isAddNewTransactionPresented) {
-            AddTransactionsView(budgets: viewModel.yearlyOverview.budgets, onSubmit: viewModel.add(transactions:))
-        }
         .navigationBarTitleDisplayMode(.inline)
         .toolbar(content: {
             ToolbarItem(placement: .principal) {
@@ -68,7 +79,7 @@ struct YearlyOverviewView: View {
             }
 
             ToolbarItem(placement: .navigationBarLeading) {
-                MonthPickerView(month: $viewModel.month)
+                MonthPickerView(month: $month)
                     .pickerStyle(MenuPickerStyle())
             }
 
@@ -81,7 +92,7 @@ struct YearlyOverviewView: View {
     }
 
     @ViewBuilder private func makeOverviewListViewItem(overview: MonthlyBudgetOverview) -> some View {
-        NavigationLink(destination: makeExpensesListView(overview: overview)) {
+        NavigationLink(destination: makeTransactionsListView(overview: overview)) {
             MonthlyOverviewItem(overview: overview)
         }
     }
@@ -93,16 +104,26 @@ struct YearlyOverviewView: View {
         let budgets = viewModel.yearlyOverview.budgets
         let viewModel = BudgetsListViewModel(budgets: budgets, dataProvider: viewModel)
 
-        BudgetsListView(viewModel: viewModel, item: makeBudgetListItem(budget:), year: year)
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .principal) {
-                    DefaultToolbar(
-                        title: "Budgets \(self.viewModel.yearlyOverview.name)",
-                        subtitle: String(year)
-                    )
+        BudgetsListView(
+            viewModel: viewModel,
+            item: makeBudgetListItem(budget:),
+            addNewBudget: { self.viewModel.isAddNewBudgetPresented = true }
+        )
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                DefaultToolbar(
+                    title: "Budgets \(self.viewModel.yearlyOverview.name)",
+                    subtitle: String(year)
+                )
+            }
+
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(action: { self.viewModel.isAddNewBudgetPresented = true }) {
+                    Label("New budget", systemImage: "plus")
                 }
             }
+        }
     }
 
     @ViewBuilder private func makeBudgetListItem(budget: Budget) -> some View {
@@ -116,19 +137,28 @@ struct YearlyOverviewView: View {
 
     // MARK: Private builder methods - Expenses
 
-    @ViewBuilder private func makeExpensesListView(overview: MonthlyBudgetOverview) -> some View {
+    @ViewBuilder private func makeTransactionsListView(overview: MonthlyBudgetOverview) -> some View {
         let viewModel = TransactionsListViewModel(transactions: overview.expensesInMonth, dataProvider: viewModel)
 
-        TransactionsListView(viewModel: viewModel)
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar(content: {
-                ToolbarItem(placement: .principal) {
-                    DefaultToolbar(
-                        title: "Expenses \(overview.name)",
-                        subtitle: "in \(Calendar.current.standaloneMonthSymbols[overview.month - 1])"
-                    )
+        TransactionsListView(
+            viewModel: viewModel,
+            addNewTransaction: { self.viewModel.isAddNewTransactionPresented = true }
+        )
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar(content: {
+            ToolbarItem(placement: .principal) {
+                DefaultToolbar(
+                    title: "Expenses \(overview.name)",
+                    subtitle: "in \(Calendar.current.standaloneMonthSymbols[overview.month - 1])"
+                )
+            }
+
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(action: { self.viewModel.isAddNewTransactionPresented = true }) {
+                    Label("New transaction", systemImage: "plus")
                 }
-            })
+            }
+        })
     }
 
     // MARK: Private builder methods - Transactions
@@ -138,16 +168,25 @@ struct YearlyOverviewView: View {
         let transactions = viewModel.yearlyOverview.expenses
         let viewModel = TransactionsListViewModel(transactions: transactions, dataProvider: viewModel)
 
-        TransactionsListView(viewModel: viewModel)
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .principal) {
-                    DefaultToolbar(
-                        title: "Transactions \(self.viewModel.yearlyOverview.name)",
-                        subtitle: String(year)
-                    )
+        TransactionsListView(
+            viewModel: viewModel,
+            addNewTransaction: { self.viewModel.isAddNewTransactionPresented = true }
+        )
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                DefaultToolbar(
+                    title: "Transactions \(self.viewModel.yearlyOverview.name)",
+                    subtitle: String(year)
+                )
+            }
+
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(action: { self.viewModel.isAddNewTransactionPresented = true }) {
+                    Label("New transaction", systemImage: "plus")
                 }
             }
+        }
     }
 }
 
