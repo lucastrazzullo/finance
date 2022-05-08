@@ -9,18 +9,38 @@ import SwiftUI
 
 struct MontlyOverviewsListView<Item: View>: View {
 
-    let montlhyOverviews: [MonthlyBudgetOverview]
+    private let maximumNumberOfOverviews: Int = 3
+
+    let monthlyOverviews: [MonthlyBudgetOverview]
     let monthlyOverviewsWithLowestAvailability: [MonthlyBudgetOverview]
 
     @ViewBuilder var item: (MonthlyBudgetOverview) -> Item
 
+    @State private var showAllOverviews: Bool = false
+
     var body: some View {
         List {
-            if montlhyOverviews.count > 0 {
-                Section(header: Text("All Overviews")) {
-                    ForEach(montlhyOverviews, id: \.self) { overview in
-                        item(overview)
-                            .listRowSeparator(.hidden)
+            if monthlyOverviews.count > 0 {
+                Section(header: Text("Monthly Overviews")) {
+                    if showAllOverviews {
+                        ForEach(monthlyOverviews, id: \.self) { overview in
+                            item(overview)
+                                .listRowSeparator(.hidden)
+                        }
+                    } else {
+                        ForEach(monthlyOverviews[0..<min(maximumNumberOfOverviews, monthlyOverviews.count)], id: \.self) { overview in
+                            item(overview)
+                                .listRowSeparator(.hidden)
+                        }
+                    }
+
+                    if monthlyOverviews.count > maximumNumberOfOverviews {
+                        Button(action: { showAllOverviews.toggle() }) {
+                            Label(
+                                showAllOverviews ? "Show less" : "Show more",
+                                systemImage: showAllOverviews ? "chevron.up" : "chevron.down"
+                            )
+                        }
                     }
                 }
             }
@@ -41,7 +61,7 @@ struct MontlyOverviewsListView<Item: View>: View {
 struct OverviewView_Previews: PreviewProvider {
     static var previews: some View {
         MontlyOverviewsListView(
-            montlhyOverviews: Mocks.overview.monthlyOverviews(month: 1),
+            monthlyOverviews: Mocks.overview.monthlyOverviews(month: 1),
             monthlyOverviewsWithLowestAvailability: Mocks.overview.monthlyOverviewsWithLowestAvailability(month: 1),
             item: { overview in
                 MonthlyOverviewItem(overview: overview)

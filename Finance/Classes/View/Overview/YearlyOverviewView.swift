@@ -18,9 +18,16 @@ struct YearlyOverviewView: View {
     var body: some View {
         TabView {
             NavigationView {
-                makeMonthlyOverviewsListView()
-                    .navigationBarTitleDisplayMode(.inline)
-                    .toolbar(content: { makeToolbar(titlePrefix: "Overview", showsMenuPicker: true) })
+                VStack(alignment: .leading) {
+                    VStack {
+                        Text("Income")
+                    }
+                    .padding()
+
+                    makeMonthlyOverviewsListView()
+                }
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar(content: { makeToolbar(titlePrefix: "Overview", showsMenuPicker: true) })
             }
             .tabItem {
                 Label("Overview", systemImage: "list.bullet.below.rectangle")
@@ -71,7 +78,7 @@ struct YearlyOverviewView: View {
 
     @ViewBuilder private func makeMonthlyOverviewsListView() -> some View {
         MontlyOverviewsListView(
-            montlhyOverviews: viewModel.yearlyOverview.monthlyOverviews(month: month),
+            monthlyOverviews: viewModel.yearlyOverview.monthlyOverviews(month: month),
             monthlyOverviewsWithLowestAvailability: viewModel.yearlyOverview.monthlyOverviewsWithLowestAvailability(month: month),
             item: { monthlyOverview in
                 NavigationLink(
