@@ -98,7 +98,8 @@ struct YearlyOverviewView: View {
         BudgetsListView(
             viewModel: BudgetsListViewModel(
                 budgets: viewModel.yearlyOverview.budgets,
-                dataProvider: viewModel
+                addBudgets: { self.viewModel.isAddNewBudgetPresented = true },
+                deleteBudgets: viewModel.delete(budgetsWith:)
             ),
             item: { budget in
                 NavigationLink(
@@ -109,8 +110,7 @@ struct YearlyOverviewView: View {
                         BudgetsListItem(budget: budget)
                     }
                 )
-            },
-            addNewBudget: { self.viewModel.isAddNewBudgetPresented = true }
+            }
         )
     }
 

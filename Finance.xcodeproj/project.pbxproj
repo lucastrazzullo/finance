@@ -16,7 +16,6 @@
 		8122A3432819B342002912D3 /* BudgetsListViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8122A3422819B342002912D3 /* BudgetsListViewModelTests.swift */; };
 		8122A3462819B4B8002912D3 /* MockBudgetDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8122A3452819B4B8002912D3 /* MockBudgetDataProvider.swift */; };
 		8122A3482819B4E2002912D3 /* Mocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8122A3472819B4E2002912D3 /* Mocks.swift */; };
-		8122A34A2819B54E002912D3 /* MockBudgetsListDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8122A3492819B54E002912D3 /* MockBudgetsListDataProvider.swift */; };
 		8122A34E2819C2C0002912D3 /* TransactionsListViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8122A34D2819C2C0002912D3 /* TransactionsListViewModelTests.swift */; };
 		8126BA7F2806E98A00C06C93 /* StorageProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8126BA7E2806E98A00C06C93 /* StorageProvider.swift */; };
 		8126BA8928073A7C00C06C93 /* ErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8126BA8828073A7C00C06C93 /* ErrorView.swift */; };
@@ -113,7 +112,6 @@
 		8122A3422819B342002912D3 /* BudgetsListViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetsListViewModelTests.swift; sourceTree = "<group>"; };
 		8122A3452819B4B8002912D3 /* MockBudgetDataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockBudgetDataProvider.swift; sourceTree = "<group>"; };
 		8122A3472819B4E2002912D3 /* Mocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mocks.swift; sourceTree = "<group>"; };
-		8122A3492819B54E002912D3 /* MockBudgetsListDataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockBudgetsListDataProvider.swift; sourceTree = "<group>"; };
 		8122A34D2819C2C0002912D3 /* TransactionsListViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionsListViewModelTests.swift; sourceTree = "<group>"; };
 		8126BA7E2806E98A00C06C93 /* StorageProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageProvider.swift; sourceTree = "<group>"; };
 		8126BA802806F69A00C06C93 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -270,7 +268,6 @@
 				8122A3472819B4E2002912D3 /* Mocks.swift */,
 				81C222DB279CD11F00759CCB /* MockStorageProvider.swift */,
 				8122A3452819B4B8002912D3 /* MockBudgetDataProvider.swift */,
-				8122A3492819B54E002912D3 /* MockBudgetsListDataProvider.swift */,
 			);
 			path = Mocks;
 			sourceTree = "<group>";
@@ -689,7 +686,6 @@
 				810F869F27FF4E1C00A1CDD4 /* BudgetsListView.swift in Sources */,
 				81CB8BF62746BFDC00A64785 /* BudgetView.swift in Sources */,
 				81C222DC279CD11F00759CCB /* MockStorageProvider.swift in Sources */,
-				8122A34A2819B54E002912D3 /* MockBudgetsListDataProvider.swift in Sources */,
 				81F7E16A27D16F3F00D67EB8 /* BudgetSlicesListItem.swift in Sources */,
 				810F86A227FF833600A1CDD4 /* MontlyOverviewsListView.swift in Sources */,
 				81735ACC279A2B8D007C9AA3 /* Array+Extensions.swift in Sources */,

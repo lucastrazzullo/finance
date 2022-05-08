@@ -13,8 +13,6 @@ struct BudgetsListView<Item: View>: View {
 
     @ViewBuilder var item: (Budget) -> Item
 
-    let addNewBudget: () -> Void
-
     var body: some View {
         List {
             Section(header: Text("Budgets")) {
@@ -28,7 +26,7 @@ struct BudgetsListView<Item: View>: View {
                     }
                 }
 
-                Button(action: addNewBudget) {
+                Button(action: viewModel.addBudgets) {
                     Label("Add", systemImage: "plus")
                         .accessibilityIdentifier(AccessibilityIdentifier.BudgetsListView.addBudgetButton)
                 }
@@ -48,9 +46,12 @@ struct BudgetsListView_Previews: PreviewProvider {
     static let budgets = Mocks.budgets
     static var previews: some View {
         BudgetsListView(
-            viewModel: .init(budgets: budgets, dataProvider: MockBudgetsListDataProvider(budgets: budgets)),
-            item: { budget in BudgetsListItem(budget: budget) },
-            addNewBudget: {}
+            viewModel: .init(
+                budgets: budgets,
+                addBudgets: {},
+                deleteBudgets: { _ in }
+            ),
+            item: { budget in BudgetsListItem(budget: budget) }
         )
     }
 }

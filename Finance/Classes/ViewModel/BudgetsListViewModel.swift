@@ -8,22 +8,23 @@
 import Foundation
 import Combine
 
-protocol BudgetsListDataProvider: AnyObject {
-    func delete(budgetsWith identifiers: Set<Budget.ID>) async throws
-}
-
 final class BudgetsListViewModel: ObservableObject {
+
+    typealias AddBudgetsHandler = () -> Void
+    typealias DeleteBudgetsHandler = (Set<Budget.ID>) async throws -> Void
 
     @Published var budgets: [Budget]
     @Published var deleteBudgetError: DomainError?
 
-    private let dataProvider: BudgetsListDataProvider
+    let addBudgets: AddBudgetsHandler
+    let deleteBudgets: DeleteBudgetsHandler
 
     // MARK: Object life cycle
 
-    init(budgets: [Budget], dataProvider: BudgetsListDataProvider) {
-        self.dataProvider = dataProvider
+    init(budgets: [Budget], addBudgets: @escaping AddBudgetsHandler, deleteBudgets: @escaping DeleteBudgetsHandler) {
         self.budgets = budgets
+        self.addBudgets = addBudgets
+        self.deleteBudgets = deleteBudgets
     }
 
     // MARK: Internal methods
@@ -32,7 +33,7 @@ final class BudgetsListViewModel: ObservableObject {
         do {
             let identifiers = budgets.at(offsets: offsets).map(\.id)
             let identifiersSet = Set(identifiers)
-            try await dataProvider.delete(budgetsWith: identifiersSet)
+            try await deleteBudgets(identifiersSet)
             budgets.delete(withIdentifiers: identifiersSet)
             deleteBudgetError = nil
         } catch {

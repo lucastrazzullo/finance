@@ -62,6 +62,11 @@ import Foundation
         try yearlyOverview.append(budget: budget)
         isAddNewBudgetPresented = false
     }
+
+    func delete(budgetsWith identifiers: Set<Budget.ID>) async throws {
+        try await storageProvider.delete(budgetsWith: identifiers)
+        yearlyOverview.delete(budgetsWith: identifiers)
+    }
 }
 
 extension YearlyOverviewViewModel: BudgetDataProvider {
@@ -80,13 +85,5 @@ extension YearlyOverviewViewModel: BudgetDataProvider {
         try YearlyBudgetOverviewValidator.willUpdate(name: name, for: budget, in: yearlyOverview.budgets)
         try await storageProvider.update(name: name, iconSystemName: icon.rawValue, inBudgetWith: budget.id)
         try yearlyOverview.update(name: name, icon: icon, inBudgetWith: budget.id)
-    }
-}
-
-extension YearlyOverviewViewModel: BudgetsListDataProvider {
-
-    func delete(budgetsWith identifiers: Set<Budget.ID>) async throws {
-        try await storageProvider.delete(budgetsWith: identifiers)
-        yearlyOverview.delete(budgetsWith: identifiers)
     }
 }

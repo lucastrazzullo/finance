@@ -11,7 +11,6 @@ import XCTest
 
 @MainActor final class BudgetsListViewModelTests: XCTestCase {
 
-    private var dataProvider: MockBudgetsListDataProvider!
     private var viewModel: BudgetsListViewModel!
 
     @MainActor override func setUpWithError() throws {
@@ -20,7 +19,6 @@ import XCTest
 
     @MainActor override func tearDownWithError() throws {
         viewModel = nil
-        dataProvider = nil
         try super.tearDownWithError()
     }
 
@@ -29,8 +27,7 @@ import XCTest
     func testDeleteBudgets() async throws {
         let budgets = Mocks.budgets
 
-        dataProvider = MockBudgetsListDataProvider(budgets: budgets)
-        viewModel = BudgetsListViewModel(budgets: budgets, dataProvider: dataProvider)
+        viewModel = BudgetsListViewModel(budgets: budgets, addBudgets: {}, deleteBudgets: { _ in })
 
         // Assert initial state
         XCTAssertNil(viewModel.deleteBudgetError)
@@ -45,9 +42,6 @@ import XCTest
         XCTAssertNil(viewModel.deleteBudgetError)
         budgets.forEach { budget in
             XCTAssertFalse(viewModel.budgets.contains(budget))
-        }
-        budgets.forEach { budget in
-            XCTAssertFalse(dataProvider.budgets.contains(budget))
         }
     }
 }
