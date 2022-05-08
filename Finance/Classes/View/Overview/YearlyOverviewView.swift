@@ -166,7 +166,7 @@ struct YearlyOverviewView: View {
 
 // MARK: - Previews
 
-private struct YearlyOverviewView_Previews: PreviewProvider {
+struct YearlyOverviewView_Previews: PreviewProvider {
     static let storageProvider = MockStorageProvider(budgets: Mocks.budgets, transactions: Mocks.transactions)
     static var previews: some View {
         YearlyOverviewView(viewModel: .init(year: Mocks.year, storageProvider: storageProvider))
