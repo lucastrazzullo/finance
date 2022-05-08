@@ -212,6 +212,7 @@ enum BudgetSliceError: DomainUnderlyingError {
 }
 
 enum TransactionError: DomainUnderlyingError {
+    case budgetsAreMissing
     case budgetSliceIsMissing
     case amountNotValid
 
@@ -221,6 +222,8 @@ enum TransactionError: DomainUnderlyingError {
 
     var description: String {
         switch self {
+        case .budgetsAreMissing:
+            return "The budgets list is empty\nAdd at least one budget"
         case .budgetSliceIsMissing:
             return "The budget slice is missing"
         case .amountNotValid:

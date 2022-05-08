@@ -9,8 +9,12 @@ import SwiftUI
 
 struct AddTransactionsView: View {
 
+    @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+
     @State private var addNewTransactionPresented: Bool = false
     @State private var transactions: [Transaction] = []
+
+    @State private var initError: DomainError?
     @State private var submitError: DomainError?
 
     let budgets: [Budget]
@@ -18,37 +22,45 @@ struct AddTransactionsView: View {
 
     var body: some View {
         NavigationView {
-            List {
-                ForEach(transactions, id: \.self) { transaction in
-                    TransactionItem(transaction: transaction, budgets: budgets)
-                }
-                .onDelete { indices in
-                    transactions.remove(atOffsets: indices)
-                }
+            ZStack {
+                if let error = initError {
+                    ErrorView(error: error, action: .init(label: "Ok") {
+                        presentationMode.wrappedValue.dismiss()
+                    })
+                } else {
+                    List {
+                        Section {
+                            ForEach(transactions, id: \.self) { transaction in
+                                TransactionItem(transaction: transaction, budgets: budgets)
+                            }
+                            .onDelete { transactions.remove(atOffsets: $0) }
+                        }
 
-                Section {
-                    Button(action: { addNewTransactionPresented = true }) {
-                        Label("Add", systemImage: "plus")
-                    }
-                    .listRowSeparator(.hidden)
-                    .padding(.vertical)
-                }
+                        Section {
+                            Button(action: { addNewTransactionPresented = true }) {
+                                Label("Add", systemImage: "plus")
+                            }
+                            .listRowSeparator(.hidden)
+                            .padding(.vertical)
+                        }
 
-                Section(header: SectionHeader(label: "Total", amount: transactions.totalAmount)) {
-                    if let error = submitError {
-                        InlineErrorView(error: error)
-                    }
+                        Section(header: SectionHeader(label: "Total", amount: transactions.totalAmount)) {
+                            if let error = submitError {
+                                InlineErrorView(error: error)
+                            }
 
-                    Button(action: save) {
-                        Text("Save")
+                            Button(action: save) {
+                                Text("Save")
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .listRowSeparator(.hidden)
+                            .frame(maxWidth: .infinity)
+                            .padding(.top)
+                        }
                     }
-                    .buttonStyle(.borderedProminent)
-                    .listRowSeparator(.hidden)
-                    .frame(maxWidth: .infinity)
-                    .padding(.top)
+                    .listStyle(.inset)
                 }
             }
-            .listStyle(.inset)
             .navigationTitle("Add transactions")
             .navigationBarTitleDisplayMode(.inline)
             .sheet(isPresented: $addNewTransactionPresented) {
@@ -73,6 +85,15 @@ struct AddTransactionsView: View {
                 submitError = error as? DomainError
             }
         }
+    }
+
+    // MARK: Object life cycle
+
+    init(budgets: [Budget], onSubmit: @escaping ([Transaction]) async throws -> Void) {
+        self.budgets = budgets
+        self.onSubmit = onSubmit
+
+        self._initError = State(wrappedValue: budgets.isEmpty ? .transaction(error: .budgetsAreMissing) : nil)
     }
 }
 

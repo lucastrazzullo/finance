@@ -16,18 +16,10 @@ struct TransactionsListView: View {
             ForEach(viewModel.months(), id: \.self) { month in
                 Section(Calendar.current.standaloneMonthSymbols[month - 1]) {
                     ForEach(viewModel.transactions(month: month)) { transaction in
-                        HStack {
-                            Text(transaction.date, style: .date)
-                            Spacer()
-                            AmountView(amount: transaction.amount)
-                        }
-                        .accessibilityIdentifier(AccessibilityIdentifier.TransactionsListView.transactionLink)
+                        TransactionItem(transaction: transaction)
+                            .accessibilityIdentifier(AccessibilityIdentifier.TransactionsListView.transactionLink)
                     }
-                    .onDelete { offsets in
-                        Task {
-                            await viewModel.delete(transactionsAt: offsets)
-                        }
-                    }
+                    .onDelete(perform: viewModel.delete(transactionsAt:))
                 }
             }
 
@@ -36,6 +28,19 @@ struct TransactionsListView: View {
             }
         }
         .listStyle(.plain)
+    }
+}
+
+private struct TransactionItem: View {
+
+    let transaction: Transaction
+
+    var body: some View {
+        HStack {
+            Text(transaction.date, style: .date)
+            Spacer()
+            AmountView(amount: transaction.amount)
+        }
     }
 }
 
