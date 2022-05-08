@@ -16,10 +16,6 @@ final class MockBudgetsListDataProvider: BudgetsListDataProvider {
         self.budgets = budgets
     }
 
-    func add(budget: Budget) async throws {
-        budgets.append(budget)
-    }
-
     func delete(budgetsWith identifiers: Set<Budget.ID>) async throws {
         identifiers.forEach { identifier in
             budgets.removeAll(where: { $0.id == identifier })

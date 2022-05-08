@@ -48,6 +48,15 @@ import Foundation
         try yearlyOverview.append(expenses: transactions)
         isAddNewTransactionPresented = false
     }
+
+    // MARK: Budgets
+
+    func add(budget: Budget) async throws {
+        try YearlyBudgetOverviewValidator.willAdd(budget: budget, to: yearlyOverview.budgets, year: yearlyOverview.year)
+        try await storageProvider.add(budget: budget)
+        try yearlyOverview.append(budget: budget)
+        isAddNewBudgetPresented = false
+    }
 }
 
 extension YearlyOverviewViewModel: BudgetDataProvider {
@@ -70,13 +79,6 @@ extension YearlyOverviewViewModel: BudgetDataProvider {
 }
 
 extension YearlyOverviewViewModel: BudgetsListDataProvider {
-
-    func add(budget: Budget) async throws {
-        try YearlyBudgetOverviewValidator.willAdd(budget: budget, to: yearlyOverview.budgets, year: yearlyOverview.year)
-        try await storageProvider.add(budget: budget)
-        try yearlyOverview.append(budget: budget)
-        isAddNewBudgetPresented = false
-    }
 
     func delete(budgetsWith identifiers: Set<Budget.ID>) async throws {
         try await storageProvider.delete(budgetsWith: identifiers)

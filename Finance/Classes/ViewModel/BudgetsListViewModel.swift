@@ -9,7 +9,6 @@ import Foundation
 import Combine
 
 protocol BudgetsListDataProvider: AnyObject {
-    func add(budget: Budget) async throws
     func delete(budgetsWith identifiers: Set<Budget.ID>) async throws
 }
 
@@ -28,11 +27,6 @@ final class BudgetsListViewModel: ObservableObject {
     }
 
     // MARK: Internal methods
-
-    func add(budget: Budget) async throws {
-        try await dataProvider.add(budget: budget)
-        budgets.append(budget)
-    }
 
     func delete(budgetsAt offsets: IndexSet) async {
         do {

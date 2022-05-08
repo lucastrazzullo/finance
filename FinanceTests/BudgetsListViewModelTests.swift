@@ -26,20 +26,6 @@ import XCTest
 
     // MARK: - Budgets
 
-    func testAddBudget() async throws {
-        let budget = try Budget(id: .init(), year: Mocks.year, name: "Mock", icon: .default, monthlyAmount: .value(100))
-
-        dataProvider = MockBudgetsListDataProvider(budgets: [])
-        viewModel = BudgetsListViewModel(budgets: [], dataProvider: dataProvider)
-
-        XCTAssertFalse(viewModel.budgets.contains(budget))
-
-        try await viewModel.add(budget: budget)
-
-        XCTAssertTrue(viewModel.budgets.contains(budget))
-        XCTAssertTrue(dataProvider.budgets.contains(budget))
-    }
-
     func testDeleteBudgets() async throws {
         let budgets = Mocks.budgets
 
