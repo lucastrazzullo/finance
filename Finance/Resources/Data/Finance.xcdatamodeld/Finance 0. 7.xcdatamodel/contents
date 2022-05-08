@@ -30,7 +30,7 @@
         <attribute name="contentDescription" optional="YES" attributeType="String"/>
         <attribute name="date" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="identifier" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
-        <relationship name="amounts" toMany="YES" deletionRule="Nullify" destinationEntity="TransactionAmountEntity" inverseName="transaction" inverseEntity="TransactionAmountEntity"/>
+        <relationship name="amounts" toMany="YES" deletionRule="Cascade" destinationEntity="TransactionAmountEntity" inverseName="transaction" inverseEntity="TransactionAmountEntity"/>
     </entity>
     <elements>
         <element name="BudgetEntity" positionX="-209.69921875" positionY="-150.32421875" width="128" height="104"/>
