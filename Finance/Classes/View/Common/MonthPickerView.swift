@@ -12,7 +12,7 @@ struct MonthPickerView: View {
     @Binding var month: Int
 
     var body: some View {
-        Picker("Month", selection: $month) {
+        Picker("Month (\(Calendar.current.standaloneMonthSymbols[month - 1]))", selection: $month) {
             ForEach(1...Calendar.current.standaloneMonthSymbols.count, id: \.self) { index in
                 Text(Calendar.current.standaloneMonthSymbols[index - 1])
             }

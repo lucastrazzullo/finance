@@ -18,7 +18,9 @@ struct YearlyOverviewView: View {
     var body: some View {
         TabView {
             NavigationView {
-                makeOverviewListView()
+                makeMonthlyOverviewsListView()
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar(content: { makeToolbar(titlePrefix: "Overview", showsMenuPicker: true) })
             }
             .tabItem {
                 Label("Overview", systemImage: "list.bullet.below.rectangle")
@@ -27,17 +29,21 @@ struct YearlyOverviewView: View {
 
             NavigationView {
                 makeBudgetsListView()
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar(content: { makeToolbar(titlePrefix: "Budgets", showsMenuPicker: false) })
             }
             .tabItem {
-                Label("Budgets", systemImage: "list.dash")
+                Label("Budgets", systemImage: "aspectratio.fill")
                     .accessibilityIdentifier(AccessibilityIdentifier.YearlyOverviewView.budgetsTab)
             }
 
             NavigationView {
-                makeTransactionsListView()
+                makeTransactionsListView(transactions: viewModel.yearlyOverview.expenses)
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar(content: { makeToolbar(titlePrefix: "Transactions", showsMenuPicker: false) })
             }
             .tabItem {
-                Label("Transactions", systemImage: "note.text")
+                Label("Transactions", systemImage: "arrow.left.arrow.right.square")
                     .accessibilityIdentifier(AccessibilityIdentifier.YearlyOverviewView.transactionsTab)
             }
         }
@@ -61,136 +67,106 @@ struct YearlyOverviewView: View {
         }
     }
 
-    // MARK: Private builder methods - Overview
+    // MARK: Private builder methods - Tabs
 
-    @ViewBuilder private func makeOverviewListView() -> some View {
+    @ViewBuilder private func makeMonthlyOverviewsListView() -> some View {
         MontlyOverviewsListView(
-            item: makeOverviewListViewItem(overview:),
             montlhyOverviews: viewModel.yearlyOverview.monthlyOverviews(month: month),
-            monthlyOverviewsWithLowestAvailability: viewModel.yearlyOverview.monthlyOverviewsWithLowestAvailability(month: month)
-        )
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar(content: {
-            ToolbarItem(placement: .principal) {
-                DefaultToolbar(
-                    title: "Overview \(viewModel.yearlyOverview.name)",
-                    subtitle: String(viewModel.yearlyOverview.year)
+            monthlyOverviewsWithLowestAvailability: viewModel.yearlyOverview.monthlyOverviewsWithLowestAvailability(month: month),
+            item: { monthlyOverview in
+                NavigationLink(
+                    destination: {
+                        TransactionsListView(
+                            viewModel: TransactionsListViewModel(
+                                transactions: monthlyOverview.expensesInMonth,
+                                dataProvider: viewModel
+                            ),
+                            addNewTransaction: {
+                                self.viewModel.isAddNewTransactionPresented = true
+                            }
+                        )
+                        .navigationBarTitleDisplayMode(.inline)
+                        .toolbar(content: { makeToolbar(titlePrefix: "Expenses", showsMenuPicker: true) })
+                    },
+                    label: {
+                        MonthlyOverviewItem(overview: monthlyOverview)
+                    }
                 )
             }
+        )
+    }
 
-            ToolbarItem(placement: .navigationBarLeading) {
-                MonthPickerView(month: $month)
-                    .pickerStyle(MenuPickerStyle())
-            }
+    @ViewBuilder private func makeBudgetsListView() -> some View {
+        BudgetsListView(
+            viewModel: BudgetsListViewModel(
+                budgets: viewModel.yearlyOverview.budgets,
+                dataProvider: viewModel
+            ),
+            item: { budget in
+                NavigationLink(
+                    destination: BudgetView(
+                        viewModel: BudgetViewModel(budget: budget, dataProvider: viewModel)
+                    ),
+                    label: {
+                        BudgetsListItem(budget: budget)
+                    }
+                )
+            },
+            addNewBudget: { self.viewModel.isAddNewBudgetPresented = true }
+        )
+    }
 
-            ToolbarItem(placement: .navigationBarTrailing) {
+    @ViewBuilder private func makeTransactionsListView(transactions: [Transaction]) -> some View {
+        TransactionsListView(
+            viewModel: TransactionsListViewModel(
+                transactions: transactions,
+                dataProvider: viewModel
+            ),
+            addNewTransaction: { self.viewModel.isAddNewTransactionPresented = true }
+        )
+    }
+
+    // MARK: Private builder methods - Toolbar
+
+    @ToolbarContentBuilder private func makeToolbar(titlePrefix: String, showsMenuPicker: Bool) -> some ToolbarContent {
+
+        ToolbarItem(placement: .principal) {
+            let title = "\(titlePrefix) \(viewModel.yearlyOverview.name)"
+            let subtitle = showsMenuPicker
+                ? String(viewModel.yearlyOverview.year) + " / " + Calendar.current.shortMonthSymbols[month - 1]
+                : String(viewModel.yearlyOverview.year)
+
+            DefaultToolbar(
+                title: title,
+                subtitle: subtitle
+            )
+        }
+
+        ToolbarItem(placement: .navigationBarTrailing) {
+            Menu {
+                if showsMenuPicker {
+                    MonthPickerView(month: $month)
+                        .pickerStyle(MenuPickerStyle())
+                }
+
                 Button(action: { viewModel.isAddNewTransactionPresented = true }) {
                     Label("New transaction", systemImage: "plus")
                 }
-            }
-        })
-    }
 
-    @ViewBuilder private func makeOverviewListViewItem(overview: MonthlyBudgetOverview) -> some View {
-        NavigationLink(destination: makeTransactionsListView(overview: overview)) {
-            MonthlyOverviewItem(overview: overview)
-        }
-    }
-
-    // MARK: Private builder methods - Budgets
-
-    @ViewBuilder private func makeBudgetsListView() -> some View {
-        let year = viewModel.yearlyOverview.year
-        let budgets = viewModel.yearlyOverview.budgets
-        let viewModel = BudgetsListViewModel(budgets: budgets, dataProvider: viewModel)
-
-        BudgetsListView(
-            viewModel: viewModel,
-            item: makeBudgetListItem(budget:),
-            addNewBudget: { self.viewModel.isAddNewBudgetPresented = true }
-        )
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .principal) {
-                DefaultToolbar(
-                    title: "Budgets \(self.viewModel.yearlyOverview.name)",
-                    subtitle: String(year)
-                )
-            }
-
-            ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: { self.viewModel.isAddNewBudgetPresented = true }) {
                     Label("New budget", systemImage: "plus")
                 }
             }
-        }
-    }
-
-    @ViewBuilder private func makeBudgetListItem(budget: Budget) -> some View {
-        let budgetViewModel = BudgetViewModel(budget: budget, dataProvider: viewModel)
-        let budgetView = BudgetView(viewModel: budgetViewModel)
-
-        NavigationLink(destination: budgetView, label: {
-            BudgetsListItem(budget: budget)
-        })
-    }
-
-    // MARK: Private builder methods - Expenses
-
-    @ViewBuilder private func makeTransactionsListView(overview: MonthlyBudgetOverview) -> some View {
-        let viewModel = TransactionsListViewModel(transactions: overview.expensesInMonth, dataProvider: viewModel)
-
-        TransactionsListView(
-            viewModel: viewModel,
-            addNewTransaction: { self.viewModel.isAddNewTransactionPresented = true }
-        )
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar(content: {
-            ToolbarItem(placement: .principal) {
-                DefaultToolbar(
-                    title: "Expenses \(overview.name)",
-                    subtitle: "in \(Calendar.current.standaloneMonthSymbols[overview.month - 1])"
-                )
-            }
-
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button(action: { self.viewModel.isAddNewTransactionPresented = true }) {
-                    Label("New transaction", systemImage: "plus")
-                }
-            }
-        })
-    }
-
-    // MARK: Private builder methods - Transactions
-
-    @ViewBuilder private func makeTransactionsListView() -> some View {
-        let year = viewModel.yearlyOverview.year
-        let transactions = viewModel.yearlyOverview.expenses
-        let viewModel = TransactionsListViewModel(transactions: transactions, dataProvider: viewModel)
-
-        TransactionsListView(
-            viewModel: viewModel,
-            addNewTransaction: { self.viewModel.isAddNewTransactionPresented = true }
-        )
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .principal) {
-                DefaultToolbar(
-                    title: "Transactions \(self.viewModel.yearlyOverview.name)",
-                    subtitle: String(year)
-                )
-            }
-
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button(action: { self.viewModel.isAddNewTransactionPresented = true }) {
-                    Label("New transaction", systemImage: "plus")
-                }
+            label: {
+                Label("Options", systemImage: "ellipsis.circle")
             }
         }
     }
 }
 
-struct YearlyOverviewView_Previews: PreviewProvider {
+// MARK: - Previews
+
+private struct YearlyOverviewView_Previews: PreviewProvider {
     static let storageProvider = MockStorageProvider(budgets: Mocks.budgets, transactions: Mocks.transactions)
     static var previews: some View {
         YearlyOverviewView(viewModel: .init(year: Mocks.year, storageProvider: storageProvider))
