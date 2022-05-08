@@ -123,8 +123,11 @@ import XCTest
         storageProvider = MockStorageProvider()
         viewModel = YearlyOverviewViewModel(year: Mocks.year, storageProvider: storageProvider)
         try await viewModel.load()
+
+        viewModel.isAddNewBudgetPresented = true
         try await viewModel.add(budget: budget)
 
+        XCTAssertFalse(viewModel.isAddNewBudgetPresented)
         XCTAssertTrue(viewModel.yearlyOverview.budgets.contains(budget))
 
         let storedBudgets = try await storageProvider.fetchBudgets(year: viewModel.yearlyOverview.year)

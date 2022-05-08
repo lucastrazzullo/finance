@@ -11,7 +11,7 @@ protocol TransactionsListDataProvider: AnyObject {
     func delete(transactionsWith identifiers: Set<Transaction.ID>) async throws
 }
 
-final class TransactionsListViewModel: ObservableObject {
+@MainActor final class TransactionsListViewModel: ObservableObject {
 
     @Published var transactions: [Transaction]
     @Published var deleteTransactionError: DomainError?
@@ -35,18 +35,16 @@ final class TransactionsListViewModel: ObservableObject {
         return transactions.filter({ $0.month == month })
     }
 
-    func delete(transactionsAt offsets: IndexSet) {
+    func delete(transactionsAt offsets: IndexSet) async {
         let identifiers = transactions.at(offsets: offsets).map(\.id)
         let identifiersSet = Set(identifiers)
 
-        Task { @MainActor in
-            do {
-                try await dataProvider.delete(transactionsWith: identifiersSet)
-                transactions.delete(withIdentifiers: identifiersSet)
-                deleteTransactionError = nil
-            } catch {
-                deleteTransactionError = error as? DomainError
-            }
+        do {
+            try await dataProvider.delete(transactionsWith: identifiersSet)
+            transactions.delete(withIdentifiers: identifiersSet)
+            deleteTransactionError = nil
+        } catch {
+            deleteTransactionError = error as? DomainError
         }
     }
 }

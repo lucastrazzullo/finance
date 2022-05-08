@@ -21,7 +21,9 @@ struct TransactionsListView: View {
                         TransactionItem(transaction: transaction)
                             .accessibilityIdentifier(AccessibilityIdentifier.TransactionsListView.transactionLink)
                     }
-                    .onDelete(perform: viewModel.delete(transactionsAt:))
+                    .onDelete(perform: { indices in
+                        Task { await viewModel.delete(transactionsAt: indices) }
+                    })
                 }
             }
 

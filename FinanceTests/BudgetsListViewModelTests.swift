@@ -34,10 +34,8 @@ import XCTest
 
         XCTAssertFalse(viewModel.budgets.contains(budget))
 
-        viewModel.isAddNewBudgetPresented = true
         try await viewModel.add(budget: budget)
 
-        XCTAssertFalse(viewModel.isAddNewBudgetPresented)
         XCTAssertTrue(viewModel.budgets.contains(budget))
         XCTAssertTrue(dataProvider.budgets.contains(budget))
     }
