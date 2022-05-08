@@ -1,5 +1,5 @@
 //
-//  MockBudgetDataProvider.swift
+//  MockBudgetStorageHandler.swift
 //  Finance
 //
 //  Created by Luca Strazzullo on 27/04/2022.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class MockBudgetDataProvider: BudgetDataProvider {
+final class MockBudgetStorageHandler: BudgetStorageHandler {
 
     enum MockError: Error {
         case budgetNotFound

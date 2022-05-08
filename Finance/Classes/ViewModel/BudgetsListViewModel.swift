@@ -1,5 +1,5 @@
 //
-//  BudgetsListDataProvider.swift
+//  BudgetsListViewModel.swift
 //  Finance
 //
 //  Created by Luca Strazzullo on 19/04/2022.

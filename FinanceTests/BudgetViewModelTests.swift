@@ -11,7 +11,7 @@ import XCTest
 
 @MainActor final class BudgetViewModelTests: XCTestCase {
 
-    private var dataProvider: MockBudgetDataProvider!
+    private var storageHandler: MockBudgetStorageHandler!
     private var viewModel: BudgetViewModel!
 
     @MainActor override func setUpWithError() throws {
@@ -20,7 +20,7 @@ import XCTest
 
     @MainActor override func tearDownWithError() throws {
         viewModel = nil
-        dataProvider = nil
+        storageHandler = nil
         try super.tearDownWithError()
     }
 
@@ -30,8 +30,8 @@ import XCTest
         let budget = Mocks.budgets[0]
         let slice = try BudgetSlice(id: .init(), name: "Adding slice", configuration: .monthly(amount: .value(100)))
 
-        dataProvider = MockBudgetDataProvider(budgets: [budget])
-        viewModel = BudgetViewModel(budget: budget, dataProvider: dataProvider)
+        storageHandler = MockBudgetStorageHandler(budgets: [budget])
+        viewModel = BudgetViewModel(budget: budget, storageHandler: storageHandler)
 
         XCTAssertFalse(budget.slices.contains(slice))
 
@@ -41,7 +41,7 @@ import XCTest
         XCTAssertFalse(viewModel.isInsertNewSlicePresented)
         XCTAssertTrue(viewModel.slices.contains(slice))
 
-        let updatedBudget = try await dataProvider.budget(with: budget.id)
+        let updatedBudget = try await storageHandler.budget(with: budget.id)
         XCTAssertTrue(updatedBudget.slices.contains(slice))
     }
 
@@ -52,8 +52,8 @@ import XCTest
         let slices = firstSlicesSet + secondSlicesSet + [extraSlice]
         let budget = try Budget(id: .init(), year: Mocks.year, name: "Name", icon: .default, slices: slices)
 
-        dataProvider = MockBudgetDataProvider(budgets: [budget])
-        viewModel = BudgetViewModel(budget: budget, dataProvider: dataProvider)
+        storageHandler = MockBudgetStorageHandler(budgets: [budget])
+        viewModel = BudgetViewModel(budget: budget, storageHandler: storageHandler)
 
         // Assert initial state
         XCTAssertNil(viewModel.deleteSlicesError)
@@ -78,7 +78,7 @@ import XCTest
         }
         XCTAssertTrue(viewModel.budget.slices.contains(extraSlice))
 
-        var updatedBudget = try await dataProvider.budget(with: budget.id)
+        var updatedBudget = try await storageHandler.budget(with: budget.id)
         firstSlicesSet.forEach { slice in
             XCTAssertFalse(updatedBudget.slices.contains(slice))
         }
@@ -100,7 +100,7 @@ import XCTest
         }
         XCTAssertTrue(viewModel.budget.slices.contains(extraSlice))
 
-        updatedBudget = try await dataProvider.budget(with: budget.id)
+        updatedBudget = try await storageHandler.budget(with: budget.id)
         firstSlicesSet.forEach { slice in
             XCTAssertFalse(updatedBudget.slices.contains(slice))
         }
@@ -127,7 +127,7 @@ import XCTest
         }
         XCTAssertTrue(viewModel.budget.slices.contains(extraSlice))
 
-        updatedBudget = try await dataProvider.budget(with: budget.id)
+        updatedBudget = try await storageHandler.budget(with: budget.id)
         firstSlicesSet.forEach { slice in
             XCTAssertFalse(updatedBudget.slices.contains(slice))
         }
@@ -139,8 +139,8 @@ import XCTest
 
     func testSaveUpdates() async throws {
         let budget = try Budget(id: .init(), year: Mocks.year, name: "Name 1", icon: .default, monthlyAmount: .value(100))
-        dataProvider = MockBudgetDataProvider(budgets: [budget])
-        viewModel = BudgetViewModel(budget: budget, dataProvider: dataProvider)
+        storageHandler = MockBudgetStorageHandler(budgets: [budget])
+        viewModel = BudgetViewModel(budget: budget, storageHandler: storageHandler)
 
         XCTAssertNil(viewModel.deleteSlicesError)
 
@@ -153,7 +153,7 @@ import XCTest
         XCTAssertEqual(viewModel.budget.name, "Name 2")
         XCTAssertEqual(viewModel.budget.icon, .car)
 
-        var updatedBudget = try await dataProvider.budget(with: budget.id)
+        var updatedBudget = try await storageHandler.budget(with: budget.id)
         XCTAssertEqual(updatedBudget.name, "Name 2")
         XCTAssertEqual(updatedBudget.icon, .car)
 
@@ -171,7 +171,7 @@ import XCTest
         XCTAssertEqual(viewModel.budget.name, "Name 2")
         XCTAssertEqual(viewModel.budget.icon, .car)
 
-        updatedBudget = try await dataProvider.budget(with: budget.id)
+        updatedBudget = try await storageHandler.budget(with: budget.id)
         XCTAssertEqual(updatedBudget.name, "Name 2")
         XCTAssertEqual(updatedBudget.icon, .car)
     }

@@ -1,5 +1,5 @@
 //
-//  TransactionsListDataProvider.swift
+//  TransactionsListViewModel.swift
 //  Finance
 //
 //  Created by Luca Strazzullo on 25/04/2022.

@@ -104,7 +104,7 @@ struct YearlyOverviewView: View {
             item: { budget in
                 NavigationLink(
                     destination: BudgetView(
-                        viewModel: BudgetViewModel(budget: budget, dataProvider: viewModel)
+                        viewModel: BudgetViewModel(budget: budget, storageHandler: viewModel)
                     ),
                     label: {
                         BudgetsListItem(budget: budget)

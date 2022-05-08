@@ -69,7 +69,7 @@ import Foundation
     }
 }
 
-extension YearlyOverviewViewModel: BudgetDataProvider {
+extension YearlyOverviewViewModel: BudgetStorageHandler {
 
     func add(slice: BudgetSlice, toBudgetWith identifier: Budget.ID) async throws {
         try await storageProvider.add(slice: slice, toBudgetWith: identifier)
