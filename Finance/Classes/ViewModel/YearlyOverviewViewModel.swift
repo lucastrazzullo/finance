@@ -21,7 +21,7 @@ import Foundation
     init(year: Int, storageProvider: StorageProvider) {
         self.storageProvider = storageProvider
         self.yearlyOverview = YearlyBudgetOverview(
-            name: "Default",
+            name: "Amsterdam",
             year: year,
             budgets: [],
             expenses: []

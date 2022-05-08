@@ -132,14 +132,21 @@ struct YearlyOverviewView: View {
 
         ToolbarItem(placement: .principal) {
             let title = "\(titlePrefix) \(viewModel.yearlyOverview.name)"
-            let subtitle = showsMenuPicker
-                ? String(viewModel.yearlyOverview.year) + " / " + Calendar.current.shortMonthSymbols[month - 1]
-                : String(viewModel.yearlyOverview.year)
+            let year = String(viewModel.yearlyOverview.year)
+            let month = showsMenuPicker ? Calendar.current.shortMonthSymbols[month - 1] : nil
 
-            DefaultToolbar(
-                title: title,
-                subtitle: subtitle
-            )
+            VStack {
+                Text(title).font(.title2.bold())
+
+                HStack(spacing: 6) {
+                    Text(year).font(.caption)
+
+                    if let month = month {
+                        Text("›")
+                        Text(month).font(.caption.bold())
+                    }
+                }
+            }
         }
 
         ToolbarItem(placement: .navigationBarTrailing) {

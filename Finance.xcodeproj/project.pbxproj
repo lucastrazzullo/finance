@@ -55,7 +55,6 @@
 		819993D52752F80C00FA3E03 /* Locale+Defaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 819993D42752F80C00FA3E03 /* Locale+Defaults.swift */; };
 		819993D72752FAA300FA3E03 /* AmountTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 819993D62752FAA300FA3E03 /* AmountTextField.swift */; };
 		819F41A5281C08C70052EEDB /* Algorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 819F41A4281C08C70052EEDB /* Algorithms */; };
-		81A6FB6A280037CD00D71BE6 /* DefaultToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81A6FB69280037CD00D71BE6 /* DefaultToolbar.swift */; };
 		81A6FB6D2800493E00D71BE6 /* YearlyOverviewFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81A6FB6C2800493E00D71BE6 /* YearlyOverviewFlow.swift */; };
 		81A6FB6F2800495A00D71BE6 /* DashboardViewElements.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81A6FB6E2800495A00D71BE6 /* DashboardViewElements.swift */; };
 		81A6FB76280071EE00D71BE6 /* BudgetIconPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81A6FB75280071EE00D71BE6 /* BudgetIconPicker.swift */; };
@@ -158,7 +157,6 @@
 		8195E8BB27A41BD200D58297 /* InlineErrorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InlineErrorView.swift; sourceTree = "<group>"; };
 		819993D42752F80C00FA3E03 /* Locale+Defaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Locale+Defaults.swift"; sourceTree = "<group>"; };
 		819993D62752FAA300FA3E03 /* AmountTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmountTextField.swift; sourceTree = "<group>"; };
-		81A6FB69280037CD00D71BE6 /* DefaultToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultToolbar.swift; sourceTree = "<group>"; };
 		81A6FB6B28003D5400D71BE6 /* Finance 0. 5.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Finance 0. 5.xcdatamodel"; sourceTree = "<group>"; };
 		81A6FB6C2800493E00D71BE6 /* YearlyOverviewFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YearlyOverviewFlow.swift; sourceTree = "<group>"; };
 		81A6FB6E2800495A00D71BE6 /* DashboardViewElements.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardViewElements.swift; sourceTree = "<group>"; };
@@ -422,7 +420,6 @@
 		819993D82756CFA300FA3E03 /* Common */ = {
 			isa = PBXGroup;
 			children = (
-				81A6FB69280037CD00D71BE6 /* DefaultToolbar.swift */,
 				817A119027EF355700058C11 /* MonthPickerView.swift */,
 				81A6FB75280071EE00D71BE6 /* BudgetIconPicker.swift */,
 				8195E8BB27A41BD200D58297 /* InlineErrorView.swift */,
@@ -688,7 +685,6 @@
 				81DF556528096D41004BB2C8 /* Icon.swift in Sources */,
 				81BB5378274E1509002B46D6 /* AmountView.swift in Sources */,
 				818D0AF12812F83A0007A6F6 /* TransactionsListView.swift in Sources */,
-				81A6FB6A280037CD00D71BE6 /* DefaultToolbar.swift in Sources */,
 				81F24A792743D6DC00C37ADE /* YearlyOverviewView.swift in Sources */,
 				81F7E16C27D178B800D67EB8 /* NewBudgetSliceScheduleView.swift in Sources */,
 				81FC8750279B65460031D3AC /* Finance.xcdatamodeld in Sources */,
