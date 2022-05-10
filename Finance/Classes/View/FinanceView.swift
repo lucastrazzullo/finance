@@ -194,7 +194,7 @@ struct FinanceView: View {
 
 // MARK: - Previews
 
-struct YearlyOverviewView_Previews: PreviewProvider {
+struct FinanceView_Previews: PreviewProvider {
     static let storageProvider = MockStorageProvider(budgets: Mocks.budgets, transactions: Mocks.transactions)
     static var previews: some View {
         FinanceView(viewModel: .init(year: Mocks.year, storageProvider: storageProvider))
