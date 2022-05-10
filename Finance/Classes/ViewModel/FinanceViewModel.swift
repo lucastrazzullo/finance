@@ -11,8 +11,14 @@ import Foundation
 
     @Published var yearlyOverview: YearlyBudgetOverview
 
+    @Published var selectedMonth: Int = Calendar.current.component(.month, from: .now)
+
     @Published var isAddNewTransactionPresented: Bool = false
     @Published var isAddNewBudgetPresented: Bool = false
+
+    var month: String {
+        return Calendar.current.shortMonthSymbols[selectedMonth - 1]
+    }
 
     private let storageProvider: StorageProvider
 

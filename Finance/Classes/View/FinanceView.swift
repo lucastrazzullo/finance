@@ -13,17 +13,16 @@ struct FinanceView: View {
 
     @ObservedObject var viewModel: FinanceViewModel
 
-    @State private var month: Int = Calendar.current.component(.month, from: .now)
-
     var body: some View {
         TabView {
             NavigationView {
                 VStack(alignment: .leading) {
                     makeIncomeOverviewView()
+                    makeMonthPrediction()
                     makeMonthlyOverviewsListView()
                 }
                 .navigationBarTitleDisplayMode(.inline)
-                .toolbar(content: { makeToolbar(titlePrefix: "Overview", showsMenuPicker: true) })
+                .toolbar(content: { makeToolbar(titlePrefix: "Overview", showsMonthPicker: true) })
             }
             .tabItem {
                 Label("Overview", systemImage: "list.bullet.below.rectangle")
@@ -33,7 +32,7 @@ struct FinanceView: View {
             NavigationView {
                 makeBudgetsListView()
                     .navigationBarTitleDisplayMode(.inline)
-                    .toolbar(content: { makeToolbar(titlePrefix: "Budgets", showsMenuPicker: false) })
+                    .toolbar(content: { makeToolbar(titlePrefix: "Budgets", showsMonthPicker: false) })
             }
             .tabItem {
                 Label("Budgets", systemImage: "aspectratio.fill")
@@ -43,7 +42,7 @@ struct FinanceView: View {
             NavigationView {
                 makeTransactionsListView(transactions: viewModel.yearlyOverview.expenses)
                     .navigationBarTitleDisplayMode(.inline)
-                    .toolbar(content: { makeToolbar(titlePrefix: "Transactions", showsMenuPicker: false) })
+                    .toolbar(content: { makeToolbar(titlePrefix: "Transactions", showsMonthPicker: false) })
             }
             .tabItem {
                 Label("Transactions", systemImage: "arrow.left.arrow.right.square")
@@ -76,7 +75,7 @@ struct FinanceView: View {
         VStack {
             Text("Income")
                 .font(.headline)
-                .foregroundColor(.gray)
+                .foregroundColor(.secondary)
 
             ZStack(alignment: .leading) {
                 Rectangle()
@@ -92,10 +91,38 @@ struct FinanceView: View {
         .padding()
     }
 
+    @ViewBuilder private func makeMonthPrediction() -> some View {
+        VStack {
+            Text(viewModel.month)
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+
+            HStack(alignment: .bottom) {
+                Rectangle()
+                    .foregroundColor(.gray)
+                    .frame(width: 100, height: 40)
+
+                ZStack {
+                    Rectangle()
+                        .foregroundColor(.green)
+                        .frame(width: 100, height: 50)
+
+                    Rectangle()
+                        .frame(width: 110, height: 2)
+                }
+
+                Rectangle()
+                    .foregroundColor(.gray.opacity(0.3))
+                    .frame(width: 100, height: 30)
+            }
+        }
+        .frame(maxWidth: .infinity)
+    }
+
     @ViewBuilder private func makeMonthlyOverviewsListView() -> some View {
         MontlyOverviewsListView(
-            monthlyOverviews: viewModel.yearlyOverview.monthlyOverviews(month: month),
-            monthlyOverviewsWithLowestAvailability: viewModel.yearlyOverview.monthlyOverviewsWithLowestAvailability(month: month),
+            monthlyOverviews: viewModel.yearlyOverview.monthlyOverviews(month: viewModel.selectedMonth),
+            monthlyOverviewsWithLowestAvailability: viewModel.yearlyOverview.monthlyOverviewsWithLowestAvailability(month: viewModel.selectedMonth),
             item: { monthlyOverview in
                 NavigationLink(
                     destination: {
@@ -107,7 +134,7 @@ struct FinanceView: View {
                             )
                         )
                         .navigationBarTitleDisplayMode(.inline)
-                        .toolbar(content: { makeToolbar(titlePrefix: "Expenses", showsMenuPicker: true) })
+                        .toolbar(content: { makeToolbar(titlePrefix: "Expenses", showsMonthPicker: true) })
                     },
                     label: {
                         MonthlyOverviewItem(overview: monthlyOverview)
@@ -149,12 +176,11 @@ struct FinanceView: View {
 
     // MARK: Private builder methods - Toolbar
 
-    @ToolbarContentBuilder private func makeToolbar(titlePrefix: String, showsMenuPicker: Bool) -> some ToolbarContent {
+    @ToolbarContentBuilder private func makeToolbar(titlePrefix: String, showsMonthPicker: Bool) -> some ToolbarContent {
 
         ToolbarItem(placement: .principal) {
             let title = "\(titlePrefix) \(viewModel.yearlyOverview.name)"
             let year = String(viewModel.yearlyOverview.year)
-            let month = showsMenuPicker ? Calendar.current.shortMonthSymbols[month - 1] : nil
 
             VStack {
                 Text(title).font(.title2.bold())
@@ -162,9 +188,9 @@ struct FinanceView: View {
                 HStack(spacing: 6) {
                     Text(year).font(.caption)
 
-                    if let month = month {
+                    if showsMonthPicker {
                         Text("›")
-                        Text(month).font(.caption.bold())
+                        Text(viewModel.month).font(.caption.bold())
                     }
                 }
             }
@@ -172,8 +198,8 @@ struct FinanceView: View {
 
         ToolbarItem(placement: .navigationBarTrailing) {
             Menu {
-                if showsMenuPicker {
-                    MonthPickerView(month: $month)
+                if showsMonthPicker {
+                    MonthPickerView(month: $viewModel.selectedMonth)
                         .pickerStyle(MenuPickerStyle())
                 }
 
