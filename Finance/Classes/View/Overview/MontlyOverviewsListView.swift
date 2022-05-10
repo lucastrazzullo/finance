@@ -61,8 +61,8 @@ struct MontlyOverviewsListView<Item: View>: View {
 struct OverviewView_Previews: PreviewProvider {
     static var previews: some View {
         MontlyOverviewsListView(
-            monthlyOverviews: Mocks.overview.monthlyOverviews(month: 1),
-            monthlyOverviewsWithLowestAvailability: Mocks.overview.monthlyOverviewsWithLowestAvailability(month: 1),
+            monthlyOverviews: Mocks.yearlyOverview.monthlyOverviews(month: 1),
+            monthlyOverviewsWithLowestAvailability: Mocks.yearlyOverview.monthlyOverviewsWithLowestAvailability(month: 1),
             item: { overview in
                 MonthlyOverviewItem(overview: overview)
             }

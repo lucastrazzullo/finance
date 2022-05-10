@@ -23,7 +23,7 @@ enum AccessibilityIdentifier {
         static let transactionLink = "BudgetLink"
     }
 
-    enum YearlyOverviewView {
+    enum FinanceView {
         static let overviewTab = "OverviewTab"
         static let budgetsTab = "BudgetsTab"
         static let transactionsTab = "TransactionsTab"

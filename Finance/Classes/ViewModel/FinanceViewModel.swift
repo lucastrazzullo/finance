@@ -7,7 +7,7 @@
 
 import Foundation
 
-@MainActor final class YearlyOverviewViewModel: ObservableObject {
+@MainActor final class FinanceViewModel: ObservableObject {
 
     @Published var yearlyOverview: YearlyBudgetOverview
 
@@ -69,7 +69,7 @@ import Foundation
     }
 }
 
-extension YearlyOverviewViewModel: BudgetStorageHandler {
+extension FinanceViewModel: BudgetStorageHandler {
 
     func add(slice: BudgetSlice, toBudgetWith identifier: Budget.ID) async throws {
         try await storageProvider.add(slice: slice, toBudgetWith: identifier)

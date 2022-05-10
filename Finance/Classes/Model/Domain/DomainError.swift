@@ -71,7 +71,7 @@ enum BudgetOverviewError: DomainUnderlyingError {
     case transactionsListNotValid
 
     var id: String {
-        return "YearlyBudgetOverview"
+        return "BudgetOverview"
     }
 
     var description: String {

@@ -15,7 +15,7 @@ enum Mocks {
 
     // MARK: - Overview
 
-    static let overview: YearlyBudgetOverview = {
+    static let yearlyOverview: YearlyBudgetOverview = {
         return YearlyBudgetOverview(
             name: "Mock",
             year: Mocks.year,

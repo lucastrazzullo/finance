@@ -1,5 +1,5 @@
 //
-//  YearlyOverviewView.swift
+//  FinanceView.swift
 //  Finance
 //
 //  Created by luca strazzullo on 16/11/21.
@@ -7,11 +7,11 @@
 
 import SwiftUI
 
-struct YearlyOverviewView: View {
+struct FinanceView: View {
 
     @Environment(\.storageProvider) private var storageProvider
 
-    @ObservedObject var viewModel: YearlyOverviewViewModel
+    @ObservedObject var viewModel: FinanceViewModel
 
     @State private var month: Int = Calendar.current.component(.month, from: .now)
 
@@ -27,7 +27,7 @@ struct YearlyOverviewView: View {
             }
             .tabItem {
                 Label("Overview", systemImage: "list.bullet.below.rectangle")
-                    .accessibilityIdentifier(AccessibilityIdentifier.YearlyOverviewView.overviewTab)
+                    .accessibilityIdentifier(AccessibilityIdentifier.FinanceView.overviewTab)
             }
 
             NavigationView {
@@ -37,7 +37,7 @@ struct YearlyOverviewView: View {
             }
             .tabItem {
                 Label("Budgets", systemImage: "aspectratio.fill")
-                    .accessibilityIdentifier(AccessibilityIdentifier.YearlyOverviewView.budgetsTab)
+                    .accessibilityIdentifier(AccessibilityIdentifier.FinanceView.budgetsTab)
             }
 
             NavigationView {
@@ -47,7 +47,7 @@ struct YearlyOverviewView: View {
             }
             .tabItem {
                 Label("Transactions", systemImage: "arrow.left.arrow.right.square")
-                    .accessibilityIdentifier(AccessibilityIdentifier.YearlyOverviewView.transactionsTab)
+                    .accessibilityIdentifier(AccessibilityIdentifier.FinanceView.transactionsTab)
             }
         }
         .sheet(isPresented: $viewModel.isAddNewTransactionPresented) {
@@ -197,7 +197,7 @@ struct YearlyOverviewView: View {
 struct YearlyOverviewView_Previews: PreviewProvider {
     static let storageProvider = MockStorageProvider(budgets: Mocks.budgets, transactions: Mocks.transactions)
     static var previews: some View {
-        YearlyOverviewView(viewModel: .init(year: Mocks.year, storageProvider: storageProvider))
+        FinanceView(viewModel: .init(year: Mocks.year, storageProvider: storageProvider))
             .environment(\.storageProvider, storageProvider)
     }
 }
