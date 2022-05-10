@@ -19,11 +19,7 @@ struct YearlyOverviewView: View {
         TabView {
             NavigationView {
                 VStack(alignment: .leading) {
-                    VStack {
-                        Text("Income")
-                    }
-                    .padding()
-
+                    makeIncomeOverviewView()
                     makeMonthlyOverviewsListView()
                 }
                 .navigationBarTitleDisplayMode(.inline)
@@ -75,6 +71,26 @@ struct YearlyOverviewView: View {
     }
 
     // MARK: Private builder methods - Tabs
+
+    @ViewBuilder private func makeIncomeOverviewView() -> some View {
+        VStack {
+            Text("Income")
+                .font(.headline)
+                .foregroundColor(.gray)
+
+            ZStack(alignment: .leading) {
+                Rectangle()
+                    .foregroundColor(.gray)
+
+                Rectangle()
+                    .frame(width: 100)
+                    .foregroundColor(.green)
+            }
+            .frame(height: 24)
+            .cornerRadius(12)
+        }
+        .padding()
+    }
 
     @ViewBuilder private func makeMonthlyOverviewsListView() -> some View {
         MontlyOverviewsListView(
