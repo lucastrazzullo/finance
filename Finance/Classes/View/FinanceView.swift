@@ -72,48 +72,92 @@ struct FinanceView: View {
     // MARK: Private builder methods - Tabs
 
     @ViewBuilder private func makeIncomeOverviewView() -> some View {
-        VStack {
+        NavigationLink(destination: EmptyView()) {
             Text("Income")
-                .font(.headline)
+                .font(.footnote)
                 .foregroundColor(.secondary)
 
             ZStack(alignment: .leading) {
                 Rectangle()
-                    .foregroundColor(.gray)
+                    .foregroundColor(.gray.opacity(0.3))
 
                 Rectangle()
                     .frame(width: 100)
-                    .foregroundColor(.green)
+                    .foregroundColor(.accentColor)
             }
-            .frame(height: 24)
-            .cornerRadius(12)
+            .frame(height: 12)
+            .cornerRadius(3)
+
+            Image(systemName: "chevron.right")
+                .accentColor(.secondary)
         }
         .padding()
     }
 
     @ViewBuilder private func makeMonthPrediction() -> some View {
-        VStack {
-            Text(viewModel.month)
-                .font(.subheadline)
-                .foregroundColor(.secondary)
+        HStack(alignment: .bottom) {
 
-            HStack(alignment: .bottom) {
-                Rectangle()
-                    .foregroundColor(.gray)
-                    .frame(width: 100, height: 40)
+            VStack {
+                Text("April")
+                    .font(.caption)
+                ZStack {
+                    Rectangle()
+                        .foregroundColor(.orange.opacity(0.3))
+                        .frame(width: 100, height: 40)
+                        .cornerRadius(3)
+
+                    HStack(spacing: 2) {
+                        Text("+")
+                        AmountView(amount: .value(1020))
+                    }
+                    .font(.caption)
+                }
+            }
+
+
+            VStack {
+                Text(viewModel.month)
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
 
                 ZStack {
                     Rectangle()
-                        .foregroundColor(.green)
+                        .foregroundColor(.yellow)
                         .frame(width: 100, height: 50)
+                        .cornerRadius(3)
 
-                    Rectangle()
-                        .frame(width: 110, height: 2)
+                    VStack(spacing: 2) {
+                        Rectangle()
+                            .foregroundColor(.primary)
+                            .frame(width: 110, height: 3)
+                            .cornerRadius(3)
+
+
+                            HStack(spacing: 2) {
+                                Text("+")
+                                AmountView(amount: .value(1230))
+                            }
+                            .font(.footnote)
+                    }
                 }
+            }
 
-                Rectangle()
-                    .foregroundColor(.gray.opacity(0.3))
-                    .frame(width: 100, height: 30)
+            VStack {
+                Text("June")
+                    .font(.caption)
+
+                ZStack {
+                    Rectangle()
+                        .foregroundColor(.gray.opacity(0.3))
+                        .frame(width: 100, height: 30)
+                        .cornerRadius(3)
+
+                    HStack(spacing: 2) {
+                        Text("+")
+                        AmountView(amount: .value(700))
+                    }
+                    .font(.caption)
+                }
             }
         }
         .frame(maxWidth: .infinity)
