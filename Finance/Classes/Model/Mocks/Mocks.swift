@@ -26,25 +26,6 @@ enum Mocks {
 
     // MARK: - Budget
 
-    static func randomBudgetIdentifiers(count: Int) -> [Budget.ID] {
-        let favouriteBudgetsIdentifiers: Set<Budget.ID> = Set(favouriteBudgetsIdentifiers)
-        var budgets = budgets.map(\.id).shuffled()
-        budgets.removeAll(where: { favouriteBudgetsIdentifiers.contains($0) })
-        guard budgets.count > count else {
-            return budgets
-        }
-        return Array(budgets[0..<count])
-    }
-
-    static let favouriteBudgetsIdentifiers: [Budget.ID] = {
-        return [
-            budgets.first(where: { $0.name == "Ilenia" })?.id,
-            budgets.first(where: { $0.name == "Groceries" })?.id,
-            budgets.first(where: { $0.name == "Car" })?.id,
-            budgets.first(where: { $0.name == "Health" })?.id
-        ].compactMap({$0})
-    }()
-
     static let budgets: [Budget] = {
         return [
             try! .init(id: UUID(), year: year, name: "House", icon: .house, slices: Mocks.houseSlices),

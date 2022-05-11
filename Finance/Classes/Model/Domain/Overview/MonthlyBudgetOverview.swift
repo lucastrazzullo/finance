@@ -9,9 +9,15 @@ import Foundation
 
 struct MonthlyBudgetOverview: Hashable {
 
+    var name: String {
+        budget?.name ?? "Unowned"
+    }
+    var icon: SystemIcon {
+        budget?.icon ?? .default
+    }
+
     let month: Int
-    let name: String
-    let icon: SystemIcon
+    let budget: Budget?
 
     let startingAmount: MoneyValue
     let remainingAmount: MoneyValue
@@ -25,22 +31,10 @@ struct MonthlyBudgetOverview: Hashable {
     }
 
     init(month: Int, expenses: [Transaction], budget: Budget?) {
-        let filteredExpenses: [Transaction]
-        if let budget = budget {
-            let budgetSlicesIdentifiers = Set(budget.slices.map(\.id))
-            filteredExpenses = expenses.filter { transaction in
-                let transactionSlicesIdentifiers = Set(transaction.amounts.map(\.sliceIdentifier))
-                return !budgetSlicesIdentifiers.intersection(transactionSlicesIdentifiers).isEmpty
-            }
-        } else {
-            filteredExpenses = expenses
-        }
-
-
-        let expensesUntilMonth = filteredExpenses
+        let expensesUntilMonth = expenses
             .filter { transaction in transaction.month < month }
 
-        let expensesInMonth = filteredExpenses
+        let expensesInMonth = expenses
             .filter { transaction in transaction.month == month }
 
         let budgetAvailabilityUpToMonth = budget?.availability(upTo: month) ?? .zero
@@ -53,8 +47,7 @@ struct MonthlyBudgetOverview: Hashable {
             : 0
 
         self.month = month
-        self.name = budget?.name ?? "Unowned"
-        self.icon = budget?.icon ?? .default
+        self.budget = budget
         self.startingAmount = startingAmount
         self.remainingAmount = remainingAmount
         self.remainingAmountPercentage = remainingAmountPercentage

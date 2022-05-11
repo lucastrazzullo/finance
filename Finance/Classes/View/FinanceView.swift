@@ -72,7 +72,8 @@ struct FinanceView: View {
 
     @ViewBuilder private func makeMonthlyProspectView() -> some View {
         MonthlyProspectView(
-            selectedMonth: $viewModel.selectedMonth
+            selectedMonth: $viewModel.selectedMonth,
+            prospects: viewModel.monthlyProspects
         )
     }
 
@@ -179,7 +180,7 @@ private struct MonthlyProspectView: View {
 
     @Binding var selectedMonth: Int
 
-    private let prospects: [MonthlyProspect]
+    let prospects: [MonthlyProspect]
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
@@ -192,29 +193,6 @@ private struct MonthlyProspectView: View {
         .frame(height: 140)
         .padding()
         .background(.gray.opacity(0.1))
-    }
-
-    init(selectedMonth: Binding<Int>) {
-        self._selectedMonth = selectedMonth
-
-        self.prospects = (1...12).compactMap(MonthlyProspect.init(month:))
-    }
-}
-
-private struct MonthlyProspect: Hashable {
-
-    let month: Int
-    let budgets: [Budget]
-    let expenses: [Transaction]
-
-    init?(month: Int) {
-        guard month > 0 && month < Calendar.current.monthSymbols.count else {
-            return nil
-        }
-
-        self.month = month
-        self.budgets = []
-        self.expenses = []
     }
 }
 
@@ -271,14 +249,7 @@ private struct MonthlyProspectItem: View {
         }
 
         var barHeight: CGFloat {
-            switch State(prospect: prospect) {
-            case .current:
-                return 80
-            case .completed:
-                return 60
-            case .prediction:
-                return 60
-            }
+            return 80
         }
         var barContainerHeight: CGFloat {
             return 100

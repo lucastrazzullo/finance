@@ -30,12 +30,23 @@ struct YearlyBudgetOverview: Identifiable {
 
     // MARK: Getters
 
+    func monthlyOverviewsWithLowestAvailability(month: Int) -> [MonthlyBudgetOverview] {
+        let overviews = monthlyOverviews(month: month)
+        return overviews
+            .filter({ $0.remainingAmount <= .value(100) })
+            .sorted(by: { $0.remainingAmount < $1.remainingAmount })
+    }
+
     func monthlyOverviews(month: Int) -> [MonthlyBudgetOverview] {
-        var overviews = budgets
-            .filter { $0.year == year }
-            .compactMap { budget in
-                MonthlyBudgetOverview(month: month, expenses: expenses, budget: budget)
+        var overviews = budgets.compactMap { budget -> MonthlyBudgetOverview in
+            let budgetSlicesIdentifiers = Set(budget.slices.map(\.id))
+            let budgetExpenses = expenses.filter { transaction in
+                let transactionSlicesIdentifiers = Set(transaction.amounts.map(\.sliceIdentifier))
+                return !budgetSlicesIdentifiers.intersection(transactionSlicesIdentifiers).isEmpty
             }
+
+            return MonthlyBudgetOverview(month: month, expenses: budgetExpenses, budget: budget)
+        }
 
         let allSlicesIdentifiers = Set(budgets.flatMap({ $0.slices.map(\.id) }))
         let unownedExpenses = expenses.filter { transaction in
@@ -48,12 +59,23 @@ struct YearlyBudgetOverview: Identifiable {
         }
 
         return overviews
+            .sorted(by: { $0.expensesInMonth.totalAmount > $1.expensesInMonth.totalAmount })
     }
 
-    func monthlyOverviewsWithLowestAvailability(month: Int) -> [MonthlyBudgetOverview] {
-        monthlyOverviews(month: month)
-            .filter({ $0.remainingAmount <= .value(100) })
-            .sorted(by: { $0.remainingAmount < $1.remainingAmount })
+    func monthlyProspects() -> [MonthlyProspect] {
+        let prospects = (1...12).compactMap { month -> MonthlyProspect in
+            let expenses = expenses
+                .filter({ $0.month <= month })
+
+            return MonthlyProspect(
+                month: month,
+                incomes: [],
+                expenses: expenses,
+                budgets: budgets
+            )
+        }
+
+        return prospects
     }
 
     // MARK: Mutating - Budgets

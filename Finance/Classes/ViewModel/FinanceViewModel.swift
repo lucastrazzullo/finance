@@ -28,6 +28,10 @@ import Foundation
         return yearlyOverview.monthlyOverviewsWithLowestAvailability(month: selectedMonth)
     }
 
+    var monthlyProspects: [MonthlyProspect] {
+        return yearlyOverview.monthlyProspects()
+    }
+
     private let storageProvider: StorageProvider
 
     // MARK: Object life cycle
