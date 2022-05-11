@@ -11,15 +11,13 @@ struct MonthlyProspect: Hashable {
 
     let month: Int
     let forecastedEndOfTheMonthAvailability: MoneyValue
+    let trendingEndOfTheMonthAvailability: MoneyValue
     let currentAvailability: MoneyValue
 
-    init(month: Int, incomes: [Transaction], expenses: [Transaction], budgets: [Budget]) {
+    init(month: Int) {
         self.month = month
-        self.forecastedEndOfTheMonthAvailability = budgets
-            .reduce(.zero, { $0 + $1.availability(upTo: month) + $1.availability(for: month) })
-        self.currentAvailability = incomes
-            .filter({ $0.month <= month })
-            .totalAmount - expenses
-            .filter({ $0.month <= month }).totalAmount
+        self.forecastedEndOfTheMonthAvailability = .value(.init(Double.random(in: 10000...14000)))
+        self.trendingEndOfTheMonthAvailability = forecastedEndOfTheMonthAvailability - .value(1000)
+        self.currentAvailability = .value(.init(Double.random(in: 10000...14000)))
     }
 }

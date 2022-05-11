@@ -185,8 +185,25 @@ private struct MonthlyProspectView: View {
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(alignment: .bottom) {
+                let highestForecastedAvailability: MoneyValue = prospects.reduce(.zero) {
+                    max($0, $1.forecastedEndOfTheMonthAvailability)
+                }
+
+                let highestTrendingAvailability: MoneyValue = prospects.reduce(.zero) {
+                    max($0, $1.trendingEndOfTheMonthAvailability)
+                }
+
+                let highestCurrentAvailability: MoneyValue = prospects.reduce(.zero) {
+                    max($0, $1.currentAvailability)
+                }
+
                 ForEach(prospects, id: \.self) { prospect in
-                    MonthlyProspectItem(viewModel: .init(prospect: prospect))
+                    MonthlyProspectItem(viewModel: .init(
+                        prospect: prospect,
+                        highestForecastedAvailability: highestForecastedAvailability,
+                        highestTrendingAvailability: highestTrendingAvailability,
+                        highestCurrentAvailability: highestCurrentAvailability)
+                    )
                 }
             }
         }
@@ -237,6 +254,7 @@ private struct MonthlyProspectItem: View {
                 return .primary
             }
         }
+
         var barColor: Color {
             switch State(prospect: prospect) {
             case .current:
@@ -247,18 +265,43 @@ private struct MonthlyProspectItem: View {
                 return .gray.opacity(0.3)
             }
         }
-
         var barHeight: CGFloat {
-            return 80
+            let percentage = prospect.forecastedEndOfTheMonthAvailability.value / highestValue.value
+            return CGFloat(truncating: NSDecimalNumber(decimal: percentage)) * containerHeight
         }
-        var barContainerHeight: CGFloat {
+
+        var indicatorValue: MoneyValue {
+            switch State(prospect: prospect) {
+            case .current, .completed:
+                return prospect.currentAvailability - prospect.forecastedEndOfTheMonthAvailability
+            case .prediction:
+                return prospect.forecastedEndOfTheMonthAvailability
+            }
+        }
+        var indicatorHeight: CGFloat {
+            switch State(prospect: prospect) {
+            case .current, .completed:
+                let percentage = prospect.currentAvailability.value / highestValue.value
+                return CGFloat(truncating: NSDecimalNumber(decimal: percentage)) * containerHeight
+            case .prediction:
+                let percentage = prospect.trendingEndOfTheMonthAvailability.value / highestValue.value
+                return CGFloat(truncating: NSDecimalNumber(decimal: percentage)) * containerHeight
+            }
+        }
+
+        var containerHeight: CGFloat {
             return 100
         }
 
         private let prospect: MonthlyProspect
+        private let highestValue: MoneyValue
 
-        init(prospect: MonthlyProspect) {
+        init(prospect: MonthlyProspect,
+             highestForecastedAvailability: MoneyValue,
+             highestTrendingAvailability: MoneyValue,
+             highestCurrentAvailability: MoneyValue) {
             self.prospect = prospect
+            self.highestValue = max(highestForecastedAvailability, highestTrendingAvailability, highestCurrentAvailability)
         }
     }
 
@@ -273,7 +316,7 @@ private struct MonthlyProspectItem: View {
 
             Spacer()
 
-            ZStack {
+            ZStack(alignment: .bottom) {
                 Rectangle()
                     .foregroundColor(viewModel.barColor)
                     .frame(width: 90, height: viewModel.barHeight)
@@ -284,16 +327,16 @@ private struct MonthlyProspectItem: View {
                         .foregroundColor(.primary)
                         .frame(width: 80, height: 3)
                         .cornerRadius(3)
+                        .padding(.bottom, 0)
 
-
-                        HStack(spacing: 2) {
-                            Text("+")
-                            AmountView(amount: .value(1230))
-                        }
+                    AmountView(amount: viewModel.indicatorValue)
                         .font(.footnote)
+
+                    Spacer()
                 }
+                .frame(height: viewModel.indicatorHeight)
             }
-            .frame(height: viewModel.barContainerHeight, alignment: .bottom)
+            .frame(height: viewModel.containerHeight, alignment: .bottom)
         }
         .background(.ultraThinMaterial)
         .cornerRadius(3)

@@ -64,15 +64,7 @@ struct YearlyBudgetOverview: Identifiable {
 
     func monthlyProspects() -> [MonthlyProspect] {
         let prospects = (1...12).compactMap { month -> MonthlyProspect in
-            let expenses = expenses
-                .filter({ $0.month <= month })
-
-            return MonthlyProspect(
-                month: month,
-                incomes: [],
-                expenses: expenses,
-                budgets: budgets
-            )
+            return MonthlyProspect(month: month)
         }
 
         return prospects
