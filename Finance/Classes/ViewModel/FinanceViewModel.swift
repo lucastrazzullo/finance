@@ -20,6 +20,14 @@ import Foundation
         return Calendar.current.shortMonthSymbols[selectedMonth - 1]
     }
 
+    var monthlyOverviews: [MonthlyBudgetOverview] {
+        return yearlyOverview.monthlyOverviews(month: selectedMonth)
+    }
+
+    var monthlyOverviewsWithLowestAvailability: [MonthlyBudgetOverview] {
+        return yearlyOverview.monthlyOverviewsWithLowestAvailability(month: selectedMonth)
+    }
+
     private let storageProvider: StorageProvider
 
     // MARK: Object life cycle

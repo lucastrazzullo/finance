@@ -17,8 +17,7 @@ struct FinanceView: View {
         TabView {
             NavigationView {
                 VStack(alignment: .leading) {
-                    makeIncomeOverviewView()
-                    makeMonthPrediction()
+                    makeMonthlyProspectView()
                     makeMonthlyOverviewsListView()
                 }
                 .navigationBarTitleDisplayMode(.inline)
@@ -71,102 +70,14 @@ struct FinanceView: View {
 
     // MARK: Private builder methods - Tabs
 
-    @ViewBuilder private func makeIncomeOverviewView() -> some View {
-        NavigationLink(destination: EmptyView()) {
-            Text("Income")
-                .font(.footnote)
-                .foregroundColor(.secondary)
-
-            ZStack(alignment: .leading) {
-                Rectangle()
-                    .foregroundColor(.gray.opacity(0.3))
-
-                Rectangle()
-                    .frame(width: 100)
-                    .foregroundColor(.accentColor)
-            }
-            .frame(height: 12)
-            .cornerRadius(3)
-
-            Image(systemName: "chevron.right")
-                .accentColor(.secondary)
-        }
-        .padding()
-    }
-
-    @ViewBuilder private func makeMonthPrediction() -> some View {
-        HStack(alignment: .bottom) {
-
-            VStack {
-                Text("April")
-                    .font(.caption)
-                ZStack {
-                    Rectangle()
-                        .foregroundColor(.orange.opacity(0.3))
-                        .frame(width: 100, height: 40)
-                        .cornerRadius(3)
-
-                    HStack(spacing: 2) {
-                        Text("+")
-                        AmountView(amount: .value(1020))
-                    }
-                    .font(.caption)
-                }
-            }
-
-
-            VStack {
-                Text(viewModel.month)
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-
-                ZStack {
-                    Rectangle()
-                        .foregroundColor(.yellow)
-                        .frame(width: 100, height: 50)
-                        .cornerRadius(3)
-
-                    VStack(spacing: 2) {
-                        Rectangle()
-                            .foregroundColor(.primary)
-                            .frame(width: 110, height: 3)
-                            .cornerRadius(3)
-
-
-                            HStack(spacing: 2) {
-                                Text("+")
-                                AmountView(amount: .value(1230))
-                            }
-                            .font(.footnote)
-                    }
-                }
-            }
-
-            VStack {
-                Text("June")
-                    .font(.caption)
-
-                ZStack {
-                    Rectangle()
-                        .foregroundColor(.gray.opacity(0.3))
-                        .frame(width: 100, height: 30)
-                        .cornerRadius(3)
-
-                    HStack(spacing: 2) {
-                        Text("+")
-                        AmountView(amount: .value(700))
-                    }
-                    .font(.caption)
-                }
-            }
-        }
-        .frame(maxWidth: .infinity)
+    @ViewBuilder private func makeMonthlyProspectView() -> some View {
+        MonthlyProspectView(selectedMonth: $viewModel.selectedMonth)
     }
 
     @ViewBuilder private func makeMonthlyOverviewsListView() -> some View {
         MontlyOverviewsListView(
-            monthlyOverviews: viewModel.yearlyOverview.monthlyOverviews(month: viewModel.selectedMonth),
-            monthlyOverviewsWithLowestAvailability: viewModel.yearlyOverview.monthlyOverviewsWithLowestAvailability(month: viewModel.selectedMonth),
+            monthlyOverviews: viewModel.monthlyOverviews,
+            monthlyOverviewsWithLowestAvailability: viewModel.monthlyOverviewsWithLowestAvailability,
             item: { monthlyOverview in
                 NavigationLink(
                     destination: {
@@ -262,12 +173,159 @@ struct FinanceView: View {
     }
 }
 
+private struct MonthlyProspectView: View {
+
+    @Binding var selectedMonth: Int
+
+    private let prospects: [MonthlyProspect]
+
+    var body: some View {
+        HStack(alignment: .bottom) {
+            ForEach(prospects, id: \.self) { prospect in
+                MonthlyProspectItem(viewModel: .init(prospect: prospect))
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: 120)
+        .padding()
+        .background(.gray.opacity(0.1))
+    }
+
+    init(selectedMonth: Binding<Int>) {
+        self._selectedMonth = selectedMonth
+
+        self.prospects = [
+            MonthlyProspect(month: selectedMonth.wrappedValue - 1),
+            MonthlyProspect(month: selectedMonth.wrappedValue),
+            MonthlyProspect(month: selectedMonth.wrappedValue + 1)
+        ].compactMap({$0})
+    }
+}
+
+private struct MonthlyProspect: Hashable {
+
+    let month: Int
+    let budgets: [Budget]
+    let expenses: [Transaction]
+
+    init?(month: Int) {
+        guard month > 0 && month < Calendar.current.monthSymbols.count else {
+            return nil
+        }
+
+        self.month = month
+        self.budgets = []
+        self.expenses = []
+    }
+}
+
+private struct MonthlyProspectItem: View {
+
+    enum State {
+        case current
+        case completed
+        case prediction
+
+        init(prospect: MonthlyProspect) {
+            let currentMonth = Calendar.current.component(.month, from: .now)
+            if prospect.month < currentMonth {
+                self = .completed
+            } else if prospect.month > currentMonth {
+                self = .prediction
+            } else {
+                self = .current
+            }
+        }
+    }
+
+    struct ViewModel: Hashable {
+
+        var month: String {
+            return Calendar.current.shortMonthSymbols[prospect.month - 1]
+        }
+
+        var monthFont: Font {
+            switch State(prospect: prospect) {
+            case .current:
+                return .subheadline
+            case .prediction, .completed:
+                return .caption
+            }
+        }
+        var monthColor: Color {
+            switch State(prospect: prospect) {
+            case .current:
+                return .secondary
+            case .prediction, .completed:
+                return .primary
+            }
+        }
+        var barColor: Color {
+            switch State(prospect: prospect) {
+            case .current:
+                return .orange
+            case .completed:
+                return .orange.opacity(0.3)
+            case .prediction:
+                return .gray.opacity(0.3)
+            }
+        }
+
+        var barHeight: CGFloat {
+            return 80
+        }
+        var barContainerHeight: CGFloat {
+            return 100
+        }
+
+        private let prospect: MonthlyProspect
+
+        init(prospect: MonthlyProspect) {
+            self.prospect = prospect
+        }
+    }
+
+    let viewModel: ViewModel
+
+    var body: some View {
+        VStack {
+            Text(viewModel.month)
+                .font(viewModel.monthFont)
+                .foregroundColor(.secondary)
+
+            Spacer()
+
+            ZStack {
+                Rectangle()
+                    .foregroundColor(viewModel.barColor)
+                    .frame(width: 90, height: viewModel.barHeight)
+                    .cornerRadius(3)
+
+                VStack(spacing: 2) {
+                    Rectangle()
+                        .foregroundColor(.primary)
+                        .frame(width: 80, height: 3)
+                        .cornerRadius(3)
+
+
+                        HStack(spacing: 2) {
+                            Text("+")
+                            AmountView(amount: .value(1230))
+                        }
+                        .font(.footnote)
+                }
+            }
+            .frame(height: viewModel.barContainerHeight, alignment: .bottom)
+        }
+    }
+}
+
 // MARK: - Previews
 
 struct FinanceView_Previews: PreviewProvider {
     static let storageProvider = MockStorageProvider(budgets: Mocks.budgets, transactions: Mocks.transactions)
     static var previews: some View {
         FinanceView(viewModel: .init(year: Mocks.year, storageProvider: storageProvider))
+//            .preferredColorScheme(.dark)
             .environment(\.storageProvider, storageProvider)
     }
 }
