@@ -16,7 +16,7 @@ struct FinanceView: View {
     var body: some View {
         TabView {
             NavigationView {
-                VStack(alignment: .leading) {
+                VStack(alignment: .leading, spacing: 0) {
                     makeMonthlyProspectView()
                     makeMonthlyOverviewsListView()
                 }
@@ -71,7 +71,9 @@ struct FinanceView: View {
     // MARK: Private builder methods - Tabs
 
     @ViewBuilder private func makeMonthlyProspectView() -> some View {
-        MonthlyProspectView(selectedMonth: $viewModel.selectedMonth)
+        MonthlyProspectView(
+            selectedMonth: $viewModel.selectedMonth
+        )
     }
 
     @ViewBuilder private func makeMonthlyOverviewsListView() -> some View {
@@ -180,12 +182,14 @@ private struct MonthlyProspectView: View {
     private let prospects: [MonthlyProspect]
 
     var body: some View {
-        HStack(alignment: .bottom) {
-            ForEach(prospects, id: \.self) { prospect in
-                MonthlyProspectItem(viewModel: .init(prospect: prospect))
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(alignment: .bottom) {
+                ForEach(prospects, id: \.self) { prospect in
+                    MonthlyProspectItem(viewModel: .init(prospect: prospect))
+                }
             }
         }
-        .frame(maxWidth: .infinity, maxHeight: 120)
+        .frame(height: 140)
         .padding()
         .background(.gray.opacity(0.1))
     }
@@ -193,11 +197,7 @@ private struct MonthlyProspectView: View {
     init(selectedMonth: Binding<Int>) {
         self._selectedMonth = selectedMonth
 
-        self.prospects = [
-            MonthlyProspect(month: selectedMonth.wrappedValue - 1),
-            MonthlyProspect(month: selectedMonth.wrappedValue),
-            MonthlyProspect(month: selectedMonth.wrappedValue + 1)
-        ].compactMap({$0})
+        self.prospects = (1...12).compactMap(MonthlyProspect.init(month:))
     }
 }
 
@@ -271,7 +271,14 @@ private struct MonthlyProspectItem: View {
         }
 
         var barHeight: CGFloat {
-            return 80
+            switch State(prospect: prospect) {
+            case .current:
+                return 80
+            case .completed:
+                return 60
+            case .prediction:
+                return 60
+            }
         }
         var barContainerHeight: CGFloat {
             return 100
@@ -291,6 +298,7 @@ private struct MonthlyProspectItem: View {
             Text(viewModel.month)
                 .font(viewModel.monthFont)
                 .foregroundColor(.secondary)
+                .padding(.top)
 
             Spacer()
 
@@ -316,6 +324,8 @@ private struct MonthlyProspectItem: View {
             }
             .frame(height: viewModel.barContainerHeight, alignment: .bottom)
         }
+        .background(.ultraThinMaterial)
+        .cornerRadius(3)
     }
 }
 
