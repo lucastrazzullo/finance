@@ -19,6 +19,7 @@
 		8122A34E2819C2C0002912D3 /* TransactionsListViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8122A34D2819C2C0002912D3 /* TransactionsListViewModelTests.swift */; };
 		8126BA7F2806E98A00C06C93 /* StorageProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8126BA7E2806E98A00C06C93 /* StorageProvider.swift */; };
 		8126BA8928073A7C00C06C93 /* ErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8126BA8828073A7C00C06C93 /* ErrorView.swift */; };
+		81341EA2283BA78300EAC8E8 /* MonthlyProspectsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81341EA1283BA78300EAC8E8 /* MonthlyProspectsListView.swift */; };
 		8157AB8327BA7E15003FEB28 /* NewSliceElements.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8157AB8227BA7E15003FEB28 /* NewSliceElements.swift */; };
 		8157AB8527BA7E5D003FEB28 /* SliceFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8157AB8427BA7E5D003FEB28 /* SliceFlow.swift */; };
 		8157AB8727BACCE9003FEB28 /* AddSliceUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8157AB8627BACCE9003FEB28 /* AddSliceUITests.swift */; };
@@ -52,7 +53,6 @@
 		8195E8BC27A41BD200D58297 /* InlineErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8195E8BB27A41BD200D58297 /* InlineErrorView.swift */; };
 		819993D52752F80C00FA3E03 /* Locale+Defaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 819993D42752F80C00FA3E03 /* Locale+Defaults.swift */; };
 		819993D72752FAA300FA3E03 /* AmountTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 819993D62752FAA300FA3E03 /* AmountTextField.swift */; };
-		819F41A5281C08C70052EEDB /* Algorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 819F41A4281C08C70052EEDB /* Algorithms */; };
 		81A6FB6D2800493E00D71BE6 /* FinanceFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81A6FB6C2800493E00D71BE6 /* FinanceFlow.swift */; };
 		81A6FB6F2800495A00D71BE6 /* FinanceViewElements.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81A6FB6E2800495A00D71BE6 /* FinanceViewElements.swift */; };
 		81A6FB76280071EE00D71BE6 /* BudgetIconPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81A6FB75280071EE00D71BE6 /* BudgetIconPicker.swift */; };
@@ -117,6 +117,7 @@
 		8126BA7E2806E98A00C06C93 /* StorageProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageProvider.swift; sourceTree = "<group>"; };
 		8126BA802806F69A00C06C93 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8126BA8828073A7C00C06C93 /* ErrorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorView.swift; sourceTree = "<group>"; };
+		81341EA1283BA78300EAC8E8 /* MonthlyProspectsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthlyProspectsListView.swift; sourceTree = "<group>"; };
 		8157AB8227BA7E15003FEB28 /* NewSliceElements.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSliceElements.swift; sourceTree = "<group>"; };
 		8157AB8427BA7E5D003FEB28 /* SliceFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SliceFlow.swift; sourceTree = "<group>"; };
 		8157AB8627BACCE9003FEB28 /* AddSliceUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddSliceUITests.swift; sourceTree = "<group>"; };
@@ -211,7 +212,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				819F41A5281C08C70052EEDB /* Algorithms in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -223,6 +223,7 @@
 			children = (
 				810F86A127FF833600A1CDD4 /* MontlyOverviewsListView.swift */,
 				810F86A528002CD700A1CDD4 /* MonthlyOverviewItem.swift */,
+				81341EA1283BA78300EAC8E8 /* MonthlyProspectsListView.swift */,
 			);
 			path = Overview;
 			sourceTree = "<group>";
@@ -564,7 +565,6 @@
 			);
 			name = Finance;
 			packageProductDependencies = (
-				819F41A4281C08C70052EEDB /* Algorithms */,
 			);
 			productName = Finance;
 			productReference = 81947EA727327FCF001C2AC9 /* Finance.app */;
@@ -603,7 +603,6 @@
 			);
 			mainGroup = 81947E9E27327FCE001C2AC9;
 			packageReferences = (
-				819F41A3281C08C70052EEDB /* XCRemoteSwiftPackageReference "swift-algorithms" */,
 			);
 			productRefGroup = 81947EA827327FCF001C2AC9 /* Products */;
 			projectDirPath = "";
@@ -709,6 +708,7 @@
 				817A119127EF355700058C11 /* MonthPickerView.swift in Sources */,
 				81CB8BFE2746DA8F00A64785 /* AmountHolder.swift in Sources */,
 				810F86A628002CD700A1CDD4 /* MonthlyOverviewItem.swift in Sources */,
+				81341EA2283BA78300EAC8E8 /* MonthlyProspectsListView.swift in Sources */,
 				81CB8BF42746BC4A00A64785 /* MoneyValue.swift in Sources */,
 				8122A3482819B4E2002912D3 /* Mocks.swift in Sources */,
 				8170340227B59945001686FA /* AccessibilityIdentifier.swift in Sources */,
@@ -1042,25 +1042,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCRemoteSwiftPackageReference section */
-		819F41A3281C08C70052EEDB /* XCRemoteSwiftPackageReference "swift-algorithms" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/apple/swift-algorithms.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		819F41A4281C08C70052EEDB /* Algorithms */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 819F41A3281C08C70052EEDB /* XCRemoteSwiftPackageReference "swift-algorithms" */;
-			productName = Algorithms;
-		};
-/* End XCSwiftPackageProductDependency section */
 
 /* Begin XCVersionGroup section */
 		81FC874E279B65460031D3AC /* Finance.xcdatamodeld */ = {

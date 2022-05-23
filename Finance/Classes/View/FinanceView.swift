@@ -16,12 +16,14 @@ struct FinanceView: View {
     var body: some View {
         TabView {
             NavigationView {
-                VStack(alignment: .leading, spacing: 0) {
+                VStack(alignment: .center, spacing: 0) {
                     makeMonthlyProspectView()
                     makeMonthlyOverviewsListView()
                 }
                 .navigationBarTitleDisplayMode(.inline)
-                .toolbar(content: { makeToolbar(titlePrefix: "Overview", showsMonthPicker: true) })
+                .toolbar {
+                    makeToolbar(titlePrefix: "Overview", showsMonthPicker: true, showsMonth: false)
+                }
             }
             .tabItem {
                 Label("Overview", systemImage: "list.bullet.below.rectangle")
@@ -31,7 +33,9 @@ struct FinanceView: View {
             NavigationView {
                 makeBudgetsListView()
                     .navigationBarTitleDisplayMode(.inline)
-                    .toolbar(content: { makeToolbar(titlePrefix: "Budgets", showsMonthPicker: false) })
+                    .toolbar {
+                        makeToolbar(titlePrefix: "Budgets", showsMonthPicker: false, showsMonth: false)
+                    }
             }
             .tabItem {
                 Label("Budgets", systemImage: "aspectratio.fill")
@@ -41,7 +45,9 @@ struct FinanceView: View {
             NavigationView {
                 makeTransactionsListView(transactions: viewModel.yearlyOverview.expenses)
                     .navigationBarTitleDisplayMode(.inline)
-                    .toolbar(content: { makeToolbar(titlePrefix: "Transactions", showsMonthPicker: false) })
+                    .toolbar {
+                        makeToolbar(titlePrefix: "Transactions", showsMonthPicker: false, showsMonth: false)
+                    }
             }
             .tabItem {
                 Label("Transactions", systemImage: "arrow.left.arrow.right.square")
@@ -71,9 +77,9 @@ struct FinanceView: View {
     // MARK: Private builder methods - Tabs
 
     @ViewBuilder private func makeMonthlyProspectView() -> some View {
-        MonthlyProspectView(
-            selectedMonth: $viewModel.selectedMonth,
-            prospects: viewModel.monthlyProspects
+        MonthlyProspectsListView(
+            prospects: viewModel.monthlyProspects,
+            selectedMonth: $viewModel.selectedMonth
         )
     }
 
@@ -92,7 +98,9 @@ struct FinanceView: View {
                             )
                         )
                         .navigationBarTitleDisplayMode(.inline)
-                        .toolbar(content: { makeToolbar(titlePrefix: "Expenses", showsMonthPicker: true) })
+                        .toolbar {
+                            makeToolbar(titlePrefix: "Expenses", showsMonthPicker: true, showsMonth: true)
+                        }
                     },
                     label: {
                         MonthlyOverviewItem(overview: monthlyOverview)
@@ -134,7 +142,7 @@ struct FinanceView: View {
 
     // MARK: Private builder methods - Toolbar
 
-    @ToolbarContentBuilder private func makeToolbar(titlePrefix: String, showsMonthPicker: Bool) -> some ToolbarContent {
+    @ToolbarContentBuilder private func makeToolbar(titlePrefix: String, showsMonthPicker: Bool, showsMonth: Bool) -> some ToolbarContent {
 
         ToolbarItem(placement: .principal) {
             let title = "\(titlePrefix) \(viewModel.yearlyOverview.name)"
@@ -146,7 +154,7 @@ struct FinanceView: View {
                 HStack(spacing: 6) {
                     Text(year).font(.caption)
 
-                    if showsMonthPicker {
+                    if showsMonth {
                         Text("›")
                         Text(viewModel.month).font(.caption.bold())
                     }
@@ -173,173 +181,6 @@ struct FinanceView: View {
                 Label("Options", systemImage: "ellipsis.circle")
             }
         }
-    }
-}
-
-private struct MonthlyProspectView: View {
-
-    @Binding var selectedMonth: Int
-
-    let prospects: [MonthlyProspect]
-
-    var body: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(alignment: .bottom) {
-                let highestForecastedAvailability: MoneyValue = prospects.reduce(.zero) {
-                    max($0, $1.forecastedEndOfTheMonthAvailability)
-                }
-
-                let highestTrendingAvailability: MoneyValue = prospects.reduce(.zero) {
-                    max($0, $1.trendingEndOfTheMonthAvailability)
-                }
-
-                let highestCurrentAvailability: MoneyValue = prospects.reduce(.zero) {
-                    max($0, $1.currentAvailability)
-                }
-
-                ForEach(prospects, id: \.self) { prospect in
-                    MonthlyProspectItem(viewModel: .init(
-                        prospect: prospect,
-                        highestForecastedAvailability: highestForecastedAvailability,
-                        highestTrendingAvailability: highestTrendingAvailability,
-                        highestCurrentAvailability: highestCurrentAvailability)
-                    )
-                }
-            }
-        }
-        .frame(height: 140)
-        .padding()
-        .background(.gray.opacity(0.1))
-    }
-}
-
-private struct MonthlyProspectItem: View {
-
-    enum State {
-        case current
-        case completed
-        case prediction
-
-        init(prospect: MonthlyProspect) {
-            let currentMonth = Calendar.current.component(.month, from: .now)
-            if prospect.month < currentMonth {
-                self = .completed
-            } else if prospect.month > currentMonth {
-                self = .prediction
-            } else {
-                self = .current
-            }
-        }
-    }
-
-    struct ViewModel: Hashable {
-
-        var month: String {
-            return Calendar.current.shortMonthSymbols[prospect.month - 1]
-        }
-
-        var monthFont: Font {
-            switch State(prospect: prospect) {
-            case .current:
-                return .subheadline
-            case .prediction, .completed:
-                return .caption
-            }
-        }
-        var monthColor: Color {
-            switch State(prospect: prospect) {
-            case .current:
-                return .secondary
-            case .prediction, .completed:
-                return .primary
-            }
-        }
-
-        var barColor: Color {
-            switch State(prospect: prospect) {
-            case .current:
-                return .orange
-            case .completed:
-                return .orange.opacity(0.3)
-            case .prediction:
-                return .gray.opacity(0.3)
-            }
-        }
-        var barHeight: CGFloat {
-            let percentage = prospect.forecastedEndOfTheMonthAvailability.value / highestValue.value
-            return CGFloat(truncating: NSDecimalNumber(decimal: percentage)) * containerHeight
-        }
-
-        var indicatorValue: MoneyValue {
-            switch State(prospect: prospect) {
-            case .current, .completed:
-                return prospect.currentAvailability - prospect.forecastedEndOfTheMonthAvailability
-            case .prediction:
-                return prospect.forecastedEndOfTheMonthAvailability
-            }
-        }
-        var indicatorHeight: CGFloat {
-            switch State(prospect: prospect) {
-            case .current, .completed:
-                let percentage = prospect.currentAvailability.value / highestValue.value
-                return CGFloat(truncating: NSDecimalNumber(decimal: percentage)) * containerHeight
-            case .prediction:
-                let percentage = prospect.trendingEndOfTheMonthAvailability.value / highestValue.value
-                return CGFloat(truncating: NSDecimalNumber(decimal: percentage)) * containerHeight
-            }
-        }
-
-        var containerHeight: CGFloat {
-            return 100
-        }
-
-        private let prospect: MonthlyProspect
-        private let highestValue: MoneyValue
-
-        init(prospect: MonthlyProspect,
-             highestForecastedAvailability: MoneyValue,
-             highestTrendingAvailability: MoneyValue,
-             highestCurrentAvailability: MoneyValue) {
-            self.prospect = prospect
-            self.highestValue = max(highestForecastedAvailability, highestTrendingAvailability, highestCurrentAvailability)
-        }
-    }
-
-    let viewModel: ViewModel
-
-    var body: some View {
-        VStack {
-            Text(viewModel.month)
-                .font(viewModel.monthFont)
-                .foregroundColor(.secondary)
-                .padding(.top)
-
-            Spacer()
-
-            ZStack(alignment: .bottom) {
-                Rectangle()
-                    .foregroundColor(viewModel.barColor)
-                    .frame(width: 90, height: viewModel.barHeight)
-                    .cornerRadius(3)
-
-                VStack(spacing: 2) {
-                    Rectangle()
-                        .foregroundColor(.primary)
-                        .frame(width: 80, height: 3)
-                        .cornerRadius(3)
-                        .padding(.bottom, 0)
-
-                    AmountView(amount: viewModel.indicatorValue)
-                        .font(.footnote)
-
-                    Spacer()
-                }
-                .frame(height: viewModel.indicatorHeight)
-            }
-            .frame(height: viewModel.containerHeight, alignment: .bottom)
-        }
-        .background(.ultraThinMaterial)
-        .cornerRadius(3)
     }
 }
 

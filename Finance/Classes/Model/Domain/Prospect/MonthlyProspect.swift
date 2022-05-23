@@ -7,7 +7,11 @@
 
 import Foundation
 
-struct MonthlyProspect: Hashable {
+struct MonthlyProspect: Hashable, Identifiable {
+
+    var id: Int {
+        return month
+    }
 
     let month: Int
     let forecastedEndOfTheMonthAvailability: MoneyValue
@@ -16,8 +20,8 @@ struct MonthlyProspect: Hashable {
 
     init(month: Int) {
         self.month = month
-        self.forecastedEndOfTheMonthAvailability = .value(.init(Double.random(in: 10000...14000)))
+        self.forecastedEndOfTheMonthAvailability = .value(12000)
         self.trendingEndOfTheMonthAvailability = forecastedEndOfTheMonthAvailability - .value(1000)
-        self.currentAvailability = .value(.init(Double.random(in: 10000...14000)))
+        self.currentAvailability = .value(10000)
     }
 }
