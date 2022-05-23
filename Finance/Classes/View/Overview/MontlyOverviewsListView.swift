@@ -23,12 +23,12 @@ struct MontlyOverviewsListView<Item: View>: View {
             if monthlyOverviews.count > 0 {
                 Section(header: Text("Monthly Overviews")) {
                     if showAllOverviews {
-                        ForEach(monthlyOverviews, id: \.self) { overview in
+                        ForEach(monthlyOverviews) { overview in
                             item(overview)
                                 .listRowSeparator(.hidden)
                         }
                     } else {
-                        ForEach(monthlyOverviews[0..<min(maximumNumberOfOverviews, monthlyOverviews.count)], id: \.self) { overview in
+                        ForEach(monthlyOverviews[0..<min(maximumNumberOfOverviews, monthlyOverviews.count)]) { overview in
                             item(overview)
                                 .listRowSeparator(.hidden)
                         }
@@ -47,7 +47,7 @@ struct MontlyOverviewsListView<Item: View>: View {
 
             if monthlyOverviewsWithLowestAvailability.count > 0 {
                 Section(header: Text("Lowest budgets this month")) {
-                    ForEach(monthlyOverviewsWithLowestAvailability, id: \.self) { overview in
+                    ForEach(monthlyOverviewsWithLowestAvailability) { overview in
                         item(overview)
                             .listRowSeparator(.hidden)
                     }

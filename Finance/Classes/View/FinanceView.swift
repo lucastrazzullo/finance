@@ -78,8 +78,8 @@ struct FinanceView: View {
 
     @ViewBuilder private func makeMonthlyProspectView() -> some View {
         MonthlyProspectsListView(
-            prospects: viewModel.monthlyProspects,
-            selectedMonth: $viewModel.selectedMonth
+            selectedMonth: $viewModel.selectedMonth,
+            prospects: viewModel.monthlyProspects
         )
     }
 

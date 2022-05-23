@@ -106,8 +106,8 @@ struct MonthlyBudgetOverviewItem_Previews: PreviewProvider {
                 MonthlyOverviewItem(
                     overview: MonthlyBudgetOverview(
                         month: 1,
-                        expenses: Mocks.transactions,
-                        budget: budget
+                        budget: budget,
+                        expenses: Mocks.transactions
                     )
                 )
                 .listRowSeparator(.hidden)

@@ -7,17 +7,20 @@
 
 import Foundation
 
-struct MonthlyBudgetOverview: Hashable {
+struct MonthlyBudgetOverview: Identifiable {
 
+    var id: UUID {
+        budget.id
+    }
     var name: String {
-        budget?.name ?? "Unowned"
+        budget.name
     }
     var icon: SystemIcon {
-        budget?.icon ?? .default
+        budget.icon
     }
 
     let month: Int
-    let budget: Budget?
+    let budget: Budget
 
     let startingAmount: MoneyValue
     let remainingAmount: MoneyValue
@@ -30,15 +33,15 @@ struct MonthlyBudgetOverview: Hashable {
         return expensesUntilMonth + expensesInMonth
     }
 
-    init(month: Int, expenses: [Transaction], budget: Budget?) {
+    init(month: Int, budget: Budget, expenses: [Transaction]) {
         let expensesUntilMonth = expenses
             .filter { transaction in transaction.month < month }
 
         let expensesInMonth = expenses
             .filter { transaction in transaction.month == month }
 
-        let budgetAvailabilityUpToMonth = budget?.availability(upTo: month) ?? .zero
-        let budgetAvailabilityInMonth = budget?.availability(for: month) ?? .zero
+        let budgetAvailabilityUpToMonth = budget.availability(upTo: month)
+        let budgetAvailabilityInMonth = budget.availability(for: month)
 
         let startingAmount = budgetAvailabilityUpToMonth + budgetAvailabilityInMonth - expensesUntilMonth.totalAmount
         let remainingAmount = startingAmount - expensesInMonth.totalAmount

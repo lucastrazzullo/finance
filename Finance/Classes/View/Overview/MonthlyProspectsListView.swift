@@ -22,8 +22,8 @@ struct MonthlyProspectsListView: View {
 
     private let itemWidth: CGFloat = 90
 
-    @State private var draggingOffset: CGFloat
-    @State private var centredItemIdentifier: MonthlyProspect.ID
+    @State private var draggingOffset: CGFloat?
+    @State private var draggingHighlightedMonth: Int?
 
     @Binding var selectedMonth: Int
 
@@ -47,49 +47,32 @@ struct MonthlyProspectsListView: View {
                 ForEach(prospects, id: \.self) { prospect in
                     MonthlyProspectItem(viewModel: .init(
                         prospect: prospect,
-                        isHighlighted: prospect.id == centredItemIdentifier,
+                        isHighlighted: prospect.month == (draggingHighlightedMonth ?? selectedMonth),
                         highestForecastedAvailability: highestForecastedAvailability,
                         highestTrendingAvailability: highestTrendingAvailability,
                         highestCurrentAvailability: highestCurrentAvailability)
                     )
                     .frame(width: itemWidth)
-                    .alignmentGuide(prospect.id == centredItemIdentifier ? .selectedItem : .center) {
-                        dimensions in dimensions[HorizontalAlignment.center] + draggingOffset
+                    .alignmentGuide(prospect.month == selectedMonth ? .selectedItem : .center) {
+                        dimensions in dimensions[HorizontalAlignment.center] + (draggingOffset ?? 0)
                     }
                     .onTapGesture {
-                        withAnimation { select(prospect: prospect) }
+                        withAnimation { selectedMonth = prospect.month }
                     }
                 }
             }
-            .padding(.horizontal)
             .frame(alignment: Alignment(horizontal: .selectedItem, vertical: .center))
             .gesture(DragGesture()
-                .onChanged { value in
-                    draggingOffset = -value.translation.width
-
-                    if let centralItemIndex = prospects.firstIndex(where: { $0.id == centredItemIdentifier }) {
-                        let numberOfDraggedItems = Int(abs(draggingOffset) / itemWidth)
-
-                        let temporaryCenterItemIndex = draggingOffset > 0 ? centralItemIndex + numberOfDraggedItems : centralItemIndex - numberOfDraggedItems
-                        if temporaryCenterItemIndex >= 0, temporaryCenterItemIndex < prospects.count {
-                            let temporaryCenterItem = prospects[temporaryCenterItemIndex]
-                            selectedMonth = temporaryCenterItem.month
-                        }
-                    }
+                .onChanged { value in 
+                    let offset = -value.translation.width
+                    draggingHighlightedMonth = centralItemMonth(offset: offset)
+                    draggingOffset = offset
                 }
                 .onEnded { value in withAnimation {
-                    let endOffset = -value.translation.width
-                    if let centralItemIndex = prospects.firstIndex(where: { $0.id == centredItemIdentifier }) {
-                        let numberOfDraggedItems = Int(abs(endOffset) / itemWidth)
-
-                        let newCenterItemIndex = endOffset > 0 ? centralItemIndex + numberOfDraggedItems : centralItemIndex - numberOfDraggedItems
-                        if newCenterItemIndex >= 0, newCenterItemIndex < prospects.count {
-                            let newCenterItem = prospects[newCenterItemIndex]
-                            select(prospect: newCenterItem)
-                        }
-                    }
-
-                    draggingOffset = 0
+                    let offset = -value.translation.width
+                    draggingHighlightedMonth = nil
+                    draggingOffset = nil
+                    selectedMonth = centralItemMonth(offset: offset) ?? selectedMonth
                 }}
             )
         }
@@ -98,17 +81,24 @@ struct MonthlyProspectsListView: View {
         .background(.gray.opacity(0.1))
     }
 
-    init(prospects: [MonthlyProspect], selectedMonth: Binding<Int>) {
-        self.prospects = prospects
-        self._selectedMonth = Binding(projectedValue: selectedMonth)
+    private func centralItemMonth(offset: CGFloat) -> Int? {
+        guard let startingCentralItemIndex = prospects.firstIndex(where: { $0.id == selectedMonth }) else {
+            return nil
+        }
 
-        self.draggingOffset = 0
-        self.centredItemIdentifier = (prospects.first(where: { $0.month == selectedMonth.wrappedValue }) ?? prospects[0]).id
-    }
+        let numberOfDraggedItems = Int(abs(offset) / itemWidth)
+        let offsetCentralItemIndex = offset > 0
+            ? startingCentralItemIndex + numberOfDraggedItems
+            : startingCentralItemIndex - numberOfDraggedItems
 
-    private func select(prospect: MonthlyProspect) {
-        centredItemIdentifier = prospect.id
-        selectedMonth = prospect.month
+        if offset > 0, offsetCentralItemIndex >= prospects.count {
+            return prospects.last?.month
+        }
+        if offset < 0, offsetCentralItemIndex < 0 {
+            return prospects.first?.month
+        }
+
+        return prospects[offsetCentralItemIndex].month
     }
 }
 
@@ -154,15 +144,6 @@ private struct MonthlyProspectItem: View {
             }
         }
 
-        var currentMonthIndicatorColor: Color {
-            switch State(prospect: prospect) {
-            case .current:
-                return .primary
-            case .prediction, .completed:
-                return .primary.opacity(0)
-            }
-        }
-
         var barColor: Color {
             switch State(prospect: prospect) {
             case .current:
@@ -203,6 +184,15 @@ private struct MonthlyProspectItem: View {
             return 100
         }
 
+        var containerBackground: Material {
+            switch isHighlighted {
+            case true:
+                return .ultraThinMaterial
+            case false:
+                return .thin
+            }
+        }
+
         private let prospect: MonthlyProspect
         private let isHighlighted: Bool
         private let highestValue: MoneyValue
@@ -223,16 +213,10 @@ private struct MonthlyProspectItem: View {
     var body: some View {
         VStack {
 
-            VStack {
-                Circle()
-                    .foregroundColor(viewModel.currentMonthIndicatorColor)
-                    .frame(width: 4, height: 4)
-
-                Text(viewModel.month)
-                    .font(viewModel.monthFont)
-                    .foregroundColor(.secondary)
-            }
-            .padding(.top)
+            Text(viewModel.month)
+                .font(viewModel.monthFont)
+                .foregroundColor(.secondary)
+                .padding(.top)
 
             Spacer()
 
@@ -259,17 +243,19 @@ private struct MonthlyProspectItem: View {
             }
             .frame(height: viewModel.containerHeight, alignment: .bottom)
         }
-        .background(.ultraThinMaterial)
+        .background(viewModel.containerBackground)
         .cornerRadius(3)
     }
 }
 
 struct MonthlyProspectsListView_Previews: PreviewProvider {
     static var previews: some View {
-        MonthlyProspectsListView(prospects: [
+        MonthlyProspectsListView(
+            selectedMonth: .constant(5),
+            prospects: [
             .init(month: 4),
             .init(month: 5),
             .init(month: 6)
-        ], selectedMonth: .constant(5))
+        ])
     }
 }

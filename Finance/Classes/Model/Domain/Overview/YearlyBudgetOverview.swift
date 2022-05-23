@@ -31,43 +31,29 @@ struct YearlyBudgetOverview: Identifiable {
     // MARK: Getters
 
     func monthlyOverviewsWithLowestAvailability(month: Int) -> [MonthlyBudgetOverview] {
-        let overviews = monthlyOverviews(month: month)
-        return overviews
+        return monthlyOverviews(month: month)
             .filter({ $0.remainingAmount <= .value(100) })
             .sorted(by: { $0.remainingAmount < $1.remainingAmount })
     }
 
     func monthlyOverviews(month: Int) -> [MonthlyBudgetOverview] {
-        var overviews = budgets.compactMap { budget -> MonthlyBudgetOverview in
+        return budgets.compactMap { budget -> MonthlyBudgetOverview in
             let budgetSlicesIdentifiers = Set(budget.slices.map(\.id))
             let budgetExpenses = expenses.filter { transaction in
                 let transactionSlicesIdentifiers = Set(transaction.amounts.map(\.sliceIdentifier))
                 return !budgetSlicesIdentifiers.intersection(transactionSlicesIdentifiers).isEmpty
             }
 
-            return MonthlyBudgetOverview(month: month, expenses: budgetExpenses, budget: budget)
+            return MonthlyBudgetOverview(month: month, budget: budget, expenses: budgetExpenses)
         }
-
-        let allSlicesIdentifiers = Set(budgets.flatMap({ $0.slices.map(\.id) }))
-        let unownedExpenses = expenses.filter { transaction in
-            let transactionSlicesIdentifiers = Set(transaction.amounts.map(\.sliceIdentifier))
-            return allSlicesIdentifiers.intersection(transactionSlicesIdentifiers).isEmpty
-        }
-        if unownedExpenses.count > 0 {
-            let unownedOverview = MonthlyBudgetOverview(month: month, expenses: unownedExpenses, budget: nil)
-            overviews.append(unownedOverview)
-        }
-
-        return overviews
-            .sorted(by: { $0.expensesInMonth.totalAmount > $1.expensesInMonth.totalAmount })
+        .sorted(by: { $0.expensesInMonth.totalAmount > $1.expensesInMonth.totalAmount })
     }
 
     func monthlyProspects() -> [MonthlyProspect] {
-        let prospects = (1...12).compactMap { month -> MonthlyProspect in
-            return MonthlyProspect(month: month)
-        }
-
-        return prospects
+        return (1...12)
+            .compactMap { month -> MonthlyProspect in
+                return MonthlyProspect(month: month)
+            }
     }
 
     // MARK: Mutating - Budgets
