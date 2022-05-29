@@ -43,7 +43,7 @@ struct FinanceView: View {
             }
 
             NavigationView {
-                makeTransactionsListView(transactions: viewModel.yearlyOverview.expenses)
+                makeTransactionsListView(transactions: viewModel.yearlyOverview.transactions)
                     .navigationBarTitleDisplayMode(.inline)
                     .toolbar {
                         makeToolbar(titlePrefix: "Transactions", showsMonthPicker: false, showsMonth: false)
@@ -77,10 +77,14 @@ struct FinanceView: View {
     // MARK: Private builder methods - Tabs
 
     @ViewBuilder private func makeMonthlyProspectView() -> some View {
-        MonthlyProspectsListView(
-            selectedMonth: $viewModel.selectedMonth,
-            prospects: viewModel.monthlyProspects
-        )
+        if viewModel.monthlyProspects.isEmpty {
+            EmptyView()
+        } else {
+            MonthlyProspectsListView(
+                selectedMonth: $viewModel.selectedMonth,
+                prospects: viewModel.monthlyProspects
+            )
+        }
     }
 
     @ViewBuilder private func makeMonthlyOverviewsListView() -> some View {
@@ -92,7 +96,7 @@ struct FinanceView: View {
                     destination: {
                         TransactionsListView(
                             viewModel: TransactionsListViewModel(
-                                transactions: monthlyOverview.expensesInMonth,
+                                transactions: monthlyOverview.transactionsInMonth,
                                 addTransactions: { self.viewModel.isAddNewTransactionPresented = true },
                                 deleteTransactions: viewModel.delete(transactionsWith:)
                             )
@@ -187,7 +191,7 @@ struct FinanceView: View {
 // MARK: - Previews
 
 struct FinanceView_Previews: PreviewProvider {
-    static let storageProvider = MockStorageProvider(budgets: Mocks.budgets, transactions: Mocks.transactions)
+    static let storageProvider = MockStorageProvider(budgets: Mocks.expenseBudgets, transactions: Mocks.allTransactions)
     static var previews: some View {
         FinanceView(viewModel: .init(year: Mocks.year, storageProvider: storageProvider))
 //            .preferredColorScheme(.dark)

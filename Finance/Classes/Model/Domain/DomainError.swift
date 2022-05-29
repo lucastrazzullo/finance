@@ -215,6 +215,7 @@ enum TransactionError: DomainUnderlyingError {
     case budgetsAreMissing
     case budgetSliceIsMissing
     case amountNotValid
+    case amountsMustBeOfSameKind
 
     var id: String {
         return "Transaction"
@@ -228,6 +229,8 @@ enum TransactionError: DomainUnderlyingError {
             return "The budget slice is missing"
         case .amountNotValid:
             return "The amount is not valid"
+        case .amountsMustBeOfSameKind:
+            return "The amounts of a transaction must belong to the same budget kind"
         }
     }
 

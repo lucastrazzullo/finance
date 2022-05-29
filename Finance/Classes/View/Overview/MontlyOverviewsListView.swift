@@ -21,7 +21,7 @@ struct MontlyOverviewsListView<Item: View>: View {
     var body: some View {
         List {
             if monthlyOverviews.count > 0 {
-                Section(header: Text("Monthly Overviews")) {
+                Section(header: Text("Overviews")) {
                     if showAllOverviews {
                         ForEach(monthlyOverviews) { overview in
                             item(overview)
@@ -62,7 +62,7 @@ struct OverviewView_Previews: PreviewProvider {
     static var previews: some View {
         MontlyOverviewsListView(
             monthlyOverviews: Mocks.yearlyOverview.monthlyOverviews(month: 1),
-            monthlyOverviewsWithLowestAvailability: Mocks.yearlyOverview.monthlyOverviewsWithLowestAvailability(month: 1),
+            monthlyOverviewsWithLowestAvailability: Mocks.yearlyOverview.monthlyOverviews(month: 1),
             item: { overview in
                 MonthlyOverviewItem(overview: overview)
             }

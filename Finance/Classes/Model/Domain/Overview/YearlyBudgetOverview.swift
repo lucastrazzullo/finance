@@ -12,47 +12,46 @@ struct YearlyBudgetOverview: Identifiable {
     let id: UUID = .init()
     let name: String
     let year: Int
+    let openingBalance: MoneyValue
 
     private(set) var budgets: [Budget]
-    private(set) var expenses: [Transaction]
+    private(set) var transactions: [Transaction]
 
     // MARK: Object life cycle
 
-    init(name: String, year: Int, budgets: [Budget], expenses: [Transaction]) {
+    init(name: String, year: Int, openingBalance: MoneyValue, budgets: [Budget], transactions: [Transaction]) {
         let budgets = budgets.filter { $0.year == year }
-        let expenses = expenses.filter { $0.year == year }
+        let transactions = transactions.filter { $0.date.year == year }
 
         self.name = name
         self.year = year
+        self.openingBalance = openingBalance
         self.budgets = budgets
-        self.expenses = expenses
+        self.transactions = transactions
     }
 
     // MARK: Getters
 
-    func monthlyOverviewsWithLowestAvailability(month: Int) -> [MonthlyBudgetOverview] {
-        return monthlyOverviews(month: month)
-            .filter({ $0.remainingAmount <= .value(100) })
-            .sorted(by: { $0.remainingAmount < $1.remainingAmount })
-    }
-
     func monthlyOverviews(month: Int) -> [MonthlyBudgetOverview] {
-        return budgets.compactMap { budget -> MonthlyBudgetOverview in
-            let budgetSlicesIdentifiers = Set(budget.slices.map(\.id))
-            let budgetExpenses = expenses.filter { transaction in
-                let transactionSlicesIdentifiers = Set(transaction.amounts.map(\.sliceIdentifier))
-                return !budgetSlicesIdentifiers.intersection(transactionSlicesIdentifiers).isEmpty
-            }
+        return budgets
+            .compactMap { budget -> MonthlyBudgetOverview? in
+                let budgetSlicesIdentifiers = Set(budget.slices.map(\.id))
+                let budgetTransactions = transactions.filter { transaction in
+                    let transactionSlicesIdentifiers = Set(transaction.amounts.map(\.sliceIdentifier))
+                    return !budgetSlicesIdentifiers.intersection(transactionSlicesIdentifiers).isEmpty
+                }
 
-            return MonthlyBudgetOverview(month: month, budget: budget, expenses: budgetExpenses)
-        }
-        .sorted(by: { $0.expensesInMonth.totalAmount > $1.expensesInMonth.totalAmount })
+                return MonthlyBudgetOverview(month: month, budget: budget, transactions: budgetTransactions)
+            }
+            .sorted {
+                $0.transactionsInMonth.totalAmount > $1.transactionsInMonth.totalAmount
+            }
     }
 
     func monthlyProspects() -> [MonthlyProspect] {
         return (1...12)
-            .compactMap { month -> MonthlyProspect in
-                return MonthlyProspect(month: month)
+            .compactMap { month -> MonthlyProspect? in
+                return MonthlyProspect(year: year, month: month, openingYearBalance: openingBalance, transactions: transactions, budgets: budgets)
             }
     }
 
@@ -92,16 +91,16 @@ struct YearlyBudgetOverview: Identifiable {
 
     // MARK: Mutating - Expenses
 
-    mutating func set(expenses: [Transaction]) {
-        self.expenses = expenses.filter { $0.year == year }
+    mutating func set(transactions: [Transaction]) {
+        self.transactions = transactions.filter { $0.date.year == year }
     }
 
-    mutating func append(expenses: [Transaction]) throws {
-        try YearlyBudgetOverviewValidator.willAdd(expenses: expenses, for: year)
-        self.expenses.append(contentsOf: expenses)
+    mutating func append(transactions: [Transaction]) throws {
+        try YearlyBudgetOverviewValidator.willAdd(transactions: transactions, for: year)
+        self.transactions.append(contentsOf: transactions)
     }
 
-    mutating func delete(expensesWith identifiers: Set<Budget.ID>) {
-        expenses.removeAll(where: { identifiers.contains($0.id) })
+    mutating func delete(transactionsWith identifiers: Set<Budget.ID>) {
+        transactions.removeAll(where: { identifiers.contains($0.id) })
     }
 }

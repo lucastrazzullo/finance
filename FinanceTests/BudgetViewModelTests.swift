@@ -27,7 +27,7 @@ import XCTest
     // MARK: - Slices
 
     func testAddSlice() async throws {
-        let budget = Mocks.budgets[0]
+        let budget = Mocks.expenseBudgets[0]
         let slice = try BudgetSlice(id: .init(), name: "Adding slice", configuration: .monthly(amount: .value(100)))
 
         storageHandler = MockBudgetStorageHandler(budgets: [budget])

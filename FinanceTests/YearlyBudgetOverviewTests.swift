@@ -26,10 +26,7 @@ final class YearlyBudgetOverviewTests: XCTestCase {
     }
 
     private func makeTransaction(year: Int, month: Int = 1, budgetId: Budget.ID = .init(), budgetSliceId: BudgetSlice.ID = .init(), amount: MoneyValue = .value(100)) -> Transaction {
-        var components = DateComponents()
-        components.year = year
-        components.month = month
-        let date = Calendar.current.date(from: components)!
+        let date = Date.with(year: year, month: month, day: 1)!
         return Transaction(id: .init(), description: nil, date: date, amounts: [.init(amount: amount, budgetIdentifier: budgetId, sliceIdentifier: budgetSliceId)])
     }
 
@@ -162,10 +159,7 @@ final class YearlyBudgetOverviewTests: XCTestCase {
         let expenses = [transaction1, transaction2]
         let yearlyOverview = YearlyBudgetOverview(name: "Name", year: 2000, budgets: [], expenses: expenses)
 
-        let overview = try XCTUnwrap(yearlyOverview.monthlyOverviews(month: 1).first)
-
-        XCTAssertEqual(overview.startingAmount, .zero)
-        XCTAssertEqual(overview.totalExpenses.totalAmount, expenses.totalAmount)
+        XCTAssertTrue(yearlyOverview.monthlyOverviews(month: 1).isEmpty)
     }
 
 }

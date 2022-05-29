@@ -246,7 +246,7 @@
 				81681CE3282675220070138D /* Transaction */,
 				81A6FB702800538D00D71BE6 /* Budget */,
 				81A6FB712800539400D71BE6 /* Overview */,
-				81DA2FDF282C2D6900BE00E8 /* Prospect */,
+				81341EA5283BD91600EAC8E8 /* Prospect */,
 			);
 			path = Domain;
 			sourceTree = "<group>";
@@ -282,6 +282,14 @@
 				81FC8751279B77240031D3AC /* CoreDataStorageProvider.swift */,
 			);
 			path = Storage;
+			sourceTree = "<group>";
+		};
+		81341EA5283BD91600EAC8E8 /* Prospect */ = {
+			isa = PBXGroup;
+			children = (
+				81DA2FE0282C2D7800BE00E8 /* MonthlyProspect.swift */,
+			);
+			path = Prospect;
 			sourceTree = "<group>";
 		};
 		81542BD6279580F300A05B77 /* Amount */ = {
@@ -472,14 +480,6 @@
 				8122A3442819B497002912D3 /* Mocks */,
 			);
 			path = Model;
-			sourceTree = "<group>";
-		};
-		81DA2FDF282C2D6900BE00E8 /* Prospect */ = {
-			isa = PBXGroup;
-			children = (
-				81DA2FE0282C2D7800BE00E8 /* MonthlyProspect.swift */,
-			);
-			path = Prospect;
 			sourceTree = "<group>";
 		};
 		81DF5578280E3437004BB2C8 /* ViewModel */ = {

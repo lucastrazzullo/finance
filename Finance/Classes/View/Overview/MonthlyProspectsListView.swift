@@ -32,25 +32,22 @@ struct MonthlyProspectsListView: View {
     var body: some View {
         ZStack {
             HStack(alignment: .bottom) {
-                let highestForecastedAvailability: MoneyValue = prospects.reduce(.zero) {
-                    max($0, $1.forecastedEndOfTheMonthAvailability)
+                let highestValue: MoneyValue = prospects.reduce(.zero) { highestAmount, prospect in
+                    switch prospect.state {
+                    case .closed(let forecastedAmount, let closingAmount):
+                        return max(highestAmount, max(forecastedAmount, closingAmount))
+                    case .current(let forecastedAmount, let actualAmount):
+                        return max(highestAmount, max(forecastedAmount, actualAmount))
+                    case .future(let forecastedAmount, let trendingAmount):
+                        return max(highestAmount, max(forecastedAmount, trendingAmount))
+                    }
                 }
 
-                let highestTrendingAvailability: MoneyValue = prospects.reduce(.zero) {
-                    max($0, $1.trendingEndOfTheMonthAvailability)
-                }
-
-                let highestCurrentAvailability: MoneyValue = prospects.reduce(.zero) {
-                    max($0, $1.currentAvailability)
-                }
-
-                ForEach(prospects, id: \.self) { prospect in
+                ForEach(prospects) { prospect in
                     MonthlyProspectItem(viewModel: .init(
                         prospect: prospect,
                         isHighlighted: prospect.month == (draggingHighlightedMonth ?? selectedMonth),
-                        highestForecastedAvailability: highestForecastedAvailability,
-                        highestTrendingAvailability: highestTrendingAvailability,
-                        highestCurrentAvailability: highestCurrentAvailability)
+                        highestValue: highestValue)
                     )
                     .frame(width: itemWidth)
                     .alignmentGuide(prospect.month == selectedMonth ? .selectedItem : .center) {
@@ -104,24 +101,7 @@ struct MonthlyProspectsListView: View {
 
 private struct MonthlyProspectItem: View {
 
-    enum State {
-        case current
-        case completed
-        case prediction
-
-        init(prospect: MonthlyProspect) {
-            let currentMonth = Calendar.current.component(.month, from: .now)
-            if prospect.month < currentMonth {
-                self = .completed
-            } else if prospect.month > currentMonth {
-                self = .prediction
-            } else {
-                self = .current
-            }
-        }
-    }
-
-    struct ViewModel: Hashable {
+    struct ViewModel {
 
         var month: String {
             return Calendar.current.shortMonthSymbols[prospect.month - 1]
@@ -136,46 +116,60 @@ private struct MonthlyProspectItem: View {
         }
 
         var monthColor: Color {
-            switch State(prospect: prospect) {
+            switch prospect.state {
             case .current:
                 return .secondary
-            case .prediction, .completed:
+            default:
                 return .primary
             }
         }
 
         var barColor: Color {
-            switch State(prospect: prospect) {
+            switch prospect.state {
             case .current:
                 return .orange
-            case .completed:
+            case .closed:
                 return .orange.opacity(0.3)
-            case .prediction:
+            case .future:
                 return .gray.opacity(0.3)
             }
         }
 
         var barHeight: CGFloat {
-            let percentage = prospect.forecastedEndOfTheMonthAvailability.value / highestValue.value
-            return CGFloat(truncating: NSDecimalNumber(decimal: percentage)) * containerHeight
+            switch prospect.state {
+            case .current(let forecastedAmount, _):
+                let percentage = forecastedAmount.value / highestValue.value
+                return CGFloat(truncating: NSDecimalNumber(decimal: percentage)) * containerHeight
+            case .closed(let forecastedAmount, _):
+                let percentage = forecastedAmount.value / highestValue.value
+                return CGFloat(truncating: NSDecimalNumber(decimal: percentage)) * containerHeight
+            case .future(let forecastedAmount, _):
+                let percentage = forecastedAmount.value / highestValue.value
+                return CGFloat(truncating: NSDecimalNumber(decimal: percentage)) * containerHeight
+            }
         }
 
         var indicatorValue: MoneyValue {
-            switch State(prospect: prospect) {
-            case .current, .completed:
-                return prospect.currentAvailability - prospect.forecastedEndOfTheMonthAvailability
-            case .prediction:
-                return prospect.forecastedEndOfTheMonthAvailability
+            switch prospect.state {
+            case .current(let forecastedAmount, let actualAmount):
+                return actualAmount - forecastedAmount
+            case .closed(let forecastedAmount, let closingAmount):
+                return closingAmount - forecastedAmount
+            case .future(_, let trendingAmount):
+                return trendingAmount
             }
         }
 
         var indicatorHeight: CGFloat {
-            switch State(prospect: prospect) {
-            case .current, .completed:
-                let percentage = prospect.currentAvailability.value / highestValue.value
+            switch prospect.state {
+            case .current(_, let actualAmount):
+                let percentage = actualAmount.value / highestValue.value
                 return CGFloat(truncating: NSDecimalNumber(decimal: percentage)) * containerHeight
-            case .prediction:
-                let percentage = prospect.trendingEndOfTheMonthAvailability.value / highestValue.value
+            case .closed(_, let closingAmount):
+                let percentage = closingAmount.value / highestValue.value
+                return CGFloat(truncating: NSDecimalNumber(decimal: percentage)) * containerHeight
+            case .future(_, let trendingAmount):
+                let percentage = trendingAmount.value / highestValue.value
                 return CGFloat(truncating: NSDecimalNumber(decimal: percentage)) * containerHeight
             }
         }
@@ -197,14 +191,10 @@ private struct MonthlyProspectItem: View {
         private let isHighlighted: Bool
         private let highestValue: MoneyValue
 
-        init(prospect: MonthlyProspect,
-             isHighlighted: Bool,
-             highestForecastedAvailability: MoneyValue,
-             highestTrendingAvailability: MoneyValue,
-             highestCurrentAvailability: MoneyValue) {
+        init(prospect: MonthlyProspect, isHighlighted: Bool, highestValue: MoneyValue) {
             self.prospect = prospect
             self.isHighlighted = isHighlighted
-            self.highestValue = max(highestForecastedAvailability, highestTrendingAvailability, highestCurrentAvailability)
+            self.highestValue = highestValue
         }
     }
 
@@ -253,9 +243,10 @@ struct MonthlyProspectsListView_Previews: PreviewProvider {
         MonthlyProspectsListView(
             selectedMonth: .constant(5),
             prospects: [
-            .init(month: 4),
-            .init(month: 5),
-            .init(month: 6)
-        ])
+                .init(year: Mocks.year, month: 4, openingYearBalance: Mocks.openingYearBalance, transactions: Mocks.allTransactions, budgets: Mocks.allBudtets),
+                .init(year: Mocks.year, month: 5, openingYearBalance: Mocks.openingYearBalance, transactions: Mocks.allTransactions, budgets: Mocks.allBudtets),
+                .init(year: Mocks.year, month: 6, openingYearBalance: Mocks.openingYearBalance, transactions: Mocks.allTransactions, budgets: Mocks.allBudtets)
+            ]
+        )
     }
 }

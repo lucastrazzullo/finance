@@ -13,10 +13,7 @@ final class MonthlyBudgetOverviewTests: XCTestCase {
     // MARK: Factories
 
     private func makeOverview(budgetAmount: Decimal, expensesAmount: Decimal) throws -> MonthlyBudgetOverview {
-        var components = DateComponents()
-        components.year = 2000
-        components.month = 1
-        let date = Calendar.current.date(from: components)!
+        let date = Date.with(year: 2000, month: 1, day: 1)!
 
         let budget = try Budget(
             id: .init(),
@@ -41,8 +38,8 @@ final class MonthlyBudgetOverviewTests: XCTestCase {
 
         return MonthlyBudgetOverview(
             month: 1,
-            expenses: [expense],
-            budget: budget
+            budget: budget,
+            expenses: [expense]
         )
     }
 

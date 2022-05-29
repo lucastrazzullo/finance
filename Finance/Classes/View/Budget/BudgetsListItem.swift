@@ -26,6 +26,6 @@ struct BudgetsListItem: View {
 
 struct BudgetsListItem_Previews: PreviewProvider {
     static var previews: some View {
-        BudgetsListItem(budget: Mocks.budgets[0])
+        BudgetsListItem(budget: Mocks.expenseBudgets[0])
     }
 }

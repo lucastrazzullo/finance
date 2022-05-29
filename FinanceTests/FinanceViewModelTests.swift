@@ -27,7 +27,7 @@ import XCTest
     // MARK: - Load
 
     func testLoad() async throws {
-        let budgets = Mocks.budgets
+        let budgets = Mocks.expenseBudgets
         let transactions = Mocks.transactions
         storageProvider = MockStorageProvider(budgets: budgets, transactions: transactions)
         viewModel = FinanceViewModel(year: Mocks.year, storageProvider: storageProvider)
@@ -38,7 +38,7 @@ import XCTest
     }
 
     func testNoLoad() throws {
-        let budgets = Mocks.budgets
+        let budgets = Mocks.expenseBudgets
         let transactions = Mocks.transactions
         storageProvider = MockStorageProvider(budgets: budgets, transactions: transactions)
         viewModel = FinanceViewModel(year: Mocks.year, storageProvider: storageProvider)
@@ -119,7 +119,7 @@ import XCTest
     // MARK: - Budgets List Data Provider
 
     func testAddBudget_valid() async throws {
-        let budget = Mocks.budgets[0]
+        let budget = Mocks.expenseBudgets[0]
         storageProvider = MockStorageProvider()
         viewModel = FinanceViewModel(year: Mocks.year, storageProvider: storageProvider)
         try await viewModel.load()
@@ -189,8 +189,8 @@ import XCTest
     }
 
     func testDeleteBudgets_valid() async throws {
-        let budgetToDelete = Mocks.budgets[0]
-        storageProvider = MockStorageProvider(budgets: Mocks.budgets, transactions: [])
+        let budgetToDelete = Mocks.expenseBudgets[0]
+        storageProvider = MockStorageProvider(budgets: Mocks.expenseBudgets, transactions: [])
         viewModel = FinanceViewModel(year: Mocks.year, storageProvider: storageProvider)
 
         try await viewModel.load()
@@ -201,8 +201,8 @@ import XCTest
     }
 
     func testDeleteBudgets_invalid() async throws {
-        let budgetToDelete = Mocks.budgets[0]
-        let otherBudget = Mocks.budgets[1]
+        let budgetToDelete = Mocks.expenseBudgets[0]
+        let otherBudget = Mocks.expenseBudgets[1]
         storageProvider = MockStorageProvider(budgets: [otherBudget], transactions: [])
         viewModel = FinanceViewModel(year: Mocks.year, storageProvider: storageProvider)
 
@@ -216,9 +216,7 @@ import XCTest
     // MARK: - Overview List Data Provider
 
     func testAddExpenses_valid() async throws {
-        var components = DateComponents()
-        components.year = Mocks.year
-        let date = Calendar.current.date(from: components)!
+        let date = Date.with(year: Mocks.year, month: 1, day: 1)!
 
         let expense1 = Transaction(id: .init(), description: nil, date: date, amounts: [.init(amount: .value(100), budgetIdentifier: .init(), sliceIdentifier: .init())])
         let expense2 = Transaction(id: .init(), description: nil, date: date, amounts: [.init(amount: .value(100), budgetIdentifier: .init(), sliceIdentifier: .init())])
@@ -232,9 +230,7 @@ import XCTest
     }
 
     func testAddExpenses_invalid() async throws {
-        var components = DateComponents()
-        components.year = Mocks.year - 1
-        let date = Calendar.current.date(from: components)!
+        let date = Date.with(year: Mocks.year - 1, month: 1, day: 1)!
         let expense = Transaction(id: .init(), description: nil, date: date, amounts: [.init(amount: .value(100), budgetIdentifier: .init(), sliceIdentifier: .init())])
         storageProvider = MockStorageProvider(budgets: [], transactions: [])
         viewModel = FinanceViewModel(year: Mocks.year, storageProvider: storageProvider)

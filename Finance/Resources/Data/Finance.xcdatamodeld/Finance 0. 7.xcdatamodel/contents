@@ -2,6 +2,7 @@
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="20086" systemVersion="21E258" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="BudgetEntity" representedClassName="BudgetEntity" syncable="YES" codeGenerationType="class">
         <attribute name="identifier" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="kind" attributeType="String"/>
         <attribute name="name" attributeType="String"/>
         <attribute name="systemIconName" optional="YES" attributeType="String"/>
         <attribute name="year" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
@@ -23,6 +24,7 @@
     <entity name="TransactionAmountEntity" representedClassName="TransactionAmountEntity" syncable="YES" codeGenerationType="class">
         <attribute name="amount" optional="YES" attributeType="Decimal" defaultValueString="0.0"/>
         <attribute name="budgetIdentifier" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="budgetKind" attributeType="String"/>
         <attribute name="sliceIdentifier" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <relationship name="transaction" maxCount="1" deletionRule="Nullify" destinationEntity="TransactionEntity" inverseName="amounts" inverseEntity="TransactionEntity"/>
     </entity>
@@ -33,10 +35,10 @@
         <relationship name="amounts" toMany="YES" deletionRule="Cascade" destinationEntity="TransactionAmountEntity" inverseName="transaction" inverseEntity="TransactionAmountEntity"/>
     </entity>
     <elements>
-        <element name="BudgetEntity" positionX="-209.69921875" positionY="-150.32421875" width="128" height="104"/>
+        <element name="BudgetEntity" positionX="-209.69921875" positionY="-150.32421875" width="128" height="119"/>
         <element name="BudgetSliceEntity" positionX="-63" positionY="-18" width="128" height="119"/>
         <element name="BudgetSliceScheduledAmountEntity" positionX="-135" positionY="-45" width="128" height="74"/>
+        <element name="TransactionAmountEntity" positionX="-135" positionY="-27" width="128" height="104"/>
         <element name="TransactionEntity" positionX="-135" positionY="-27" width="128" height="89"/>
-        <element name="TransactionAmountEntity" positionX="-135" positionY="-27" width="128" height="89"/>
     </elements>
 </model>

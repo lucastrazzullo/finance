@@ -30,8 +30,8 @@ enum YearlyBudgetOverviewValidator {
         }
     }
 
-    static func willAdd(expenses: [Transaction], for year: Int) throws {
-        guard !expenses.contains(where: { $0.date.year != year }) else {
+    static func willAdd(transactions: [Transaction], for year: Int) throws {
+        guard !transactions.contains(where: { $0.date.year != year }) else {
             throw DomainError.budgetOverview(error: .transactionsListNotValid)
         }
     }

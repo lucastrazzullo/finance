@@ -26,27 +26,26 @@ struct MonthlyBudgetOverview: Identifiable {
     let remainingAmount: MoneyValue
     let remainingAmountPercentage: Float
 
-    let expensesUntilMonth: [Transaction]
-    let expensesInMonth: [Transaction]
-
-    var totalExpenses: [Transaction] {
-        return expensesUntilMonth + expensesInMonth
+    let transactionsUntilMonth: [Transaction]
+    let transactionsInMonth: [Transaction]
+    var transactions: [Transaction] {
+        return transactionsUntilMonth + transactionsInMonth
     }
 
-    init(month: Int, budget: Budget, expenses: [Transaction]) {
-        let expensesUntilMonth = expenses
-            .filter { transaction in transaction.month < month }
+    init(month: Int, budget: Budget, transactions: [Transaction]) {
+        let transactionsUntilMonth = transactions
+            .filter { transaction in transaction.date.month < month }
 
-        let expensesInMonth = expenses
-            .filter { transaction in transaction.month == month }
+        let transactionsInMonth = transactions
+            .filter { transaction in transaction.date.month == month }
 
         let budgetAvailabilityUpToMonth = budget.availability(upTo: month)
         let budgetAvailabilityInMonth = budget.availability(for: month)
 
-        let startingAmount = budgetAvailabilityUpToMonth + budgetAvailabilityInMonth - expensesUntilMonth.totalAmount
-        let remainingAmount = startingAmount - expensesInMonth.totalAmount
+        let startingAmount = budgetAvailabilityUpToMonth + budgetAvailabilityInMonth - transactionsUntilMonth.totalAmount
+        let remainingAmount = startingAmount - transactionsInMonth.totalAmount
         let remainingAmountPercentage = remainingAmount.value > 0
-            ? Float(truncating: NSDecimalNumber(decimal: 1 - expensesInMonth.totalAmount.value / startingAmount.value))
+            ? Float(truncating: NSDecimalNumber(decimal: 1 - transactionsInMonth.totalAmount.value / startingAmount.value))
             : 0
 
         self.month = month
@@ -54,7 +53,7 @@ struct MonthlyBudgetOverview: Identifiable {
         self.startingAmount = startingAmount
         self.remainingAmount = remainingAmount
         self.remainingAmountPercentage = remainingAmountPercentage
-        self.expensesUntilMonth = expensesUntilMonth
-        self.expensesInMonth = expensesInMonth
+        self.transactionsUntilMonth = transactionsUntilMonth
+        self.transactionsInMonth = transactionsInMonth
     }
 }

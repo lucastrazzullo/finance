@@ -150,6 +150,6 @@ private struct TransactionItem: View {
 
 struct AddTransactionsView_Previews: PreviewProvider {
     static var previews: some View {
-        AddTransactionsView(budgets: Mocks.budgets) { _ in }
+        AddTransactionsView(budgets: Mocks.expenseBudgets) { _ in }
     }
 }

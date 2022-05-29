@@ -26,8 +26,13 @@ struct MonthlyOverviewItem: View {
                     }
 
                     HStack(spacing: 2) {
-                        Text("Expenses").font(.caption2)
-                        AmountView(amount: overview.expensesInMonth.totalAmount).font(.caption2.bold())
+                        switch overview.budget.kind {
+                        case .income:
+                            Text( "Incomes").font(.caption2)
+                        case .expense:
+                            Text( "Expenses").font(.caption2)
+                        }
+                        AmountView(amount: overview.transactionsInMonth.totalAmount).font(.caption2.bold())
                     }
                 }
             }
@@ -102,12 +107,12 @@ struct MonthlyOverviewItem: View {
 struct MonthlyBudgetOverviewItem_Previews: PreviewProvider {
     static var previews: some View {
         List {
-            ForEach(Mocks.budgets) { budget in
+            ForEach(Mocks.expenseBudgets) { budget in
                 MonthlyOverviewItem(
                     overview: MonthlyBudgetOverview(
                         month: 1,
                         budget: budget,
-                        expenses: Mocks.transactions
+                        transactions: Mocks.allTransactions
                     )
                 )
                 .listRowSeparator(.hidden)

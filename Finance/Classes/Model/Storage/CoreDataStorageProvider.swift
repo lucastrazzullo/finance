@@ -175,18 +175,8 @@ final class CoreDataStorageProvider: StorageProvider {
         let request: NSFetchRequest<TransactionEntity> = TransactionEntity.fetchRequest()
 
         if let year = year {
-            var startDateComponents = DateComponents()
-            startDateComponents.year = Int(year)
-            startDateComponents.month = Int(1)
-            startDateComponents.day = Int(1)
-
-            var endDateComponents = DateComponents()
-            endDateComponents.year = Int(year)
-            endDateComponents.month = Int(12)
-            endDateComponents.day = Int(31)
-
-            if let startDate = Calendar.current.date(from: startDateComponents),
-               let endDate = Calendar.current.date(from: endDateComponents) {
+            if let startDate = Date.with(year: year, month: 1, day: 1),
+               let endDate = Date.with(year: year, month: 12, day: 31) {
                 let predicate = NSPredicate(format: "date >= %@ && date <= %@", startDate as NSDate, endDate as NSDate)
                 request.predicate = predicate
             }
@@ -220,6 +210,13 @@ final class CoreDataStorageProvider: StorageProvider {
         transactionAmountEntity.amount = NSDecimalNumber(decimal: amount.amount.value)
         transactionAmountEntity.budgetIdentifier = amount.budgetIdentifier
         transactionAmountEntity.sliceIdentifier = amount.sliceIdentifier
+
+        switch amount.budgetKind {
+        case .expense:
+            transactionAmountEntity.budgetKind = "expense"
+        case .income:
+            transactionAmountEntity.budgetKind = "income"
+        }
     }
 
     private func setupBudgetEntity(_ budgetEntity: BudgetEntity, with budget: Budget) {
@@ -227,6 +224,13 @@ final class CoreDataStorageProvider: StorageProvider {
         budgetEntity.year = Int64(budget.year)
         budgetEntity.name = budget.name
         budgetEntity.systemIconName = budget.icon.rawValue
+
+        switch budget.kind {
+        case .expense:
+            budgetEntity.kind = "expense"
+        case .income:
+            budgetEntity.kind = "income"
+        }
 
         budgetEntity.slices = NSSet(array: budget.slices.map { slice in
             let sliceEntity = BudgetSliceEntity(context: persistentContainer.viewContext)
@@ -280,6 +284,7 @@ private extension Budget {
 
     static func with(budgetEntity: BudgetEntity) throws -> Budget {
         guard let identifier = budgetEntity.identifier,
+              let kind = budgetEntity.kind,
               let name = budgetEntity.name,
               let systemIconName = budgetEntity.systemIconName,
               let icon = SystemIcon(rawValue: systemIconName),
@@ -289,11 +294,22 @@ private extension Budget {
 
         let year = Int(budgetEntity.year)
 
+        let budgetKind: Budget.Kind = {
+            switch kind {
+            case "income":
+                return .income
+            case "epxense":
+                return .expense
+            default:
+                return .expense
+            }
+        }()
+
         let budgetSlices = try slices
             .compactMap { $0 as? BudgetSliceEntity }
             .compactMap { try BudgetSlice.with(budgetSliceEntity: $0) }
 
-        return try Budget(id: identifier, year: year, name: name, icon: icon, slices: budgetSlices)
+        return try Budget(id: identifier, year: year, kind: budgetKind, name: name, icon: icon, slices: budgetSlices)
     }
 }
 
@@ -367,7 +383,7 @@ private extension Transaction {
 
         let description = transactionEntity.contentDescription
 
-        return .init(
+        return try .init(
             id: identifier,
             description: description,
             date: date,
@@ -380,13 +396,26 @@ private extension Transaction.Amount {
 
     static func with(transactionAmountEntity: TransactionAmountEntity) throws -> Self? {
         guard let amount = transactionAmountEntity.amount,
+              let budgetKind = transactionAmountEntity.budgetKind,
               let budgetIdentifier = transactionAmountEntity.budgetIdentifier,
               let sliceIdentifier = transactionAmountEntity.sliceIdentifier else {
             return nil
         }
 
+        let kind: Budget.Kind = {
+            switch budgetKind {
+            case "income":
+                return .income
+            case "epxense":
+                return .expense
+            default:
+                return .expense
+            }
+        }()
+
         return Transaction.Amount(
             amount: .value(amount.decimalValue),
+            budgetKind: kind,
             budgetIdentifier: budgetIdentifier,
             sliceIdentifier: sliceIdentifier
         )

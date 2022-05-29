@@ -9,6 +9,7 @@ import SwiftUI
 
 struct NewBudgetView: View {
 
+    @State private var budgetKind: Budget.Kind = .expense
     @State private var budgetName: String = ""
     @State private var budgetSystemIcon: SystemIcon = .default
     @State private var budgetSlices: [BudgetSlice] = []
@@ -23,6 +24,17 @@ struct NewBudgetView: View {
         NavigationView {
             Form {
                 Section {
+                    Picker("Kind", selection: $budgetKind) {
+                        ForEach(Budget.Kind.allCases, id: \.self) { kind in
+                            switch kind {
+                            case .expense:
+                                Text("Expense")
+                            case .income:
+                                Text("Income")
+                            }
+                        }
+                    }
+
                     HStack {
                         TextField("Name", text: $budgetName)
                             .accessibilityIdentifier(AccessibilityIdentifier.NewBudgetView.nameInputField)
@@ -75,6 +87,7 @@ struct NewBudgetView: View {
                 let budget = try Budget(
                     id: .init(),
                     year: year,
+                    kind: budgetKind,
                     name: budgetName,
                     icon: budgetSystemIcon,
                     slices: budgetSlices

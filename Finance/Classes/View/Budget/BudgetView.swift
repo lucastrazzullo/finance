@@ -132,8 +132,8 @@ struct BudgetView_Previews: PreviewProvider {
         NavigationView {
             BudgetView(
                 viewModel: BudgetViewModel(
-                    budget: Mocks.budgets[0],
-                    storageHandler: MockBudgetStorageHandler(budgets: Mocks.budgets)
+                    budget: Mocks.expenseBudgets[0],
+                    storageHandler: MockBudgetStorageHandler(budgets: Mocks.expenseBudgets)
                 )
             )
         }

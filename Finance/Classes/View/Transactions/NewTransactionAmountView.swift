@@ -65,6 +65,7 @@ struct NewTransactionAmountView: View {
 
             let amount = Transaction.Amount(
                 amount: .value(transactionAmount),
+                budgetKind: transactionBudget.kind,
                 budgetIdentifier: transactionBudget.id,
                 sliceIdentifier: transactionSlice.id
             )
@@ -80,6 +81,6 @@ struct NewTransactionAmountView: View {
 
 struct NewTransactionAmountView_Previews: PreviewProvider {
     static var previews: some View {
-        NewTransactionAmountView(budgets: Mocks.budgets) { _ in }
+        NewTransactionAmountView(budgets: Mocks.expenseBudgets) { _ in }
     }
 }

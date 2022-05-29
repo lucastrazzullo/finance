@@ -11,10 +11,16 @@ struct Budget: Identifiable, Hashable, AmountHolder {
 
     typealias ID = UUID
 
+    enum Kind: CaseIterable {
+        case expense
+        case income
+    }
+
     private static let defaultSliceName: String = "Default"
 
     let id: ID
     let year: Int
+    let kind: Kind
 
     private(set) var icon: SystemIcon
     private(set) var name: String
@@ -26,19 +32,20 @@ struct Budget: Identifiable, Hashable, AmountHolder {
 
     // MARK: Object life cycle
 
-    init(id: ID, year: Int, name: String, icon: SystemIcon, monthlyAmount: MoneyValue) throws {
+    init(id: ID, year: Int, kind: Kind, name: String, icon: SystemIcon, monthlyAmount: MoneyValue) throws {
         let slices = [
             try BudgetSlice(id: .init(), name: Self.defaultSliceName, configuration: .monthly(amount: monthlyAmount))
         ]
-        try self.init(id: id, year: year, name: name, icon: icon, slices: slices)
+        try self.init(id: id, year: year, kind: kind, name: name, icon: icon, slices: slices)
     }
 
-    init(id: ID, year: Int, name: String, icon: SystemIcon, slices: [BudgetSlice]) throws {
+    init(id: ID, year: Int, kind: Kind, name: String, icon: SystemIcon, slices: [BudgetSlice]) throws {
         try BudgetValidator.canUse(name: name)
         try BudgetValidator.canUse(slices: slices)
 
         self.id = id
         self.year = year
+        self.kind = kind
         self.icon = icon
         self.name = name
         self.slices = slices
@@ -99,6 +106,23 @@ struct Budget: Identifiable, Hashable, AmountHolder {
 
 extension Array where Element == Budget {
 
+    func availability(for month: Int) -> MoneyValue {
+        return self.reduce(.zero) { sum, budget in
+            return sum + budget.availability(for: month)
+        }
+    }
+
+    func availability(upTo month: Int) -> MoneyValue {
+        return self.reduce(.zero) { sum, budget in
+            return sum + budget.availability(upTo: month)
+        }
+    }
+}
+
+extension Array where Element == Budget {
+
+    // MARK: Look Up
+
     func with(identifiers: Set<Budget.ID>) -> [Budget] {
         return self.filter({ identifiers.contains($0.id) })
     }
@@ -118,11 +142,20 @@ extension Array where Element == Budget {
         return self[index]
     }
 
+    // MARK: Delete
+
     mutating func delete(withIdentifier identifier: Budget.ID) {
         self.removeAll(where: { $0.id == identifier })
     }
 
     mutating func delete(withIdentifiers identifiers: Set<Budget.ID>) {
         self.removeAll(where: { identifiers.contains($0.id) })
+    }
+}
+
+extension Array where Element == Budget.Kind {
+
+    func containsMultipleKinds() -> Bool {
+        return Set(self).count > 1
     }
 }

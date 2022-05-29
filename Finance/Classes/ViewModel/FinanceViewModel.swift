@@ -25,7 +25,9 @@ import Foundation
     }
 
     var monthlyOverviewsWithLowestAvailability: [MonthlyBudgetOverview] {
-        return yearlyOverview.monthlyOverviewsWithLowestAvailability(month: selectedMonth)
+        return yearlyOverview.monthlyOverviews(month: selectedMonth)
+            .filter({ $0.remainingAmount <= .value(100) })
+            .sorted(by: { $0.remainingAmount < $1.remainingAmount })
     }
 
     var monthlyProspects: [MonthlyProspect] {
@@ -41,8 +43,9 @@ import Foundation
         self.yearlyOverview = YearlyBudgetOverview(
             name: "Amsterdam",
             year: year,
+            openingBalance: .zero,
             budgets: [],
-            expenses: []
+            transactions: []
         )
     }
 
@@ -50,26 +53,26 @@ import Foundation
 
     func load() async throws {
         let budgets = try await storageProvider.fetchBudgets(year: yearlyOverview.year)
-        let expenses = try await storageProvider.fetchTransactions(year: yearlyOverview.year)
+        let transactions = try await storageProvider.fetchTransactions(year: yearlyOverview.year)
 
         yearlyOverview.set(budgets: budgets)
-        yearlyOverview.set(expenses: expenses)
+        yearlyOverview.set(transactions: transactions)
     }
 
     // MARK: Transactions
 
     func add(transactions: [Transaction]) async throws {
-        try YearlyBudgetOverviewValidator.willAdd(expenses: transactions, for: yearlyOverview.year)
+        try YearlyBudgetOverviewValidator.willAdd(transactions: transactions, for: yearlyOverview.year)
         for transaction in transactions {
             try await storageProvider.add(transaction: transaction)
         }
-        try yearlyOverview.append(expenses: transactions)
+        try yearlyOverview.append(transactions: transactions)
         isAddNewTransactionPresented = false
     }
 
     func delete(transactionsWith identifiers: Set<Transaction.ID>) async throws {
         try await storageProvider.delete(transactionsWith: identifiers)
-        yearlyOverview.delete(expensesWith: identifiers)
+        yearlyOverview.delete(transactionsWith: identifiers)
     }
 
     // MARK: Budgets

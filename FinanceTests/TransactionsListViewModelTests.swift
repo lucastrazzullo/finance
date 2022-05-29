@@ -25,7 +25,7 @@ import XCTest
     // MARK: - Transactions
 
     func testDeleteTransactions() async throws {
-        let transactions = Mocks.transactions.filter({ $0.month == 1 })
+        let transactions = Mocks.transactions.filter({ $0.date.month == 1 })
 
         viewModel = TransactionsListViewModel(transactions: transactions, addTransactions: {}, deleteTransactions: { _ in })
 

@@ -29,11 +29,11 @@ import Foundation
     // MARK: Internal methods
 
     func months() -> [Int] {
-        return transactions.map(\.month).removeDuplicates()
+        return transactions.map(\.date.month).removeDuplicates()
     }
 
     func transactions(month: Int) -> [Transaction] {
-        return transactions.filter({ $0.month == month })
+        return transactions.filter({ $0.date.month == month })
     }
 
     func delete(transactionsAt offsets: IndexSet) async {

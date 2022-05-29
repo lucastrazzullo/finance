@@ -25,7 +25,7 @@ import XCTest
     // MARK: - Budgets
 
     func testDeleteBudgets() async throws {
-        let budgets = Mocks.budgets
+        let budgets = Mocks.expenseBudgets
 
         viewModel = BudgetsListViewModel(budgets: budgets, addBudgets: {}, deleteBudgets: { _ in })
 

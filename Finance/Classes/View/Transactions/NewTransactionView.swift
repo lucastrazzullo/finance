@@ -28,7 +28,7 @@ struct NewTransactionView: View {
                         .datePickerStyle(.compact)
                 }
 
-                Section(header: SectionHeader(title: "Amount", amount: transactionAmounts.totalAmount)) {
+                Section(header: SectionHeader(title: "Amount", amount: transactionAmounts.balance)) {
                     ForEach(transactionAmounts, id: \.self) { amount in
                         AmountItem(amount: amount, budgets: budgets)
                     }
@@ -71,7 +71,7 @@ struct NewTransactionView: View {
 
                 let transactionDescription = transactionDescription.isEmpty ? nil : transactionDescription
 
-                let transaction = Transaction(
+                let transaction = try Transaction(
                     id: .init(),
                     description: transactionDescription,
                     date: transactionDate,
@@ -142,6 +142,6 @@ private struct SectionHeader: View {
 
 struct NewTransactionView_Previews: PreviewProvider {
     static var previews: some View {
-        NewTransactionView(budgets: Mocks.budgets) { _ in }
+        NewTransactionView(budgets: Mocks.expenseBudgets) { _ in }
     }
 }

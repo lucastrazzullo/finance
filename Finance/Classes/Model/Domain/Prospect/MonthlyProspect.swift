@@ -7,21 +7,43 @@
 
 import Foundation
 
-struct MonthlyProspect: Hashable, Identifiable {
+struct MonthlyProspect: Identifiable {
+
+    enum State {
+        case closed(forecastedAmount: MoneyValue, closingAmount: MoneyValue)
+        case current(forecastedAmount: MoneyValue, actualAmount: MoneyValue)
+        case future(forecastedAmount: MoneyValue, trendingAmount: MoneyValue)
+    }
 
     var id: Int {
         return month
     }
 
     let month: Int
-    let forecastedEndOfTheMonthAvailability: MoneyValue
-    let trendingEndOfTheMonthAvailability: MoneyValue
-    let currentAvailability: MoneyValue
+    let state: State
 
-    init(month: Int) {
+    // MARK: Object life cycle
+
+    init(year: Int, month: Int, openingYearBalance: MoneyValue, transactions: [Transaction], budgets: [Budget]) {
         self.month = month
-        self.forecastedEndOfTheMonthAvailability = .value(12000)
-        self.trendingEndOfTheMonthAvailability = forecastedEndOfTheMonthAvailability - .value(1000)
-        self.currentAvailability = .value(10000)
+
+//        let budgetAvailabilityUntilMonth = budgets.availability(upTo: month)
+//        let budgetAvailabilityInMonth = budgets.availability(for: month)
+
+//        let incomes = transactions.filter({ $0.budgetKind == .income })
+//        let expenses = transactions.filter({ $0.budgetKind == .expense })
+
+        let balanceToDate = MoneyValue.zero
+        let forecastedAmount = MoneyValue.zero
+        let trendingAmount = MoneyValue.zero
+
+        let currentMonth = Calendar.current.component(.month, from: .now)
+        if month < currentMonth {
+            self.state = .closed(forecastedAmount: forecastedAmount, closingAmount: balanceToDate)
+        } else if month > currentMonth {
+            self.state = .future(forecastedAmount: forecastedAmount, trendingAmount: trendingAmount)
+        } else {
+            self.state = .current(forecastedAmount: forecastedAmount, actualAmount: balanceToDate)
+        }
     }
 }

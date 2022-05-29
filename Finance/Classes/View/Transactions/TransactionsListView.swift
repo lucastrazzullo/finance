@@ -56,7 +56,7 @@ struct TransactionsListView_Previews: PreviewProvider {
         NavigationView {
             TransactionsListView(
                 viewModel: .init(
-                    transactions: Mocks.transactions,
+                    transactions: Mocks.allTransactions,
                     addTransactions: {},
                     deleteTransactions: { _ in }
                 )

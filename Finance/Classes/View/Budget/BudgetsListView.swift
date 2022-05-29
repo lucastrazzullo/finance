@@ -43,7 +43,7 @@ struct BudgetsListView<Item: View>: View {
 // MARK: - Previews
 
 struct BudgetsListView_Previews: PreviewProvider {
-    static let budgets = Mocks.budgets
+    static let budgets = Mocks.expenseBudgets
     static var previews: some View {
         BudgetsListView(
             viewModel: .init(
