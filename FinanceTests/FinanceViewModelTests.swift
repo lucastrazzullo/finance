@@ -27,24 +27,24 @@ import XCTest
     // MARK: - Load
 
     func testLoad() async throws {
-        let budgets = Mocks.expenseBudgets
-        let transactions = Mocks.transactions
+        let budgets = Mocks.allBudgets
+        let transactions = Mocks.allTransactions
         storageProvider = MockStorageProvider(budgets: budgets, transactions: transactions)
         viewModel = FinanceViewModel(year: Mocks.year, storageProvider: storageProvider)
 
         try await viewModel.load()
         XCTAssertEqual(viewModel.yearlyOverview.budgets, budgets)
-        XCTAssertEqual(viewModel.yearlyOverview.expenses, transactions)
+        XCTAssertEqual(viewModel.yearlyOverview.transactions, transactions)
     }
 
     func testNoLoad() throws {
-        let budgets = Mocks.expenseBudgets
-        let transactions = Mocks.transactions
+        let budgets = Mocks.allBudgets
+        let transactions = Mocks.allTransactions
         storageProvider = MockStorageProvider(budgets: budgets, transactions: transactions)
         viewModel = FinanceViewModel(year: Mocks.year, storageProvider: storageProvider)
 
         XCTAssertNotEqual(viewModel.yearlyOverview.budgets, budgets)
-        XCTAssertNotEqual(viewModel.yearlyOverview.expenses, transactions)
+        XCTAssertNotEqual(viewModel.yearlyOverview.transactions, transactions)
     }
 
     // MARK: - Budget data provider
@@ -52,7 +52,7 @@ import XCTest
     func testAddSlice() async throws {
         let slice1 = try BudgetSlice(id: .init(), name: "Name 1", configuration: .monthly(amount: .value(100)))
         let slice2 = try BudgetSlice(id: .init(), name: "Name 2", configuration: .monthly(amount: .value(100)))
-        let budget = try Budget(id: .init(), year: Mocks.year, name: "Name", icon: .default, slices: [slice1])
+        let budget = try Budget(id: .init(), year: Mocks.year, kind: .expense, name: "Name", icon: .default, slices: [slice1])
         storageProvider = MockStorageProvider(budgets: [budget], transactions: [])
         viewModel = FinanceViewModel(year: Mocks.year, storageProvider: storageProvider)
         try await viewModel.load()
@@ -65,7 +65,7 @@ import XCTest
     func testDeleteSlices() async throws {
         let slice1 = try BudgetSlice(id: .init(), name: "Name 1", configuration: .monthly(amount: .value(100)))
         let slice2 = try BudgetSlice(id: .init(), name: "Name 2", configuration: .monthly(amount: .value(100)))
-        let budget = try Budget(id: .init(), year: Mocks.year, name: "Name", icon: .default, slices: [slice1, slice2])
+        let budget = try Budget(id: .init(), year: Mocks.year, kind: .expense, name: "Name", icon: .default, slices: [slice1, slice2])
         storageProvider = MockStorageProvider(budgets: [budget], transactions: [])
         viewModel = FinanceViewModel(year: Mocks.year, storageProvider: storageProvider)
         try await viewModel.load()
@@ -82,8 +82,8 @@ import XCTest
     }
 
     func testUpdateNameInBudget() async throws {
-        let budget1 = try Budget(id: .init(), year: Mocks.year, name: "Name 1", icon: .default, monthlyAmount: .value(100))
-        let budget2 = try Budget(id: .init(), year: Mocks.year, name: "Name 2", icon: .default, monthlyAmount: .value(100))
+        let budget1 = try Budget(id: .init(), year: Mocks.year, kind: .expense, name: "Name 1", icon: .default, monthlyAmount: .value(100))
+        let budget2 = try Budget(id: .init(), year: Mocks.year, kind: .expense, name: "Name 2", icon: .default, monthlyAmount: .value(100))
         storageProvider = MockStorageProvider(budgets: [budget1, budget2], transactions: [])
         viewModel = FinanceViewModel(year: Mocks.year, storageProvider: storageProvider)
         try await viewModel.load()
@@ -135,9 +135,9 @@ import XCTest
     }
 
     func testAddBudget_invalid() async throws {
-        let budget1 = try Budget(id: .init(), year: Mocks.year, name: "Name 1", icon: .default, monthlyAmount: .value(100))
-        let budget2 = try Budget(id: .init(), year: Mocks.year, name: "Name 1", icon: .default, monthlyAmount: .value(100))
-        let budget3 = try Budget(id: .init(), year: Mocks.year - 1, name: "Name 3", icon: .default, monthlyAmount: .value(100))
+        let budget1 = try Budget(id: .init(), year: Mocks.year, kind: .expense, name: "Name 1", icon: .default, monthlyAmount: .value(100))
+        let budget2 = try Budget(id: .init(), year: Mocks.year, kind: .expense, name: "Name 1", icon: .default, monthlyAmount: .value(100))
+        let budget3 = try Budget(id: .init(), year: Mocks.year - 1, kind: .expense, name: "Name 3", icon: .default, monthlyAmount: .value(100))
         storageProvider = MockStorageProvider(budgets: [budget1], transactions: [])
         viewModel = FinanceViewModel(year: Mocks.year, storageProvider: storageProvider)
         try await viewModel.load()
@@ -218,20 +218,20 @@ import XCTest
     func testAddExpenses_valid() async throws {
         let date = Date.with(year: Mocks.year, month: 1, day: 1)!
 
-        let expense1 = Transaction(id: .init(), description: nil, date: date, amounts: [.init(amount: .value(100), budgetIdentifier: .init(), sliceIdentifier: .init())])
-        let expense2 = Transaction(id: .init(), description: nil, date: date, amounts: [.init(amount: .value(100), budgetIdentifier: .init(), sliceIdentifier: .init())])
+        let expense1 = try Transaction(id: .init(), description: nil, date: date, amounts: [.init(amount: .value(100), budgetKind: .expense, budgetIdentifier: .init(), sliceIdentifier: .init())])
+        let expense2 = try Transaction(id: .init(), description: nil, date: date, amounts: [.init(amount: .value(100), budgetKind: .expense, budgetIdentifier: .init(), sliceIdentifier: .init())])
         storageProvider = MockStorageProvider(budgets: [], transactions: [])
         viewModel = FinanceViewModel(year: Mocks.year, storageProvider: storageProvider)
         try await viewModel.load()
 
         try await viewModel.add(transactions: [expense1, expense2])
-        XCTAssertNotNil(viewModel.yearlyOverview.expenses.with(identifier: expense1.id))
-        XCTAssertNotNil(viewModel.yearlyOverview.expenses.with(identifier: expense2.id))
+        XCTAssertNotNil(viewModel.yearlyOverview.transactions.with(identifier: expense1.id))
+        XCTAssertNotNil(viewModel.yearlyOverview.transactions.with(identifier: expense2.id))
     }
 
     func testAddExpenses_invalid() async throws {
         let date = Date.with(year: Mocks.year - 1, month: 1, day: 1)!
-        let expense = Transaction(id: .init(), description: nil, date: date, amounts: [.init(amount: .value(100), budgetIdentifier: .init(), sliceIdentifier: .init())])
+        let expense = try Transaction(id: .init(), description: nil, date: date, amounts: [.init(amount: .value(100), budgetKind: .expense, budgetIdentifier: .init(), sliceIdentifier: .init())])
         storageProvider = MockStorageProvider(budgets: [], transactions: [])
         viewModel = FinanceViewModel(year: Mocks.year, storageProvider: storageProvider)
         try await viewModel.load()
@@ -248,14 +248,14 @@ import XCTest
     }
 
     func testDeleteExpenses() async throws {
-        let expensesToDelete = Mocks.transactions[0]
-        storageProvider = MockStorageProvider(budgets: [], transactions: Mocks.transactions)
+        let transactionsToDelete = Mocks.allTransactions[0]
+        storageProvider = MockStorageProvider(budgets: [], transactions: Mocks.allTransactions)
         viewModel = FinanceViewModel(year: Mocks.year, storageProvider: storageProvider)
         try await viewModel.load()
 
-        XCTAssertTrue(viewModel.yearlyOverview.expenses.contains(expensesToDelete))
+        XCTAssertTrue(viewModel.yearlyOverview.transactions.contains(transactionsToDelete))
 
-        try await viewModel.delete(transactionsWith: [expensesToDelete.id])
-        XCTAssertFalse(viewModel.yearlyOverview.expenses.contains(expensesToDelete))
+        try await viewModel.delete(transactionsWith: [transactionsToDelete.id])
+        XCTAssertFalse(viewModel.yearlyOverview.transactions.contains(transactionsToDelete))
     }
 }

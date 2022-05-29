@@ -77,12 +77,12 @@ extension Array where Element == Transaction {
 extension Array where Element == Transaction.Amount {
 
     var balance: MoneyValue {
-        reduce(.zero, {
-            switch $1.budgetKind {
+        reduce(.zero, { balance, transaction in
+            switch transaction.budgetKind {
             case .expense:
-                return $0 - $1.amount
+                return balance - transaction.amount
             case .income:
-                return $0 + $1.amount
+                return balance + transaction.amount
             }
         })
     }

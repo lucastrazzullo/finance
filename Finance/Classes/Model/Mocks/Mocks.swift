@@ -21,14 +21,14 @@ enum Mocks {
             name: "Mock",
             year: Mocks.year,
             openingBalance: Mocks.openingYearBalance,
-            budgets: Mocks.allBudtets,
+            budgets: Mocks.allBudgets,
             transactions: Mocks.allTransactions
         )
     }()
 
     // MARK: - Budget
 
-    static let allBudtets: [Budget] = {
+    static let allBudgets: [Budget] = {
         return incomeBudgets + expenseBudgets
     }()
 

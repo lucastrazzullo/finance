@@ -18,18 +18,20 @@ final class MonthlyBudgetOverviewTests: XCTestCase {
         let budget = try Budget(
             id: .init(),
             year: date.year,
+            kind: .expense,
             name: "Name",
             icon: .default,
             monthlyAmount: .value(budgetAmount)
         )
 
-        let expense = Transaction(
+        let expense = try! Transaction(
             id: .init(),
             description: nil,
             date: date,
             amounts: [
                 .init(
                     amount: .value(expensesAmount),
+                    budgetKind: .expense,
                     budgetIdentifier: budget.id,
                     sliceIdentifier: budget.slices[0].id
                 )
@@ -39,7 +41,7 @@ final class MonthlyBudgetOverviewTests: XCTestCase {
         return MonthlyBudgetOverview(
             month: 1,
             budget: budget,
-            expenses: [expense]
+            transactions: [expense]
         )
     }
 

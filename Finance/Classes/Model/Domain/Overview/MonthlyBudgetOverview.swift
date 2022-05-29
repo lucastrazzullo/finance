@@ -42,10 +42,10 @@ struct MonthlyBudgetOverview: Identifiable {
         let budgetAvailabilityUpToMonth = budget.availability(upTo: month)
         let budgetAvailabilityInMonth = budget.availability(for: month)
 
-        let startingAmount = budgetAvailabilityUpToMonth + budgetAvailabilityInMonth - transactionsUntilMonth.totalAmount
-        let remainingAmount = startingAmount - transactionsInMonth.totalAmount
+        let startingAmount = budgetAvailabilityUpToMonth + budgetAvailabilityInMonth + transactionsUntilMonth.totalAmount
+        let remainingAmount = startingAmount + transactionsInMonth.totalAmount
         let remainingAmountPercentage = remainingAmount.value > 0
-            ? Float(truncating: NSDecimalNumber(decimal: 1 - transactionsInMonth.totalAmount.value / startingAmount.value))
+            ? Float(truncating: NSDecimalNumber(decimal: 1 + transactionsInMonth.totalAmount.value / startingAmount.value))
             : 0
 
         self.month = month

@@ -50,7 +50,7 @@ import XCTest
         let secondSlicesSet = Mocks.groceriesSlices
         let extraSlice = try BudgetSlice(id: .init(), name: "Extra slice", configuration: .monthly(amount: .value(100)))
         let slices = firstSlicesSet + secondSlicesSet + [extraSlice]
-        let budget = try Budget(id: .init(), year: Mocks.year, name: "Name", icon: .default, slices: slices)
+        let budget = try Budget(id: .init(), year: Mocks.year, kind: .expense, name: "Name", icon: .default, slices: slices)
 
         storageHandler = MockBudgetStorageHandler(budgets: [budget])
         viewModel = BudgetViewModel(budget: budget, storageHandler: storageHandler)
@@ -138,7 +138,7 @@ import XCTest
     }
 
     func testSaveUpdates() async throws {
-        let budget = try Budget(id: .init(), year: Mocks.year, name: "Name 1", icon: .default, monthlyAmount: .value(100))
+        let budget = try Budget(id: .init(), year: Mocks.year, kind: .expense, name: "Name 1", icon: .default, monthlyAmount: .value(100))
         storageHandler = MockBudgetStorageHandler(budgets: [budget])
         viewModel = BudgetViewModel(budget: budget, storageHandler: storageHandler)
 

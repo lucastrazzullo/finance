@@ -243,9 +243,9 @@ struct MonthlyProspectsListView_Previews: PreviewProvider {
         MonthlyProspectsListView(
             selectedMonth: .constant(5),
             prospects: [
-                .init(year: Mocks.year, month: 4, openingYearBalance: Mocks.openingYearBalance, transactions: Mocks.allTransactions, budgets: Mocks.allBudtets),
-                .init(year: Mocks.year, month: 5, openingYearBalance: Mocks.openingYearBalance, transactions: Mocks.allTransactions, budgets: Mocks.allBudtets),
-                .init(year: Mocks.year, month: 6, openingYearBalance: Mocks.openingYearBalance, transactions: Mocks.allTransactions, budgets: Mocks.allBudtets)
+                .init(year: Mocks.year, month: 4, openingYearBalance: Mocks.openingYearBalance, transactions: Mocks.allTransactions, budgets: Mocks.allBudgets),
+                .init(year: Mocks.year, month: 5, openingYearBalance: Mocks.openingYearBalance, transactions: Mocks.allTransactions, budgets: Mocks.allBudgets),
+                .init(year: Mocks.year, month: 6, openingYearBalance: Mocks.openingYearBalance, transactions: Mocks.allTransactions, budgets: Mocks.allBudgets)
             ]
         )
     }
