@@ -33,7 +33,7 @@ struct MonthlyProspect: Identifiable {
 //        let incomes = transactions.filter({ $0.budgetKind == .income })
 //        let expenses = transactions.filter({ $0.budgetKind == .expense })
 
-        let balanceToDate = MoneyValue.zero
+        let balanceToDate = openingYearBalance + transactions.totalAmount(including: month)
         let forecastedAmount = MoneyValue.zero
         let trendingAmount = MoneyValue.zero
 

@@ -48,12 +48,12 @@ protocol FinanceStorageHandler: AnyObject {
 
     // MARK: Object life cycle
 
-    init(year: Int, storageHandler: FinanceStorageHandler) {
+    init(year: Int, openingBalance: MoneyValue, storageHandler: FinanceStorageHandler) {
         self.storageHandler = storageHandler
         self.yearlyOverview = YearlyBudgetOverview(
             name: "Amsterdam",
             year: year,
-            openingBalance: .zero,
+            openingBalance: openingBalance,
             budgets: [],
             transactions: []
         )

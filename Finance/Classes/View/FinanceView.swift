@@ -198,7 +198,11 @@ struct FinanceView: View {
 
     init(finance: Finance, year: Int) {
         self.finance = finance
-        self.viewModel = FinanceViewModel(year: year, storageHandler: finance)
+        self.viewModel = FinanceViewModel(
+            year: year,
+            openingBalance: .zero,
+            storageHandler: finance
+        )
     }
 }
 
