@@ -23,7 +23,7 @@ struct FinanceView: View {
                 .toolbar {
                     makeToolbar(
                         title: "Overview \(viewModel.yearlyOverview.name)",
-                        subtitle: "\(viewModel.yearlyOverview.year) / \(viewModel.month)", 
+                        subtitle: "\(viewModel.yearlyOverview.year) / \(viewModel.month)",
                         showsMonthPicker: true
                     )
                 }
