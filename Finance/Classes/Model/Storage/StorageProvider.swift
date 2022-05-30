@@ -12,6 +12,8 @@ protocol StorageProvider: AnyObject {
     // MARK: Fetch
 
     func fetchTransactions(year: Int) async throws -> [Transaction]
+
+    func fetchBudget(with identifier: Budget.ID) async throws -> Budget
     func fetchBudgets(year: Int) async throws -> [Budget]
 
     // MARK: Add

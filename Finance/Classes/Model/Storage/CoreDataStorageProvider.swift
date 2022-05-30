@@ -32,6 +32,11 @@ final class CoreDataStorageProvider: StorageProvider {
         return try entities.compactMap { try Transaction.with(transactionEntity: $0) }
     }
 
+    func fetchBudget(with identifier: Budget.ID) async throws -> Budget {
+        let entity = try fetchBudgetEntity(with: identifier)
+        return try Budget.with(budgetEntity: entity)
+    }
+
     func fetchBudgets(year: Int) async throws -> [Budget] {
         let budgetEntities = try fetchBudgetEntities(year: year)
         return budgetEntities.compactMap { return try? Budget.with(budgetEntity: $0) }

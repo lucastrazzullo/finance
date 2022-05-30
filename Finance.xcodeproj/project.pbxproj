@@ -20,6 +20,8 @@
 		8126BA7F2806E98A00C06C93 /* StorageProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8126BA7E2806E98A00C06C93 /* StorageProvider.swift */; };
 		8126BA8928073A7C00C06C93 /* ErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8126BA8828073A7C00C06C93 /* ErrorView.swift */; };
 		81341EA2283BA78300EAC8E8 /* MonthlyProspectsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81341EA1283BA78300EAC8E8 /* MonthlyProspectsListView.swift */; };
+		81341EFC2845074A00EAC8E8 /* Finance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81341EFB2845074A00EAC8E8 /* Finance.swift */; };
+		81341EFE28450D4900EAC8E8 /* FinanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81341EFD28450D4900EAC8E8 /* FinanceTests.swift */; };
 		8157AB8327BA7E15003FEB28 /* NewSliceElements.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8157AB8227BA7E15003FEB28 /* NewSliceElements.swift */; };
 		8157AB8527BA7E5D003FEB28 /* SliceFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8157AB8427BA7E5D003FEB28 /* SliceFlow.swift */; };
 		8157AB8727BACCE9003FEB28 /* AddSliceUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8157AB8627BACCE9003FEB28 /* AddSliceUITests.swift */; };
@@ -118,6 +120,8 @@
 		8126BA802806F69A00C06C93 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8126BA8828073A7C00C06C93 /* ErrorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorView.swift; sourceTree = "<group>"; };
 		81341EA1283BA78300EAC8E8 /* MonthlyProspectsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthlyProspectsListView.swift; sourceTree = "<group>"; };
+		81341EFB2845074A00EAC8E8 /* Finance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Finance.swift; sourceTree = "<group>"; };
+		81341EFD28450D4900EAC8E8 /* FinanceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceTests.swift; sourceTree = "<group>"; };
 		8157AB8227BA7E15003FEB28 /* NewSliceElements.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSliceElements.swift; sourceTree = "<group>"; };
 		8157AB8427BA7E5D003FEB28 /* SliceFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SliceFlow.swift; sourceTree = "<group>"; };
 		8157AB8627BACCE9003FEB28 /* AddSliceUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddSliceUITests.swift; sourceTree = "<group>"; };
@@ -314,6 +318,7 @@
 			isa = PBXGroup;
 			children = (
 				81947EAA27327FCF001C2AC9 /* FinanceApp.swift */,
+				81341EFB2845074A00EAC8E8 /* Finance.swift */,
 				81CB8BEE2746B91900A64785 /* Model */,
 				81CB8BED2746B91100A64785 /* View */,
 				81DF5578280E3437004BB2C8 /* ViewModel */,
@@ -334,6 +339,7 @@
 		817033EA27B25F9F001686FA /* FinanceTests */ = {
 			isa = PBXGroup;
 			children = (
+				81341EFD28450D4900EAC8E8 /* FinanceTests.swift */,
 				816A24CB2801E02E00AAF8C0 /* BudgetTests.swift */,
 				81F3B90728041AB900A1B89F /* BudgetSliceTests.swift */,
 				81F3B90928041EAD00A1B89F /* YearlyBudgetOverviewTests.swift */,
@@ -653,6 +659,7 @@
 				818D0AE72812D0870007A6F6 /* FinanceViewModelTests.swift in Sources */,
 				8122A3432819B342002912D3 /* BudgetsListViewModelTests.swift in Sources */,
 				81F3B90828041AB900A1B89F /* BudgetSliceTests.swift in Sources */,
+				81341EFE28450D4900EAC8E8 /* FinanceTests.swift in Sources */,
 				818D0AEF2812ED250007A6F6 /* BudgetViewModelTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -712,6 +719,7 @@
 				81CB8BF42746BC4A00A64785 /* MoneyValue.swift in Sources */,
 				8122A3482819B4E2002912D3 /* Mocks.swift in Sources */,
 				8170340227B59945001686FA /* AccessibilityIdentifier.swift in Sources */,
+				81341EFC2845074A00EAC8E8 /* Finance.swift in Sources */,
 				810F86A427FF91CB00A1CDD4 /* MonthlyBudgetOverview.swift in Sources */,
 				819993D52752F80C00FA3E03 /* Locale+Defaults.swift in Sources */,
 				8126BA8928073A7C00C06C93 /* ErrorView.swift in Sources */,

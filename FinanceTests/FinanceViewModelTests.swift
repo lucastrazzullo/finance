@@ -11,7 +11,6 @@ import XCTest
 
 @MainActor final class FinanceViewModelTests: XCTestCase {
 
-    private var storageProvider: StorageProvider!
     private var viewModel: FinanceViewModel!
 
     @MainActor override func setUpWithError() throws {
@@ -20,7 +19,6 @@ import XCTest
 
     @MainActor override func tearDownWithError() throws {
         viewModel = nil
-        storageProvider = nil
         try super.tearDownWithError()
     }
 
@@ -29,8 +27,9 @@ import XCTest
     func testLoad() async throws {
         let budgets = Mocks.allBudgets
         let transactions = Mocks.allTransactions
-        storageProvider = MockStorageProvider(budgets: budgets, transactions: transactions)
-        viewModel = FinanceViewModel(year: Mocks.year, storageProvider: storageProvider)
+        let storageProvider = MockStorageProvider(budgets: budgets, transactions: transactions)
+        let finance = Finance(storageProvider: storageProvider)
+        viewModel = FinanceViewModel(year: Mocks.year, storageHandler: finance)
 
         try await viewModel.load()
         XCTAssertEqual(viewModel.yearlyOverview.budgets, budgets)
@@ -40,88 +39,21 @@ import XCTest
     func testNoLoad() throws {
         let budgets = Mocks.allBudgets
         let transactions = Mocks.allTransactions
-        storageProvider = MockStorageProvider(budgets: budgets, transactions: transactions)
-        viewModel = FinanceViewModel(year: Mocks.year, storageProvider: storageProvider)
+        let storageProvider = MockStorageProvider(budgets: budgets, transactions: transactions)
+        let finance = Finance(storageProvider: storageProvider)
+        viewModel = FinanceViewModel(year: Mocks.year, storageHandler: finance)
 
         XCTAssertNotEqual(viewModel.yearlyOverview.budgets, budgets)
         XCTAssertNotEqual(viewModel.yearlyOverview.transactions, transactions)
-    }
-
-    // MARK: - Budget data provider
-
-    func testAddSlice() async throws {
-        let slice1 = try BudgetSlice(id: .init(), name: "Name 1", configuration: .monthly(amount: .value(100)))
-        let slice2 = try BudgetSlice(id: .init(), name: "Name 2", configuration: .monthly(amount: .value(100)))
-        let budget = try Budget(id: .init(), year: Mocks.year, kind: .expense, name: "Name", icon: .default, slices: [slice1])
-        storageProvider = MockStorageProvider(budgets: [budget], transactions: [])
-        viewModel = FinanceViewModel(year: Mocks.year, storageProvider: storageProvider)
-        try await viewModel.load()
-
-        try await viewModel.add(slice: slice2, toBudgetWith: budget.id)
-        let updatedBudget = viewModel.yearlyOverview.budgets.with(identifier: budget.id)
-        XCTAssertNotNil(updatedBudget?.slices.with(identifier: slice2.id))
-    }
-
-    func testDeleteSlices() async throws {
-        let slice1 = try BudgetSlice(id: .init(), name: "Name 1", configuration: .monthly(amount: .value(100)))
-        let slice2 = try BudgetSlice(id: .init(), name: "Name 2", configuration: .monthly(amount: .value(100)))
-        let budget = try Budget(id: .init(), year: Mocks.year, kind: .expense, name: "Name", icon: .default, slices: [slice1, slice2])
-        storageProvider = MockStorageProvider(budgets: [budget], transactions: [])
-        viewModel = FinanceViewModel(year: Mocks.year, storageProvider: storageProvider)
-        try await viewModel.load()
-
-        // Delete slice 1
-        try await viewModel.delete(slicesWith: [slice1.id], inBudgetWith: budget.id)
-        var updatedBudget = viewModel.yearlyOverview.budgets.with(identifier: budget.id)
-        XCTAssertNil(updatedBudget?.slices.with(identifier: slice1.id))
-
-        // Delete slice 2
-        try? await viewModel.delete(slicesWith: [slice2.id], inBudgetWith: budget.id)
-        updatedBudget = viewModel.yearlyOverview.budgets.with(identifier: budget.id)
-        XCTAssertNotNil(updatedBudget?.slices.with(identifier: slice2.id))
-    }
-
-    func testUpdateNameInBudget() async throws {
-        let budget1 = try Budget(id: .init(), year: Mocks.year, kind: .expense, name: "Name 1", icon: .default, monthlyAmount: .value(100))
-        let budget2 = try Budget(id: .init(), year: Mocks.year, kind: .expense, name: "Name 2", icon: .default, monthlyAmount: .value(100))
-        storageProvider = MockStorageProvider(budgets: [budget1, budget2], transactions: [])
-        viewModel = FinanceViewModel(year: Mocks.year, storageProvider: storageProvider)
-        try await viewModel.load()
-
-        // Update with same name
-        try await viewModel.update(name: "Name 1", icon: .car, in: budget1)
-        var updatedBudget = viewModel.yearlyOverview.budgets.with(identifier: budget1.id)
-        updatedBudget = try XCTUnwrap(updatedBudget)
-        XCTAssertEqual(updatedBudget?.name, "Name 1")
-        XCTAssertEqual(updatedBudget?.icon, .car)
-
-        // Update with different name
-        try await viewModel.update(name: "Name 3", icon: .default, in: budget1)
-        updatedBudget = viewModel.yearlyOverview.budgets.with(identifier: budget1.id)
-        updatedBudget = try XCTUnwrap(updatedBudget)
-        XCTAssertEqual(updatedBudget?.name, "Name 3")
-        XCTAssertEqual(updatedBudget?.icon, .default)
-
-        // Update with same name as another budget
-        do {
-            try await viewModel.update(name: "Name 2", icon: .car, in: budget1)
-            XCTFail("Error expected")
-        } catch {
-            guard case DomainError.budgetOverview(error: .budgetAlreadyExistsWith(name: "Name 2")) = error else {
-                XCTFail("Different error thrown: \(error)")
-                return
-            }
-        }
-        XCTAssertEqual(updatedBudget?.name, "Name 3")
-        XCTAssertEqual(updatedBudget?.icon, .default)
     }
 
     // MARK: - Budgets List Data Provider
 
     func testAddBudget_valid() async throws {
         let budget = Mocks.expenseBudgets[0]
-        storageProvider = MockStorageProvider()
-        viewModel = FinanceViewModel(year: Mocks.year, storageProvider: storageProvider)
+        let storageProvider = MockStorageProvider()
+        let finance = Finance(storageProvider: storageProvider)
+        viewModel = FinanceViewModel(year: Mocks.year, storageHandler: finance)
         try await viewModel.load()
 
         viewModel.isAddNewBudgetPresented = true
@@ -138,8 +70,9 @@ import XCTest
         let budget1 = try Budget(id: .init(), year: Mocks.year, kind: .expense, name: "Name 1", icon: .default, monthlyAmount: .value(100))
         let budget2 = try Budget(id: .init(), year: Mocks.year, kind: .expense, name: "Name 1", icon: .default, monthlyAmount: .value(100))
         let budget3 = try Budget(id: .init(), year: Mocks.year - 1, kind: .expense, name: "Name 3", icon: .default, monthlyAmount: .value(100))
-        storageProvider = MockStorageProvider(budgets: [budget1], transactions: [])
-        viewModel = FinanceViewModel(year: Mocks.year, storageProvider: storageProvider)
+        let storageProvider = MockStorageProvider(budgets: [budget1], transactions: [])
+        let finance = Finance(storageProvider: storageProvider)
+        viewModel = FinanceViewModel(year: Mocks.year, storageHandler: finance)
         try await viewModel.load()
 
         // Budget that was already in the list
@@ -190,8 +123,9 @@ import XCTest
 
     func testDeleteBudgets_valid() async throws {
         let budgetToDelete = Mocks.expenseBudgets[0]
-        storageProvider = MockStorageProvider(budgets: Mocks.expenseBudgets, transactions: [])
-        viewModel = FinanceViewModel(year: Mocks.year, storageProvider: storageProvider)
+        let storageProvider = MockStorageProvider(budgets: Mocks.expenseBudgets, transactions: [])
+        let finance = Finance(storageProvider: storageProvider)
+        viewModel = FinanceViewModel(year: Mocks.year, storageHandler: finance)
 
         try await viewModel.load()
         XCTAssertTrue(viewModel.yearlyOverview.budgets.contains(budgetToDelete))
@@ -203,8 +137,9 @@ import XCTest
     func testDeleteBudgets_invalid() async throws {
         let budgetToDelete = Mocks.expenseBudgets[0]
         let otherBudget = Mocks.expenseBudgets[1]
-        storageProvider = MockStorageProvider(budgets: [otherBudget], transactions: [])
-        viewModel = FinanceViewModel(year: Mocks.year, storageProvider: storageProvider)
+        let storageProvider = MockStorageProvider(budgets: [otherBudget], transactions: [])
+        let finance = Finance(storageProvider: storageProvider)
+        viewModel = FinanceViewModel(year: Mocks.year, storageHandler: finance)
 
         try await viewModel.load()
         XCTAssertFalse(viewModel.yearlyOverview.budgets.contains(budgetToDelete))
@@ -220,8 +155,9 @@ import XCTest
 
         let expense1 = try Transaction(id: .init(), description: nil, date: date, amounts: [.init(amount: .value(100), budgetKind: .expense, budgetIdentifier: .init(), sliceIdentifier: .init())])
         let expense2 = try Transaction(id: .init(), description: nil, date: date, amounts: [.init(amount: .value(100), budgetKind: .expense, budgetIdentifier: .init(), sliceIdentifier: .init())])
-        storageProvider = MockStorageProvider(budgets: [], transactions: [])
-        viewModel = FinanceViewModel(year: Mocks.year, storageProvider: storageProvider)
+        let storageProvider = MockStorageProvider(budgets: [], transactions: [])
+        let finance = Finance(storageProvider: storageProvider)
+        viewModel = FinanceViewModel(year: Mocks.year, storageHandler: finance)
         try await viewModel.load()
 
         try await viewModel.add(transactions: [expense1, expense2])
@@ -232,8 +168,9 @@ import XCTest
     func testAddExpenses_invalid() async throws {
         let date = Date.with(year: Mocks.year - 1, month: 1, day: 1)!
         let expense = try Transaction(id: .init(), description: nil, date: date, amounts: [.init(amount: .value(100), budgetKind: .expense, budgetIdentifier: .init(), sliceIdentifier: .init())])
-        storageProvider = MockStorageProvider(budgets: [], transactions: [])
-        viewModel = FinanceViewModel(year: Mocks.year, storageProvider: storageProvider)
+        let storageProvider = MockStorageProvider(budgets: [], transactions: [])
+        let finance = Finance(storageProvider: storageProvider)
+        viewModel = FinanceViewModel(year: Mocks.year, storageHandler: finance)
         try await viewModel.load()
 
         do {
@@ -249,8 +186,9 @@ import XCTest
 
     func testDeleteExpenses() async throws {
         let transactionsToDelete = Mocks.allTransactions[0]
-        storageProvider = MockStorageProvider(budgets: [], transactions: Mocks.allTransactions)
-        viewModel = FinanceViewModel(year: Mocks.year, storageProvider: storageProvider)
+        let storageProvider = MockStorageProvider(budgets: [], transactions: Mocks.allTransactions)
+        let finance = Finance(storageProvider: storageProvider)
+        viewModel = FinanceViewModel(year: Mocks.year, storageHandler: finance)
         try await viewModel.load()
 
         XCTAssertTrue(viewModel.yearlyOverview.transactions.contains(transactionsToDelete))

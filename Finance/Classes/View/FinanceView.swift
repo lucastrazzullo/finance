@@ -9,8 +9,7 @@ import SwiftUI
 
 struct FinanceView: View {
 
-    @Environment(\.storageProvider) private var storageProvider
-
+    @ObservedObject var finance: Finance
     @ObservedObject var viewModel: FinanceViewModel
 
     var body: some View {
@@ -124,7 +123,7 @@ struct FinanceView: View {
             item: { budget in
                 NavigationLink(
                     destination: BudgetView(
-                        viewModel: BudgetViewModel(budget: budget, storageHandler: viewModel)
+                        viewModel: BudgetViewModel(budget: budget, storageHandler: finance)
                     ),
                     label: {
                         BudgetsListItem(budget: budget)
@@ -186,15 +185,22 @@ struct FinanceView: View {
             }
         }
     }
+
+    // MARK: Object life cycle
+
+    init(finance: Finance, year: Int) {
+        self.finance = finance
+        self.viewModel = FinanceViewModel(year: year, storageHandler: finance)
+    }
 }
 
 // MARK: - Previews
 
 struct FinanceView_Previews: PreviewProvider {
     static let storageProvider = MockStorageProvider(budgets: Mocks.expenseBudgets, transactions: Mocks.allTransactions)
+    static let finance = Finance(storageProvider: storageProvider)
     static var previews: some View {
-        FinanceView(viewModel: .init(year: Mocks.year, storageProvider: storageProvider))
+        FinanceView(finance: finance, year: Mocks.year)
 //            .preferredColorScheme(.dark)
-            .environment(\.storageProvider, storageProvider)
     }
 }

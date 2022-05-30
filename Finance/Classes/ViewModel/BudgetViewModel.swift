@@ -55,7 +55,6 @@ protocol BudgetStorageHandler: AnyObject {
     // MARK: Internal methods
 
     func add(slice: BudgetSlice) async throws {
-        try BudgetValidator.willAdd(slice: slice, to: budget.slices)
         try await storageHandler.add(slice: slice, toBudgetWith: budget.id)
         try budget.append(slice: slice)
         isInsertNewSlicePresented = false
@@ -66,7 +65,6 @@ protocol BudgetStorageHandler: AnyObject {
             let identifiers = budget.slices(at: offsets).map(\.id)
             let identifiersSet = Set(identifiers)
 
-            try BudgetValidator.willDelete(slicesWith: identifiersSet, from: budget.slices)
             try await storageHandler.delete(slicesWith: identifiersSet, inBudgetWith: budget.id)
             try budget.delete(slicesWith: identifiersSet)
             deleteSlicesError = nil
@@ -77,7 +75,6 @@ protocol BudgetStorageHandler: AnyObject {
 
     func saveUpdates() async {
         do {
-            try BudgetValidator.canUse(name: updatingBudgetName)
             try await storageHandler.update(name: updatingBudgetName, icon: updatingBudgetIcon, in: budget)
             try budget.update(name: updatingBudgetName)
             try budget.update(icon: updatingBudgetIcon)

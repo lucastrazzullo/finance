@@ -9,30 +9,21 @@ import SwiftUI
 
 @main struct FinanceApp: App {
 
-    @Environment(\.storageProvider) private var storageProvider
+    @StateObject var finance: Finance = {
+        let storageProvider: StorageProvider = {
+            if CommandLine.arguments.contains("testing") {
+                return MockStorageProvider()
+            } else {
+                return CoreDataStorageProvider()
+            }
+        }()
+
+        return Finance(storageProvider: storageProvider)
+    }()
 
     var body: some Scene {
         WindowGroup {
-            FinanceView(viewModel: .init(year: 2022, storageProvider: storageProvider))
+            FinanceView(finance: finance, year: 2022)
         }
-    }
-}
-
-// MARK: - Environment
-
-private struct StorageProviderKey: EnvironmentKey {
-    static let defaultValue: StorageProvider = {
-        if CommandLine.arguments.contains("testing") {
-            return MockStorageProvider()
-        } else {
-            return CoreDataStorageProvider()
-        }
-    }()
-}
-
-extension EnvironmentValues {
-    var storageProvider: StorageProvider {
-        get { return self[StorageProviderKey.self] }
-        set { self[StorageProviderKey.self] = newValue }
     }
 }

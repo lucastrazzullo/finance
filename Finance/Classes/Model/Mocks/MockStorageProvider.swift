@@ -30,6 +30,14 @@ final class MockStorageProvider: StorageProvider {
 
     // MARK: Fetch
 
+    func fetchBudget(with identifier: Budget.ID) async throws -> Budget {
+        guard let budget = budgets.first(where: { $0.id == identifier }) else {
+            throw DomainError.storageProvider(error: .budgetEntityNotFound)
+        }
+
+        return budget
+    }
+
     func fetchBudgets(year: Int) async throws -> [Budget] {
         return budgets.filter { budget in
             budget.year == year
