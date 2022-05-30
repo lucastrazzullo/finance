@@ -64,6 +64,17 @@ struct Budget: Identifiable, Hashable, AmountHolder {
             }
     }
 
+    func availability(including month: Int) -> MoneyValue {
+        slices.reduce(MoneyValue.zero) { accumulatedAmount, slice in
+                switch slice.configuration {
+                case .monthly(let amount):
+                    return accumulatedAmount + (amount * .value(Decimal(month)))
+                case .scheduled(let schedules):
+                    return accumulatedAmount + schedules.filter({ $0.month <= month }).totalAmount
+                }
+            }
+    }
+
     func availability(for month: Int) -> MoneyValue {
         slices.reduce(MoneyValue.zero) { accumulatedAmount, slice in
                 switch slice.configuration {

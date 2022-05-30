@@ -50,6 +50,10 @@ extension Array where Element == Transaction {
         return self.filter({ $0.date.month < month }).totalAmount
     }
 
+    func totalAmount(including month: Int) -> MoneyValue {
+        return self.filter({ $0.date.month <= month }).totalAmount
+    }
+
     func totalAmount(in month: Int) -> MoneyValue {
         return self.filter({ $0.date.month == month }).totalAmount
     }

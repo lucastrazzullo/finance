@@ -18,42 +18,50 @@ struct MonthlyBudgetOverview: Identifiable {
     var icon: SystemIcon {
         budget.icon
     }
-
-    let month: Int
-    let budget: Budget
-
-    let startingAmount: MoneyValue
-    let remainingAmount: MoneyValue
-    let remainingAmountPercentage: Float
-
-    let transactionsUntilMonth: [Transaction]
-    let transactionsInMonth: [Transaction]
-    var transactions: [Transaction] {
-        return transactionsUntilMonth + transactionsInMonth
+    var kind: Budget.Kind {
+        budget.kind
     }
 
+    var transactionsInMonth: [Transaction] {
+        transactions.filter { $0.date.month == month }
+    }
+    var amount: MoneyValue {
+        transactionsInMonth.totalAmount
+    }
+    var remainingAmount: MoneyValue {
+        switch kind {
+        case .expense:
+            return thresholdAmount + amount
+        case .income:
+            return thresholdAmount - amount
+        }
+    }
+    var amountPercentage: Float {
+        switch kind {
+        case .expense:
+            return Float(truncating: NSDecimalNumber(decimal: 1 + amount.value / thresholdAmount.value))
+        case .income:
+            return Float(truncating: NSDecimalNumber(decimal: amount.value / thresholdAmount.value))
+        }
+    }
+    var thresholdAmount: MoneyValue {
+        let budgetAvailability = budget.availability(including: month)
+        let transactionsUntilMonth = transactions.totalAmount(upTo: month)
+        switch kind {
+        case .expense:
+            return budgetAvailability + transactionsUntilMonth
+        case .income:
+            return budgetAvailability - transactionsUntilMonth
+        }
+    }
+
+    private let month: Int
+    private let budget: Budget
+    private let transactions: [Transaction]
+
     init(month: Int, budget: Budget, transactions: [Transaction]) {
-        let transactionsUntilMonth = transactions
-            .filter { transaction in transaction.date.month < month }
-
-        let transactionsInMonth = transactions
-            .filter { transaction in transaction.date.month == month }
-
-        let budgetAvailabilityUpToMonth = budget.availability(upTo: month)
-        let budgetAvailabilityInMonth = budget.availability(for: month)
-
-        let startingAmount = budgetAvailabilityUpToMonth + budgetAvailabilityInMonth + transactionsUntilMonth.totalAmount
-        let remainingAmount = startingAmount + transactionsInMonth.totalAmount
-        let remainingAmountPercentage = remainingAmount.value > 0
-            ? Float(truncating: NSDecimalNumber(decimal: 1 + transactionsInMonth.totalAmount.value / startingAmount.value))
-            : 0
-
         self.month = month
         self.budget = budget
-        self.startingAmount = startingAmount
-        self.remainingAmount = remainingAmount
-        self.remainingAmountPercentage = remainingAmountPercentage
-        self.transactionsUntilMonth = transactionsUntilMonth
-        self.transactionsInMonth = transactionsInMonth
+        self.transactions = transactions
     }
 }

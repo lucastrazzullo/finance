@@ -131,7 +131,7 @@ final class YearlyBudgetOverviewTests: XCTestCase {
         // Remaining amount: 100 starting amount - 50 transaction in month 01 >> 50
 
         let montlyOverview_month1 = try XCTUnwrap(yearlyOverview.monthlyOverviews(month: 1).first { $0.name == budget.name })
-        XCTAssertEqual(montlyOverview_month1.startingAmount, .value(100))
+        XCTAssertEqual(montlyOverview_month1.thresholdAmount, .value(100))
         XCTAssertEqual(montlyOverview_month1.remainingAmount, .value(50))
 
 
@@ -141,7 +141,7 @@ final class YearlyBudgetOverviewTests: XCTestCase {
         // Remaining amount: 150 starting amount - 50 transaction in month 02 >> 100
 
         let montlyOverview_month2 = try XCTUnwrap(yearlyOverview.monthlyOverviews(month: 2).first { $0.name == budget.name })
-        XCTAssertEqual(montlyOverview_month2.startingAmount, .value(150))
+        XCTAssertEqual(montlyOverview_month2.thresholdAmount, .value(150))
         XCTAssertEqual(montlyOverview_month2.remainingAmount, .value(100))
 
 
@@ -151,7 +151,7 @@ final class YearlyBudgetOverviewTests: XCTestCase {
         // Remaining amount: 200 starting amount - 0 transaction in month 02 >> 200
 
         let montlyOverview_month3 = try XCTUnwrap(yearlyOverview.monthlyOverviews(month: 3).first { $0.name == budget.name })
-        XCTAssertEqual(montlyOverview_month3.startingAmount, .value(200))
+        XCTAssertEqual(montlyOverview_month3.thresholdAmount, .value(200))
         XCTAssertEqual(montlyOverview_month3.remainingAmount, .value(200))
     }
 

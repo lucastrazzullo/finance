@@ -21,18 +21,23 @@ struct MonthlyOverviewItem: View {
 
                 VStack(alignment: .leading) {
                     HStack(spacing: 2) {
-                        Text("Budget").font(.caption2)
-                        AmountView(amount: overview.startingAmount).font(.caption2.bold())
+                        switch overview.kind {
+                        case .income:
+                            Text("Expected").font(.caption2)
+                        case .expense:
+                            Text("Budget").font(.caption2)
+                        }
+                        AmountView(amount: overview.thresholdAmount).font(.caption2.bold())
                     }
 
                     HStack(spacing: 2) {
-                        switch overview.budget.kind {
+                        switch overview.kind {
                         case .income:
                             Text( "Incomes").font(.caption2)
                         case .expense:
                             Text( "Expenses").font(.caption2)
                         }
-                        AmountView(amount: overview.transactionsInMonth.totalAmount).font(.caption2.bold())
+                        AmountView(amount: overview.amount).font(.caption2.bold())
                     }
                 }
             }
@@ -41,7 +46,16 @@ struct MonthlyOverviewItem: View {
 
             HStack {
                 VStack(alignment: .trailing) {
-                    Text(availabilityLabel).font(.caption2)
+                    switch overview.kind {
+                    case .income:
+                        Text("Remaining").font(.caption2)
+                    case .expense:
+                        if overview.remainingAmount.value >= 0 {
+                            Text("Remaining").font(.caption2)
+                        } else {
+                            Text("Negative").font(.caption2)
+                        }
+                    }
                     AmountView(amount: overview.remainingAmount).font(.subheadline)
                 }
 
@@ -52,7 +66,7 @@ struct MonthlyOverviewItem: View {
 
                     availabilityIndicatorView(
                         color: availabilityIndicatorColor,
-                        percentage: CGFloat(overview.remainingAmountPercentage))
+                        percentage: CGFloat(overview.amountPercentage))
                 }
             }
         }
@@ -69,22 +83,16 @@ struct MonthlyOverviewItem: View {
         }
     }
 
-    private var availabilityLabel: String {
-        if overview.remainingAmount.value >= 0 {
-            return "Remaining"
-        } else {
-            return "Negative"
-        }
-    }
-
     private var availabilityIndicatorColor: Color {
-        switch overview.remainingAmountPercentage {
+        switch abs(overview.amountPercentage) {
         case 0..<0.33:
             return .red
         case 0.33..<0.66:
             return .orange
-        default:
+        case 0.66...1.00:
             return .green
+        default:
+            return .indigo
         }
     }
 
@@ -107,7 +115,7 @@ struct MonthlyOverviewItem: View {
 struct MonthlyBudgetOverviewItem_Previews: PreviewProvider {
     static var previews: some View {
         List {
-            ForEach(Mocks.expenseBudgets) { budget in
+            ForEach(Mocks.allBudgets) { budget in
                 MonthlyOverviewItem(
                     overview: MonthlyBudgetOverview(
                         month: 1,

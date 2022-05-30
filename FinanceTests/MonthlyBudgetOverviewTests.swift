@@ -12,7 +12,7 @@ final class MonthlyBudgetOverviewTests: XCTestCase {
 
     // MARK: Factories
 
-    private func makeOverview(budgetAmount: Decimal, expensesAmount: Decimal) throws -> MonthlyBudgetOverview {
+    private func makeOverview(startingAmount: Decimal, expensesAmount: Decimal) throws -> MonthlyBudgetOverview {
         let date = Date.with(year: 2000, month: 1, day: 1)!
 
         let budget = try Budget(
@@ -21,7 +21,21 @@ final class MonthlyBudgetOverviewTests: XCTestCase {
             kind: .expense,
             name: "Name",
             icon: .default,
-            monthlyAmount: .value(budgetAmount)
+            monthlyAmount: .value(abs(startingAmount))
+        )
+
+        let startingExpense = try! Transaction(
+            id: .init(),
+            description: nil,
+            date: date,
+            amounts: [
+                .init(
+                    amount: .value(startingAmount < 0 ? abs(startingAmount) * 2 : 0),
+                    budgetKind: .expense,
+                    budgetIdentifier: budget.id,
+                    sliceIdentifier: budget.slices[0].id
+                )
+            ]
         )
 
         let expense = try! Transaction(
@@ -41,31 +55,31 @@ final class MonthlyBudgetOverviewTests: XCTestCase {
         return MonthlyBudgetOverview(
             month: 1,
             budget: budget,
-            transactions: [expense]
+            transactions: [startingExpense, expense]
         )
     }
 
     // MARK: Tests
 
     func testRemainingAmount() throws {
-        var overview = try makeOverview(budgetAmount: 100, expensesAmount: 25)
+        var overview = try makeOverview(startingAmount: 100, expensesAmount: 25)
         XCTAssertEqual(overview.remainingAmount, .value(75))
 
-        overview = try makeOverview(budgetAmount: 10, expensesAmount: 100)
+        overview = try makeOverview(startingAmount: 10, expensesAmount: 100)
         XCTAssertEqual(overview.remainingAmount, .value(-90))
 
-        overview = try makeOverview(budgetAmount: -100, expensesAmount: 100)
+        overview = try makeOverview(startingAmount: -100, expensesAmount: 100)
         XCTAssertEqual(overview.remainingAmount, .value(-200))
     }
 
     func testRemainingAmountPercentage() throws {
-        var overview = try makeOverview(budgetAmount: 100, expensesAmount: 25)
-        XCTAssertEqual(overview.remainingAmountPercentage, 0.75)
+        var overview = try makeOverview(startingAmount: 100, expensesAmount: 25)
+        XCTAssertEqual(overview.amountPercentage, 0.75)
 
-        overview = try makeOverview(budgetAmount: 10, expensesAmount: 100)
-        XCTAssertEqual(overview.remainingAmountPercentage, 0)
+        overview = try makeOverview(startingAmount: 10, expensesAmount: 100)
+        XCTAssertEqual(overview.amountPercentage, -9.0)
 
-        overview = try makeOverview(budgetAmount: -100, expensesAmount: 100)
-        XCTAssertEqual(overview.remainingAmountPercentage, 0)
+        overview = try makeOverview(startingAmount: -100, expensesAmount: 100)
+        XCTAssertEqual(overview.amountPercentage, -2.0)
     }
 }
