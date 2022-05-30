@@ -35,16 +35,10 @@ struct YearlyBudgetOverview: Identifiable {
     func monthlyOverviews(month: Int) -> [MonthlyBudgetOverview] {
         return budgets
             .compactMap { budget -> MonthlyBudgetOverview? in
-                let budgetSlicesIdentifiers = Set(budget.slices.map(\.id))
-                let budgetTransactions = transactions.filter { transaction in
-                    let transactionSlicesIdentifiers = Set(transaction.amounts.map(\.sliceIdentifier))
-                    return !budgetSlicesIdentifiers.intersection(transactionSlicesIdentifiers).isEmpty
-                }
-
-                return MonthlyBudgetOverview(month: month, budget: budget, transactions: budgetTransactions)
+                MonthlyBudgetOverview(month: month, budget: budget, transactions: transactions)
             }
-            .sorted {
-                $0.transactionsInMonth.totalAmount > $1.transactionsInMonth.totalAmount
+            .sorted { lhs, rhs in
+                lhs.transactionsInMonth.totalAmount > rhs.transactionsInMonth.totalAmount
             }
     }
 

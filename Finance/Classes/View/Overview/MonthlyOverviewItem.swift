@@ -91,6 +91,8 @@ struct MonthlyOverviewItem: View {
             return .orange
         case 0.66...1.00:
             return .green
+        case ..<0:
+            return .gray.opacity(0.2)
         default:
             return .indigo
         }

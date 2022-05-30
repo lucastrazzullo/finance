@@ -62,6 +62,10 @@ struct MonthlyBudgetOverview: Identifiable {
     init(month: Int, budget: Budget, transactions: [Transaction]) {
         self.month = month
         self.budget = budget
-        self.transactions = transactions
+        self.transactions = transactions.filter {
+            $0.amounts.first {
+                $0.budgetIdentifier == budget.id
+            } != nil
+        }
     }
 }

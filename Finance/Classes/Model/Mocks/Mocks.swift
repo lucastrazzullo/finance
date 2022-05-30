@@ -95,19 +95,19 @@ enum Mocks {
         let date = Date.with(year: year, month: 1)!
         return [
             try! Transaction(id: .init(), description: nil, date: date, amounts: [
-                .init(amount: .value(100), budgetKind: .expense, budgetIdentifier: expenseBudgets[0].id, sliceIdentifier: expenseBudgets[0].slices[0].id)
+                .init(amount: .value(100), budgetKind: expenseBudgets[0].kind, budgetIdentifier: expenseBudgets[0].id, sliceIdentifier: expenseBudgets[0].slices[0].id)
             ]),
             try! Transaction(id: .init(), description: nil, date: date, amounts: [
-                .init(amount: .value(100), budgetKind: .expense, budgetIdentifier: expenseBudgets[0].id, sliceIdentifier: expenseBudgets[0].slices[1].id)
+                .init(amount: .value(100), budgetKind: expenseBudgets[0].kind, budgetIdentifier: expenseBudgets[0].id, sliceIdentifier: expenseBudgets[0].slices[1].id)
             ]),
             try! Transaction(id: .init(), description: nil, date: date, amounts: [
-                .init(amount: .value(100), budgetKind: .expense, budgetIdentifier: expenseBudgets[0].id, sliceIdentifier: expenseBudgets[0].slices[2].id)
+                .init(amount: .value(100), budgetKind: expenseBudgets[0].kind, budgetIdentifier: expenseBudgets[0].id, sliceIdentifier: expenseBudgets[0].slices[2].id)
             ]),
             try! Transaction(id: .init(), description: nil, date: date, amounts: [
-                .init(amount: .value(100), budgetKind: .expense, budgetIdentifier: expenseBudgets[1].id, sliceIdentifier: expenseBudgets[1].slices[0].id)
+                .init(amount: .value(100), budgetKind: expenseBudgets[0].kind, budgetIdentifier: expenseBudgets[1].id, sliceIdentifier: expenseBudgets[1].slices[0].id)
             ]),
             try! Transaction(id: .init(), description: nil, date: date, amounts: [
-                .init(amount: .value(100), budgetKind: .expense, budgetIdentifier: expenseBudgets[1].id, sliceIdentifier: expenseBudgets[1].slices[1].id)
+                .init(amount: .value(100), budgetKind: expenseBudgets[0].kind, budgetIdentifier: expenseBudgets[1].id, sliceIdentifier: expenseBudgets[1].slices[1].id)
             ])
         ]
     }()
