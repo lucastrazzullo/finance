@@ -21,7 +21,6 @@ protocol FinanceStorageHandler: AnyObject {
 @MainActor final class FinanceViewModel: ObservableObject {
 
     @Published var yearlyOverview: YearlyBudgetOverview
-
     @Published var selectedMonth: Int = Calendar.current.component(.month, from: .now)
 
     @Published var isAddNewTransactionPresented: Bool = false

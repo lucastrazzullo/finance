@@ -21,7 +21,11 @@ struct FinanceView: View {
                 }
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
-                    makeToolbar(titlePrefix: "Overview", showsMonthPicker: true, showsMonth: false)
+                    makeToolbar(
+                        title: "Overview \(viewModel.yearlyOverview.name)",
+                        subtitle: "\(viewModel.yearlyOverview.year) / \(viewModel.month)", 
+                        showsMonthPicker: true
+                    )
                 }
             }
             .tabItem {
@@ -33,7 +37,11 @@ struct FinanceView: View {
                 makeBudgetsListView()
                     .navigationBarTitleDisplayMode(.inline)
                     .toolbar {
-                        makeToolbar(titlePrefix: "Budgets", showsMonthPicker: false, showsMonth: false)
+                        makeToolbar(
+                            title: "Budgets \(viewModel.yearlyOverview.name)",
+                            subtitle: "\(viewModel.yearlyOverview.year)",
+                            showsMonthPicker: false
+                        )
                     }
             }
             .tabItem {
@@ -45,7 +53,11 @@ struct FinanceView: View {
                 makeTransactionsListView(transactions: viewModel.yearlyOverview.transactions)
                     .navigationBarTitleDisplayMode(.inline)
                     .toolbar {
-                        makeToolbar(titlePrefix: "Transactions", showsMonthPicker: false, showsMonth: false)
+                        makeToolbar(
+                            title: "Transactions \(viewModel.yearlyOverview.name)",
+                            subtitle: "\(viewModel.yearlyOverview.year)",
+                            showsMonthPicker: false
+                        )
                     }
             }
             .tabItem {
@@ -102,7 +114,11 @@ struct FinanceView: View {
                         )
                         .navigationBarTitleDisplayMode(.inline)
                         .toolbar {
-                            makeToolbar(titlePrefix: "Expenses", showsMonthPicker: true, showsMonth: true)
+                            makeToolbar(
+                                title: "Transactions \(monthlyOverview.name)",
+                                subtitle: "\(viewModel.yearlyOverview.year) / \(viewModel.month)",
+                                showsMonthPicker: true
+                            )
                         }
                     },
                     label: {
@@ -145,22 +161,14 @@ struct FinanceView: View {
 
     // MARK: Private builder methods - Toolbar
 
-    @ToolbarContentBuilder private func makeToolbar(titlePrefix: String, showsMonthPicker: Bool, showsMonth: Bool) -> some ToolbarContent {
+    @ToolbarContentBuilder private func makeToolbar(title: String, subtitle: String?, showsMonthPicker: Bool) -> some ToolbarContent {
 
         ToolbarItem(placement: .principal) {
-            let title = "\(titlePrefix) \(viewModel.yearlyOverview.name)"
-            let year = String(viewModel.yearlyOverview.year)
-
             VStack {
                 Text(title).font(.title2.bold())
 
-                HStack(spacing: 6) {
-                    Text(year).font(.caption)
-
-                    if showsMonth {
-                        Text("›")
-                        Text(viewModel.month).font(.caption.bold())
-                    }
+                if let subtitle = subtitle {
+                    Text(subtitle).font(.caption)
                 }
             }
         }
