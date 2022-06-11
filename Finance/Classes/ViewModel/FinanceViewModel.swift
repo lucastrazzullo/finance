@@ -20,7 +20,7 @@ protocol FinanceStorageHandler: AnyObject {
 
 @MainActor final class FinanceViewModel: ObservableObject {
 
-    @Published var yearlyOverview: YearlyBudgetOverview
+    @Published var yearlyOverview: YearlyOverview
     @Published var selectedMonth: Int = Calendar.current.component(.month, from: .now)
 
     @Published var isAddNewTransactionPresented: Bool = false
@@ -30,18 +30,18 @@ protocol FinanceStorageHandler: AnyObject {
         return Calendar.current.shortMonthSymbols[selectedMonth - 1]
     }
 
-    var monthlyOverviews: [MonthlyBudgetOverview] {
-        return yearlyOverview.monthlyOverviews(month: selectedMonth)
+    var budgetOverviews: [BudgetOverview] {
+        return yearlyOverview.budgetOverviews(month: selectedMonth)
     }
 
-    var monthlyOverviewsWithLowestAvailability: [MonthlyBudgetOverview] {
-        return yearlyOverview.monthlyOverviews(month: selectedMonth)
+    var budgetOverviewsWithLowestAvailability: [BudgetOverview] {
+        return yearlyOverview.budgetOverviews(month: selectedMonth)
             .filter({ $0.remainingAmount <= .value(100) })
             .sorted(by: { $0.remainingAmount < $1.remainingAmount })
     }
 
-    var monthlyProspects: [MonthlyProspect] {
-        return yearlyOverview.monthlyProspects()
+    var monthlyOverviews: [MonthlyOverview] {
+        return yearlyOverview.monthlyOverviews()
     }
 
     private let storageHandler: FinanceStorageHandler
@@ -50,7 +50,7 @@ protocol FinanceStorageHandler: AnyObject {
 
     init(year: Int, openingBalance: MoneyValue, storageHandler: FinanceStorageHandler) {
         self.storageHandler = storageHandler
-        self.yearlyOverview = YearlyBudgetOverview(
+        self.yearlyOverview = YearlyOverview(
             name: "Amsterdam",
             year: year,
             openingBalance: openingBalance,

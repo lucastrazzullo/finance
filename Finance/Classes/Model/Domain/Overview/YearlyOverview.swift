@@ -1,5 +1,5 @@
 //
-//  YearlyBudgetOverview.swift
+//  YearlyOverview.swift
 //  Finance
 //
 //  Created by Luca Strazzullo on 07/02/2022.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct YearlyBudgetOverview: Identifiable {
+struct YearlyOverview: Identifiable {
 
     let id: UUID = .init()
     let name: String
@@ -20,32 +20,31 @@ struct YearlyBudgetOverview: Identifiable {
     // MARK: Object life cycle
 
     init(name: String, year: Int, openingBalance: MoneyValue, budgets: [Budget], transactions: [Transaction]) {
-        let budgets = budgets.filter { $0.year == year }
-        let transactions = transactions.filter { $0.date.year == year }
+        self.budgets = budgets.filter { $0.year == year }
+        self.transactions = transactions.filter { $0.date.year == year }
+
 
         self.name = name
         self.year = year
         self.openingBalance = openingBalance
-        self.budgets = budgets
-        self.transactions = transactions
     }
 
     // MARK: Getters
 
-    func monthlyOverviews(month: Int) -> [MonthlyBudgetOverview] {
+    func budgetOverviews(month: Int) -> [BudgetOverview] {
         return budgets
-            .compactMap { budget -> MonthlyBudgetOverview? in
-                MonthlyBudgetOverview(month: month, budget: budget, transactions: transactions)
+            .compactMap { budget -> BudgetOverview? in
+                BudgetOverview(month: month, budget: budget, transactions: transactions)
             }
             .sorted { lhs, rhs in
                 lhs.transactionsInMonth.totalAmount > rhs.transactionsInMonth.totalAmount
             }
     }
 
-    func monthlyProspects() -> [MonthlyProspect] {
+    func monthlyOverviews() -> [MonthlyOverview] {
         return (1...12)
-            .compactMap { month -> MonthlyProspect? in
-                return MonthlyProspect(year: year, month: month, openingYearBalance: openingBalance, transactions: transactions, budgets: budgets)
+            .compactMap { month -> MonthlyOverview? in
+                return MonthlyOverview(month: month, openingBalance: openingBalance, transactions: transactions, budgets: budgets)
             }
     }
 
@@ -56,7 +55,7 @@ struct YearlyBudgetOverview: Identifiable {
     }
 
     mutating func append(budget: Budget) throws {
-        try YearlyBudgetOverviewValidator.willAdd(budget: budget, to: budgets, year: year)
+        try YearlyOverviewValidator.willAdd(budget: budget, to: budgets, year: year)
         self.budgets.append(budget)
     }
 
@@ -90,7 +89,7 @@ struct YearlyBudgetOverview: Identifiable {
     }
 
     mutating func append(transactions: [Transaction]) throws {
-        try YearlyBudgetOverviewValidator.willAdd(transactions: transactions, for: year)
+        try YearlyOverviewValidator.willAdd(transactions: transactions, for: year)
         self.transactions.append(contentsOf: transactions)
     }
 

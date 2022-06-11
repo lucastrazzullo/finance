@@ -1,5 +1,5 @@
 //
-//  MonthlyBudgetOverview.swift
+//  BudgetOverview.swift
 //  Finance
 //
 //  Created by Luca Strazzullo on 07/04/2022.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct MonthlyBudgetOverview: Identifiable {
+struct BudgetOverview: Identifiable {
 
     var id: UUID {
         budget.id

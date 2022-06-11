@@ -12,7 +12,7 @@ final class MonthlyBudgetOverviewTests: XCTestCase {
 
     // MARK: Factories
 
-    private func makeOverview(startingAmount: Decimal, expensesAmount: Decimal) throws -> MonthlyBudgetOverview {
+    private func makeOverview(startingAmount: Decimal, expensesAmount: Decimal) throws -> BudgetOverview {
         let date = Date.with(year: 2000, month: 1, day: 1)!
 
         let budget = try Budget(
@@ -52,7 +52,7 @@ final class MonthlyBudgetOverviewTests: XCTestCase {
             ]
         )
 
-        return MonthlyBudgetOverview(
+        return BudgetOverview(
             month: 1,
             budget: budget,
             transactions: [startingExpense, expense]

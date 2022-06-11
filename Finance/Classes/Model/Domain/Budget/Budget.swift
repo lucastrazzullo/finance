@@ -128,6 +128,12 @@ extension Array where Element == Budget {
             return sum + budget.availability(upTo: month)
         }
     }
+
+    func availability(including month: Int) -> MoneyValue {
+        return self.reduce(.zero) { sum, budget in
+            return sum + budget.availability(including: month)
+        }
+    }
 }
 
 extension Array where Element == Budget {

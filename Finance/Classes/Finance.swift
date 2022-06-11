@@ -25,7 +25,7 @@ extension Finance: FinanceStorageHandler {
     }
 
     func add(transactions: [Transaction], for year: Int) async throws {
-        try YearlyBudgetOverviewValidator.willAdd(transactions: transactions, for: year)
+        try YearlyOverviewValidator.willAdd(transactions: transactions, for: year)
         for transaction in transactions {
             try await storageProvider.add(transaction: transaction)
         }
@@ -47,7 +47,7 @@ extension Finance: FinanceStorageHandler {
 
     func add(budget: Budget, for year: Int) async throws {
         let budgets = try await fetchBudgets(year: year)
-        try YearlyBudgetOverviewValidator.willAdd(budget: budget, to: budgets, year: year)
+        try YearlyOverviewValidator.willAdd(budget: budget, to: budgets, year: year)
         try await storageProvider.add(budget: budget)
     }
 
@@ -73,7 +73,7 @@ extension Finance: BudgetStorageHandler {
     func update(name: String, icon: SystemIcon, in budget: Budget) async throws {
         try BudgetValidator.canUse(name: name)
         let budgets = try await storageProvider.fetchBudgets(year: budget.year)
-        try YearlyBudgetOverviewValidator.willUpdate(name: name, for: budget, in: budgets)
+        try YearlyOverviewValidator.willUpdate(name: name, for: budget, in: budgets)
         try await storageProvider.update(name: name, iconSystemName: icon.rawValue, inBudgetWith: budget.id)
     }
 }

@@ -15,18 +15,15 @@ struct FinanceView: View {
     var body: some View {
         TabView {
             NavigationView {
-                VStack(alignment: .center, spacing: 0) {
-                    makeMonthlyProspectView()
-                    makeMonthlyOverviewsListView()
-                }
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar {
-                    makeToolbar(
-                        title: "Overview \(viewModel.yearlyOverview.name)",
-                        subtitle: "\(viewModel.yearlyOverview.year) / \(viewModel.month)",
-                        showsMonthPicker: true
-                    )
-                }
+                makeBudgetOverviewsListView()
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        makeToolbar(
+                            title: "Overview \(viewModel.yearlyOverview.name)",
+                            subtitle: "\(viewModel.yearlyOverview.year) / \(viewModel.month)",
+                            showsMonthPicker: true
+                        )
+                    }
             }
             .tabItem {
                 Label("Overview", systemImage: "list.bullet.below.rectangle")
@@ -87,21 +84,10 @@ struct FinanceView: View {
 
     // MARK: Private builder methods - Tabs
 
-    @ViewBuilder private func makeMonthlyProspectView() -> some View {
-        if viewModel.monthlyProspects.isEmpty {
-            EmptyView()
-        } else {
-            MonthlyProspectsListView(
-                selectedMonth: $viewModel.selectedMonth,
-                prospects: viewModel.monthlyProspects
-            )
-        }
-    }
-
-    @ViewBuilder private func makeMonthlyOverviewsListView() -> some View {
-        MontlyOverviewsListView(
-            monthlyOverviews: viewModel.monthlyOverviews,
-            monthlyOverviewsWithLowestAvailability: viewModel.monthlyOverviewsWithLowestAvailability,
+    @ViewBuilder private func makeBudgetOverviewsListView() -> some View {
+        BudgetOverviewsListView(
+            monthlyOverviews: viewModel.budgetOverviews,
+            monthlyOverviewsWithLowestAvailability: viewModel.budgetOverviewsWithLowestAvailability,
             item: { monthlyOverview in
                 NavigationLink(
                     destination: {
@@ -122,7 +108,7 @@ struct FinanceView: View {
                         }
                     },
                     label: {
-                        MonthlyOverviewItem(overview: monthlyOverview)
+                        BudgetOverviewItem(overview: monthlyOverview)
                     }
                 )
             }

@@ -1,5 +1,5 @@
 //
-//  YearlyBudgetOverviewValidator.swift
+//  YearlyOverviewValidator.swift
 //  Finance
 //
 //  Created by Luca Strazzullo on 22/04/2022.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum YearlyBudgetOverviewValidator {
+enum YearlyOverviewValidator {
 
     static func willAdd(budget: Budget, to list: [Budget], year: Int) throws {
         guard budget.year == year else {

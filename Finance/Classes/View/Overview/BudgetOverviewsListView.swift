@@ -1,5 +1,5 @@
 //
-//  MontlyOverviewsListView.swift
+//  BudgetOverviewsListView.swift
 //  Finance
 //
 //  Created by Luca Strazzullo on 07/04/2022.
@@ -7,14 +7,14 @@
 
 import SwiftUI
 
-struct MontlyOverviewsListView<Item: View>: View {
+struct BudgetOverviewsListView<Item: View>: View {
 
     private let maximumNumberOfOverviews: Int = 3
 
-    let monthlyOverviews: [MonthlyBudgetOverview]
-    let monthlyOverviewsWithLowestAvailability: [MonthlyBudgetOverview]
+    let monthlyOverviews: [BudgetOverview]
+    let monthlyOverviewsWithLowestAvailability: [BudgetOverview]
 
-    @ViewBuilder var item: (MonthlyBudgetOverview) -> Item
+    @ViewBuilder var item: (BudgetOverview) -> Item
 
     @State private var showAllOverviews: Bool = false
 
@@ -60,11 +60,11 @@ struct MontlyOverviewsListView<Item: View>: View {
 
 struct OverviewView_Previews: PreviewProvider {
     static var previews: some View {
-        MontlyOverviewsListView(
-            monthlyOverviews: Mocks.yearlyOverview.monthlyOverviews(month: 1),
-            monthlyOverviewsWithLowestAvailability: Mocks.yearlyOverview.monthlyOverviews(month: 1),
+        BudgetOverviewsListView(
+            monthlyOverviews: Mocks.yearlyOverview.budgetOverviews(month: 1),
+            monthlyOverviewsWithLowestAvailability: Mocks.yearlyOverview.budgetOverviews(month: 1),
             item: { overview in
-                MonthlyOverviewItem(overview: overview)
+                BudgetOverviewItem(overview: overview)
             }
         )
     }

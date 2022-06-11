@@ -12,8 +12,8 @@ final class YearlyBudgetOverviewTests: XCTestCase {
 
     // MARK: Factories
 
-    private func makeOverview(year: Int, budgets: [Budget], expenses: [Transaction]) throws -> YearlyBudgetOverview {
-        return YearlyBudgetOverview(name: "Name", year: year, openingBalance: .zero, budgets: budgets, transactions: expenses)
+    private func makeOverview(year: Int, budgets: [Budget], expenses: [Transaction]) throws -> YearlyOverview {
+        return YearlyOverview(name: "Name", year: year, openingBalance: .zero, budgets: budgets, transactions: expenses)
     }
 
     private func makeBudget(year: Int, name: String = "Name", slices: [BudgetSlice]? = nil) throws -> Budget {
@@ -121,7 +121,7 @@ final class YearlyBudgetOverviewTests: XCTestCase {
         let transaction1 = makeTransaction(year: 2000, month: 1, budgetId: budget.id, budgetKind: budget.kind, budgetSliceId: slice.id, amount: .value(50))
         let transaction2 = makeTransaction(year: 2000, month: 2, budgetId: budget.id, budgetKind: budget.kind, budgetSliceId: slice.id, amount: .value(50))
 
-        let yearlyOverview = YearlyBudgetOverview(name: "Name", year: 2000, openingBalance: .zero, budgets: [budget], transactions: [transaction1, transaction2])
+        let yearlyOverview = YearlyOverview(name: "Name", year: 2000, openingBalance: .zero, budgets: [budget], transactions: [transaction1, transaction2])
 
         // Assert
 
@@ -130,7 +130,7 @@ final class YearlyBudgetOverviewTests: XCTestCase {
         // Starting amount: 100 budget - 0 transactions in months before >> 100
         // Remaining amount: 100 starting amount - 50 transaction in month 01 >> 50
 
-        let montlyOverview_month1 = try XCTUnwrap(yearlyOverview.monthlyOverviews(month: 1).first { $0.name == budget.name })
+        let montlyOverview_month1 = try XCTUnwrap(yearlyOverview.budgetOverviews(month: 1).first { $0.name == budget.name })
         XCTAssertEqual(montlyOverview_month1.thresholdAmount, .value(100))
         XCTAssertEqual(montlyOverview_month1.remainingAmount, .value(50))
 
@@ -140,7 +140,7 @@ final class YearlyBudgetOverviewTests: XCTestCase {
         // Starting amount: 200 budget - 50 transactions in months before >> 150
         // Remaining amount: 150 starting amount - 50 transaction in month 02 >> 100
 
-        let montlyOverview_month2 = try XCTUnwrap(yearlyOverview.monthlyOverviews(month: 2).first { $0.name == budget.name })
+        let montlyOverview_month2 = try XCTUnwrap(yearlyOverview.budgetOverviews(month: 2).first { $0.name == budget.name })
         XCTAssertEqual(montlyOverview_month2.thresholdAmount, .value(150))
         XCTAssertEqual(montlyOverview_month2.remainingAmount, .value(100))
 
@@ -150,7 +150,7 @@ final class YearlyBudgetOverviewTests: XCTestCase {
         // Starting amount: 300 budget - 100 transactions in months before >> 200
         // Remaining amount: 200 starting amount - 0 transaction in month 02 >> 200
 
-        let montlyOverview_month3 = try XCTUnwrap(yearlyOverview.monthlyOverviews(month: 3).first { $0.name == budget.name })
+        let montlyOverview_month3 = try XCTUnwrap(yearlyOverview.budgetOverviews(month: 3).first { $0.name == budget.name })
         XCTAssertEqual(montlyOverview_month3.thresholdAmount, .value(200))
         XCTAssertEqual(montlyOverview_month3.remainingAmount, .value(200))
     }
@@ -159,9 +159,9 @@ final class YearlyBudgetOverviewTests: XCTestCase {
         let transaction1 = makeTransaction(year: 2000, month: 1, amount: .value(50))
         let transaction2 = makeTransaction(year: 2000, month: 1, amount: .value(50))
         let expenses = [transaction1, transaction2]
-        let yearlyOverview = YearlyBudgetOverview(name: "Name", year: 2000, openingBalance: .zero, budgets: [], transactions: expenses)
+        let yearlyOverview = YearlyOverview(name: "Name", year: 2000, openingBalance: .zero, budgets: [], transactions: expenses)
 
-        XCTAssertTrue(yearlyOverview.monthlyOverviews(month: 1).isEmpty)
+        XCTAssertTrue(yearlyOverview.budgetOverviews(month: 1).isEmpty)
     }
 
 }
