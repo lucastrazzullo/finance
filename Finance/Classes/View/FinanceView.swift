@@ -16,28 +16,42 @@ struct FinanceView: View {
         TabView {
             NavigationView {
                 VStack(alignment: .leading) {
-                    HStack {
-                        Text("Balance")
-                        AmountView(amount: viewModel.currentBalance)
-                            .font(.headline)
-                    }
-                    .padding()
-                    .background(
-                        Capsule(style: .circular)
-                            .foregroundColor(.yellow)
-                    )
-                    .padding(.top, 24)
-                    .padding(.horizontal)
-
-                    makeBudgetOverviewsListView()
-                        .navigationBarTitleDisplayMode(.inline)
-                        .toolbar {
-                            makeToolbar(
-                                title: "Overview \(viewModel.yearlyOverview.name)",
-                                subtitle: "\(viewModel.yearlyOverview.year) / \(viewModel.month)",
-                                showsMonthPicker: true
+                    BalanceOverviewView(currentBalance: viewModel.currentBalance)
+                    BudgetOverviewsView(
+                        itemBuilder: { budgetOverview in
+                            NavigationLink(
+                                destination: {
+                                    TransactionsListView(
+                                        viewModel: TransactionsListViewModel(
+                                            transactions: budgetOverview.transactionsInMonth,
+                                            addTransactions: { self.viewModel.isAddNewTransactionPresented = true },
+                                            deleteTransactions: viewModel.delete(transactionsWith:)
+                                        )
+                                    )
+                                    .navigationBarTitleDisplayMode(.inline)
+                                    .toolbar {
+                                        makeToolbar(
+                                            title: "Transactions \(budgetOverview.name)",
+                                            subtitle: "\(viewModel.yearlyOverview.year) / \(viewModel.month)",
+                                            showsMonthPicker: true
+                                        )
+                                    }
+                                },
+                                label: {
+                                    BudgetOverviewItem(overview: budgetOverview)
+                                }
                             )
-                        }
+                        },
+                        budgetOverviews: viewModel.budgetOverviews
+                    )
+                }
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    makeToolbar(
+                        title: "Overview \(viewModel.yearlyOverview.name)",
+                        subtitle: "\(viewModel.yearlyOverview.year) / \(viewModel.month)",
+                        showsMonthPicker: true
+                    )
                 }
             }
             .tabItem {
@@ -46,15 +60,31 @@ struct FinanceView: View {
             }
 
             NavigationView {
-                makeBudgetsListView()
-                    .navigationBarTitleDisplayMode(.inline)
-                    .toolbar {
-                        makeToolbar(
-                            title: "Budgets \(viewModel.yearlyOverview.name)",
-                            subtitle: "\(viewModel.yearlyOverview.year)",
-                            showsMonthPicker: false
+                BudgetsListView(
+                    itemBuilder: { budget in
+                        NavigationLink(
+                            destination: BudgetView(
+                                viewModel: BudgetViewModel(budget: budget, storageHandler: finance)
+                            ),
+                            label: {
+                                BudgetsListItem(budget: budget)
+                            }
                         )
-                    }
+                    },
+                    viewModel: BudgetsListViewModel(
+                        budgets: viewModel.yearlyOverview.budgets,
+                        addBudgets: { self.viewModel.isAddNewBudgetPresented = true },
+                        deleteBudgets: viewModel.delete(budgetsWith:)
+                    )
+                )
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    makeToolbar(
+                        title: "Budgets \(viewModel.yearlyOverview.name)",
+                        subtitle: "\(viewModel.yearlyOverview.year)",
+                        showsMonthPicker: false
+                    )
+                }
             }
             .tabItem {
                 Label("Budgets", systemImage: "aspectratio.fill")
@@ -62,15 +92,21 @@ struct FinanceView: View {
             }
 
             NavigationView {
-                makeTransactionsListView(transactions: viewModel.yearlyOverview.transactions)
-                    .navigationBarTitleDisplayMode(.inline)
-                    .toolbar {
-                        makeToolbar(
-                            title: "Transactions \(viewModel.yearlyOverview.name)",
-                            subtitle: "\(viewModel.yearlyOverview.year)",
-                            showsMonthPicker: false
-                        )
-                    }
+                TransactionsListView(
+                    viewModel: TransactionsListViewModel(
+                        transactions: viewModel.yearlyOverview.transactions,
+                        addTransactions: { self.viewModel.isAddNewTransactionPresented = true },
+                        deleteTransactions: viewModel.delete(transactionsWith:)
+                    )
+                )
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    makeToolbar(
+                        title: "Transactions \(viewModel.yearlyOverview.name)",
+                        subtitle: "\(viewModel.yearlyOverview.year)",
+                        showsMonthPicker: false
+                    )
+                }
             }
             .tabItem {
                 Label("Transactions", systemImage: "arrow.left.arrow.right.square")
@@ -95,69 +131,6 @@ struct FinanceView: View {
         .refreshable {
             try? await viewModel.load()
         }
-    }
-
-    // MARK: Private builder methods - Tabs
-
-    @ViewBuilder private func makeBudgetOverviewsListView() -> some View {
-        BudgetOverviewsListView(
-            monthlyOverviews: viewModel.budgetOverviews,
-            monthlyOverviewsWithLowestAvailability: viewModel.budgetOverviewsWithLowestAvailability,
-            item: { monthlyOverview in
-                NavigationLink(
-                    destination: {
-                        TransactionsListView(
-                            viewModel: TransactionsListViewModel(
-                                transactions: monthlyOverview.transactionsInMonth,
-                                addTransactions: { self.viewModel.isAddNewTransactionPresented = true },
-                                deleteTransactions: viewModel.delete(transactionsWith:)
-                            )
-                        )
-                        .navigationBarTitleDisplayMode(.inline)
-                        .toolbar {
-                            makeToolbar(
-                                title: "Transactions \(monthlyOverview.name)",
-                                subtitle: "\(viewModel.yearlyOverview.year) / \(viewModel.month)",
-                                showsMonthPicker: true
-                            )
-                        }
-                    },
-                    label: {
-                        BudgetOverviewItem(overview: monthlyOverview)
-                    }
-                )
-            }
-        )
-    }
-
-    @ViewBuilder private func makeBudgetsListView() -> some View {
-        BudgetsListView(
-            viewModel: BudgetsListViewModel(
-                budgets: viewModel.yearlyOverview.budgets,
-                addBudgets: { self.viewModel.isAddNewBudgetPresented = true },
-                deleteBudgets: viewModel.delete(budgetsWith:)
-            ),
-            item: { budget in
-                NavigationLink(
-                    destination: BudgetView(
-                        viewModel: BudgetViewModel(budget: budget, storageHandler: finance)
-                    ),
-                    label: {
-                        BudgetsListItem(budget: budget)
-                    }
-                )
-            }
-        )
-    }
-
-    @ViewBuilder private func makeTransactionsListView(transactions: [Transaction]) -> some View {
-        TransactionsListView(
-            viewModel: TransactionsListViewModel(
-                transactions: transactions,
-                addTransactions: { self.viewModel.isAddNewTransactionPresented = true },
-                deleteTransactions: viewModel.delete(transactionsWith:)
-            )
-        )
     }
 
     // MARK: Private builder methods - Toolbar
@@ -204,6 +177,29 @@ struct FinanceView: View {
             openingBalance: .zero,
             storageHandler: finance
         )
+    }
+}
+
+// MARK: - Views
+
+private struct BudgetOverviewsView<Item: View>: View {
+
+    @ViewBuilder let itemBuilder: (BudgetOverview) -> Item
+
+    let budgetOverviews: [BudgetOverview]
+
+    var body: some View {
+        BudgetOverviewsListView(
+            budgetOverviews: budgetOverviews,
+            budgetOverviewsWithLowestAvailability: budgetOverviewsWithLowestAvailability,
+            item: { budgetOverview in itemBuilder(budgetOverview) }
+        )
+    }
+
+    private var budgetOverviewsWithLowestAvailability: [BudgetOverview] {
+        budgetOverviews
+            .filter({ $0.remainingAmount <= .value(100) })
+            .sorted(by: { $0.remainingAmount < $1.remainingAmount })
     }
 }
 

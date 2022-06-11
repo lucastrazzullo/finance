@@ -11,8 +11,8 @@ struct BudgetOverviewsListView<Item: View>: View {
 
     private let maximumNumberOfOverviews: Int = 3
 
-    let monthlyOverviews: [BudgetOverview]
-    let monthlyOverviewsWithLowestAvailability: [BudgetOverview]
+    let budgetOverviews: [BudgetOverview]
+    let budgetOverviewsWithLowestAvailability: [BudgetOverview]
 
     @ViewBuilder var item: (BudgetOverview) -> Item
 
@@ -20,21 +20,21 @@ struct BudgetOverviewsListView<Item: View>: View {
 
     var body: some View {
         List {
-            if monthlyOverviews.count > 0 {
+            if budgetOverviews.count > 0 {
                 Section(header: Text("Overviews")) {
                     if showAllOverviews {
-                        ForEach(monthlyOverviews) { overview in
+                        ForEach(budgetOverviews) { overview in
                             item(overview)
                                 .listRowSeparator(.hidden)
                         }
                     } else {
-                        ForEach(monthlyOverviews[0..<min(maximumNumberOfOverviews, monthlyOverviews.count)]) { overview in
+                        ForEach(budgetOverviews[0..<min(maximumNumberOfOverviews, budgetOverviews.count)]) { overview in
                             item(overview)
                                 .listRowSeparator(.hidden)
                         }
                     }
 
-                    if monthlyOverviews.count > maximumNumberOfOverviews && !monthlyOverviewsWithLowestAvailability.isEmpty {
+                    if budgetOverviews.count > maximumNumberOfOverviews && !budgetOverviewsWithLowestAvailability.isEmpty {
                         Button(action: { showAllOverviews.toggle() }) {
                             Label(
                                 showAllOverviews ? "Show less" : "Show more",
@@ -45,9 +45,9 @@ struct BudgetOverviewsListView<Item: View>: View {
                 }
             }
 
-            if monthlyOverviewsWithLowestAvailability.count > 0 {
+            if budgetOverviewsWithLowestAvailability.count > 0 {
                 Section(header: Text("Lowest budgets this month")) {
-                    ForEach(monthlyOverviewsWithLowestAvailability) { overview in
+                    ForEach(budgetOverviewsWithLowestAvailability) { overview in
                         item(overview)
                             .listRowSeparator(.hidden)
                     }
@@ -61,8 +61,8 @@ struct BudgetOverviewsListView<Item: View>: View {
 struct OverviewView_Previews: PreviewProvider {
     static var previews: some View {
         BudgetOverviewsListView(
-            monthlyOverviews: Mocks.yearlyOverview.budgetOverviews(month: 1),
-            monthlyOverviewsWithLowestAvailability: Mocks.yearlyOverview.budgetOverviews(month: 1),
+            budgetOverviews: Mocks.yearlyOverview.budgetOverviews(month: 1),
+            budgetOverviewsWithLowestAvailability: Mocks.yearlyOverview.budgetOverviews(month: 1),
             item: { overview in
                 BudgetOverviewItem(overview: overview)
             }

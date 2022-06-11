@@ -9,15 +9,15 @@ import SwiftUI
 
 struct BudgetsListView<Item: View>: View {
 
-    @ObservedObject var viewModel: BudgetsListViewModel
+    @ViewBuilder var itemBuilder: (Budget) -> Item
 
-    @ViewBuilder var item: (Budget) -> Item
+    @ObservedObject var viewModel: BudgetsListViewModel
 
     var body: some View {
         List {
             Section(header: Text("Budgets")) {
                 ForEach(viewModel.budgets) { budget in
-                    item(budget)
+                    itemBuilder(budget)
                         .accessibilityIdentifier(AccessibilityIdentifier.BudgetsListView.budgetLink)
                 }
                 .onDelete { offsets in
@@ -46,12 +46,14 @@ struct BudgetsListView_Previews: PreviewProvider {
     static let budgets = Mocks.expenseBudgets
     static var previews: some View {
         BudgetsListView(
+            itemBuilder: { budget in
+                BudgetsListItem(budget: budget)
+            },
             viewModel: .init(
                 budgets: budgets,
                 addBudgets: {},
                 deleteBudgets: { _ in }
-            ),
-            item: { budget in BudgetsListItem(budget: budget) }
+            )
         )
     }
 }

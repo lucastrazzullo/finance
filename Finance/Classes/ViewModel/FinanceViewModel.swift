@@ -38,12 +38,6 @@ protocol FinanceStorageHandler: AnyObject {
         return yearlyOverview.budgetOverviews(month: selectedMonth)
     }
 
-    var budgetOverviewsWithLowestAvailability: [BudgetOverview] {
-        return yearlyOverview.budgetOverviews(month: selectedMonth)
-            .filter({ $0.remainingAmount <= .value(100) })
-            .sorted(by: { $0.remainingAmount < $1.remainingAmount })
-    }
-
     var monthlyOverviews: [MonthlyOverview] {
         return yearlyOverview.monthlyOverviews()
     }
