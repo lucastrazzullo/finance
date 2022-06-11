@@ -15,15 +15,30 @@ struct FinanceView: View {
     var body: some View {
         TabView {
             NavigationView {
-                makeBudgetOverviewsListView()
-                    .navigationBarTitleDisplayMode(.inline)
-                    .toolbar {
-                        makeToolbar(
-                            title: "Overview \(viewModel.yearlyOverview.name)",
-                            subtitle: "\(viewModel.yearlyOverview.year) / \(viewModel.month)",
-                            showsMonthPicker: true
-                        )
+                VStack(alignment: .leading) {
+                    HStack {
+                        Text("Balance")
+                        AmountView(amount: viewModel.currentBalance)
+                            .font(.headline)
                     }
+                    .padding()
+                    .background(
+                        Capsule(style: .circular)
+                            .foregroundColor(.yellow)
+                    )
+                    .padding(.top, 24)
+                    .padding(.horizontal)
+
+                    makeBudgetOverviewsListView()
+                        .navigationBarTitleDisplayMode(.inline)
+                        .toolbar {
+                            makeToolbar(
+                                title: "Overview \(viewModel.yearlyOverview.name)",
+                                subtitle: "\(viewModel.yearlyOverview.year) / \(viewModel.month)",
+                                showsMonthPicker: true
+                            )
+                        }
+                }
             }
             .tabItem {
                 Label("Overview", systemImage: "list.bullet.below.rectangle")

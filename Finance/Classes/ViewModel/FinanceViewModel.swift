@@ -30,6 +30,10 @@ protocol FinanceStorageHandler: AnyObject {
         return Calendar.current.shortMonthSymbols[selectedMonth - 1]
     }
 
+    var currentBalance: MoneyValue {
+        return yearlyOverview.balance(including: selectedMonth)
+    }
+
     var budgetOverviews: [BudgetOverview] {
         return yearlyOverview.budgetOverviews(month: selectedMonth)
     }

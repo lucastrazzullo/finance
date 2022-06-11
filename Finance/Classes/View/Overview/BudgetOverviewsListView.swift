@@ -34,7 +34,7 @@ struct BudgetOverviewsListView<Item: View>: View {
                         }
                     }
 
-                    if monthlyOverviews.count > maximumNumberOfOverviews {
+                    if monthlyOverviews.count > maximumNumberOfOverviews && !monthlyOverviewsWithLowestAvailability.isEmpty {
                         Button(action: { showAllOverviews.toggle() }) {
                             Label(
                                 showAllOverviews ? "Show less" : "Show more",

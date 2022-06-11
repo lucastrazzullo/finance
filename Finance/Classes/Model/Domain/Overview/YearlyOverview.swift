@@ -31,6 +31,10 @@ struct YearlyOverview: Identifiable {
 
     // MARK: Getters
 
+    func balance(including month: Int) -> MoneyValue {
+        return openingBalance + transactions.totalAmount(including: month)
+    }
+
     func budgetOverviews(month: Int) -> [BudgetOverview] {
         return budgets
             .compactMap { budget -> BudgetOverview? in
